@@ -43,7 +43,7 @@ import { useDataContext } from '@/context/data-context';
 type SortableKeys = 'name' | 'company' | 'email' | 'status' | 'role';
 
 export default function MerchantList({ merchants: initialMerchants, approvalView = false }: { merchants: Merchant[], approvalView?: boolean }) {
-  const { updateMerchantStatus } = useDataContext();
+  const { merchants: contextMerchants, updateMerchantStatus } = useDataContext();
   const [merchants, setMerchants] = React.useState(initialMerchants);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -74,9 +74,13 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
   };
 
   const filteredAndSortedMerchants = React.useMemo(() => {
-    let sortableItems = [...merchants];
+    let sourceData = approvalView ? contextMerchants : merchants;
+    let sortableItems = [...sourceData];
 
-    if (activeTab !== 'all') {
+    if (approvalView) {
+      sortableItems = sortableItems.filter(m => m.status === 'Pending');
+    }
+    else if (activeTab !== 'all') {
       sortableItems = sortableItems.filter(
         (merchant) => merchant.status.toLowerCase() === activeTab
       );
@@ -106,7 +110,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     }
 
     return sortableItems;
-  }, [merchants, searchTerm, sortConfig, activeTab]);
+  }, [merchants, contextMerchants, searchTerm, sortConfig, activeTab, approvalView]);
 
   const getSortIndicator = (key: SortableKeys) => {
     if (sortConfig?.key !== key) {
@@ -236,7 +240,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 <DropdownMenuItem>Edit</DropdownMenuItem>
-                                {merchant.status === 'Pending' && (
+                                {approvalView && merchant.status === 'Pending' && (
                                   <>
                                     <DropdownMenuItem onClick={() => handleStatusChange(merchant.id, 'Active')}>
                                       <CheckCircle className="mr-2 h-4 w-4" />
