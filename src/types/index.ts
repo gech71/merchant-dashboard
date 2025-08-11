@@ -29,9 +29,17 @@ export type Merchant = {
 };
 
 export type SalesRep = {
-  id: string;
+  id:string;
   name: string;
   email: string;
   company: string;
+  status: 'Active' | 'Inactive' | 'Pending';
+};
+
+export type BranchUser = {
+  id: string;
+  name: string;
+  email: string;
+  branch: string;
   status: 'Active' | 'Inactive' | 'Pending';
 };

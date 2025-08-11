@@ -12,6 +12,7 @@ import {
   ChevronDown,
   UserCircle,
   CheckSquare,
+  UserCog,
 } from 'lucide-react';
 
 import {
@@ -42,6 +43,7 @@ import { cn } from '@/lib/utils';
 const NAV_ITEMS = [
   { href: '/dashboard/companies', icon: Building, label: 'Companies' },
   { href: '/dashboard/branches', icon: Home, label: 'Branches' },
+  { href: '/dashboard/branch-users', icon: UserCog, label: 'Branch Users' },
   { href: '/dashboard/merchants', icon: Briefcase, label: 'Merchant Users' },
   { href: '/dashboard/sales-reps', icon: Users, label: 'Sales Reps' },
 ];
@@ -60,7 +62,7 @@ function UserProfile() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className='w-full justify-start gap-2 p-2'
+          className='w-full justify-start gap-2 p-2 text-left'
         >
           <Avatar className="h-8 w-8">
             <AvatarImage src="https://placehold.co/40x40.png" />
@@ -97,10 +99,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   return (
       <div className="flex min-h-screen">
-        <Sidebar collapsible='none'>
+        <Sidebar>
           <SidebarContent className="flex flex-col justify-between">
             <div>
-              <SidebarHeader className="flex items-center justify-between p-4">
+              <SidebarHeader className="flex items-center justify-between p-4 text-left">
                 <div className="flex items-center gap-2">
                   <div
                     className={cn(
@@ -120,7 +122,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     <SidebarMenuButton
                       asChild
                       isActive={pathname === item.href}
-                      className="justify-start"
+                      className="justify-start text-left"
                     >
                       <Link href={item.href}>
                         <item.icon />
@@ -142,7 +144,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     <SidebarMenuButton
                       asChild
                       isActive={pathname === item.href}
-                      className="justify-start"
+                      className="justify-start text-left"
                     >
                       <Link href={item.href}>
                         <item.icon />
