@@ -91,7 +91,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { state } = useSidebar();
 
   return (
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen w-full">
         <Sidebar>
           <SidebarContent className="flex flex-col justify-between">
             <div>
