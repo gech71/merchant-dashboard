@@ -45,14 +45,12 @@ const NAV_ITEMS = [
   { href: '/dashboard/branches', icon: Home, label: 'Branches' },
   { href: '/dashboard/branch-users', icon: UserCog, label: 'Branch Users' },
   { href: '/dashboard/merchants', icon: Briefcase, label: 'Merchant Users' },
-  { href: '/dashboard/sales-reps', icon: Users, label: 'Sales Reps' },
 ];
 
 const APPROVAL_NAV_ITEMS = [
   { href: '/dashboard/approvals/companies', icon: Building, label: 'Companies' },
   { href: '/dashboard/approvals/branches', icon: Home, label: 'Branches' },
   { href: '/dashboard/approvals/merchants', icon: Briefcase, label: 'Merchant Users' },
-  { href: '/dashboard/approvals/sales-reps', icon: Users, label: 'Sales Reps' },
 ]
 
 function UserProfile() {

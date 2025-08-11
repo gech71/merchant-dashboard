@@ -29,14 +29,6 @@ export type Merchant = {
   status: 'Active' | 'Pending' | 'Disabled';
 };
 
-export type SalesRep = {
-  id:string;
-  name: string;
-  email: string;
-  company: string;
-  status: 'Active' | 'Inactive' | 'Pending';
-};
-
 export type BranchUser = {
   id: string;
   name: string;
