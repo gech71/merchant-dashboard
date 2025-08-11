@@ -22,9 +22,6 @@ import { Merchant } from '@/types';
 import { useDataContext } from '@/context/data-context';
 
 const merchantFormSchema = z.object({
-  name: z.string().min(2, 'Full name must be at least 2 characters.'),
-  company: z.string({ required_error: 'Please select a company.' }),
-  email: z.string().email('Please enter a valid email address.'),
   role: z.enum(['Admin', 'Sales'], { required_error: 'Please select a role.' }),
 });
 
@@ -39,14 +36,11 @@ export function EditMerchantForm({
   setOpen: (open: boolean) => void;
 }) {
   const { toast } = useToast();
-  const { companies, merchants, updateMerchant } = useDataContext();
+  const { merchants, updateMerchant } = useDataContext();
 
   const form = useForm<MerchantFormValues>({
     resolver: zodResolver(merchantFormSchema),
     defaultValues: {
-      name: merchant.name,
-      company: merchant.company,
-      email: merchant.email,
       role: merchant.role,
     },
   });
@@ -54,12 +48,12 @@ export function EditMerchantForm({
   function onSubmit(data: MerchantFormValues) {
     if (data.role === 'Admin') {
       const adminExists = merchants.some(
-        (m) => m.id !== merchant.id && m.company === data.company && m.role === 'Admin'
+        (m) => m.id !== merchant.id && m.company === merchant.company && m.role === 'Admin'
       );
       if (adminExists) {
-        form.setError('company', {
+        form.setError('role', {
           type: 'manual',
-          message: `An Admin user already exists for ${data.company}. You can't have more than one.`,
+          message: `An Admin user already exists for ${merchant.company}. You can't have more than one.`,
         });
         return;
       }
@@ -73,7 +67,7 @@ export function EditMerchantForm({
     updateMerchant(updatedMerchant);
     toast({
       title: 'Merchant User Updated',
-      description: `${data.name} has been successfully updated.`,
+      description: `${merchant.name} has been successfully updated.`,
     });
     setOpen(false);
   }
@@ -81,43 +75,20 @@ export function EditMerchantForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Full Name</FormLabel>
-              <FormControl>
-                <Input placeholder="John Doe" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="company"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Company</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a company" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {companies.map((company) => (
-                    <SelectItem key={company.id} value={company.fieldName}>
-                      {company.fieldName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <FormItem>
+            <FormLabel>Full Name</FormLabel>
+            <FormControl>
+                <Input placeholder="John Doe" value={merchant.name} disabled />
+            </FormControl>
+        </FormItem>
+        
+        <FormItem>
+            <FormLabel>Company</FormLabel>
+            <FormControl>
+                 <Input placeholder="Company" value={merchant.company} disabled />
+            </FormControl>
+        </FormItem>
+
         <FormField
           control={form.control}
           name="role"
@@ -139,19 +110,14 @@ export function EditMerchantForm({
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="user@company.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        
+        <FormItem>
+            <FormLabel>Email</FormLabel>
+            <FormControl>
+                <Input placeholder="user@company.com" value={merchant.email} disabled/>
+            </FormControl>
+        </FormItem>
+
         <div className="flex justify-end gap-2 pt-4">
           <Button
             type="button"
