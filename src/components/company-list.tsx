@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import type { Company } from '@/types';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, PlusCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
 
 type SortableKeys = 'name' | 'sales';
 
@@ -80,92 +86,108 @@ export default function CompanyList({ companies }: { companies: Company[] }) {
   };
 
   return (
-    <Card className="max-w-4xl mx-auto shadow-lg">
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <CardTitle className="text-2xl font-headline">MerchantView</CardTitle>
+    <Tabs defaultValue="all">
+      <div className="flex items-center">
+        <TabsList>
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="active">Approved</TabsTrigger>
+          <TabsTrigger value="pending">Pending</TabsTrigger>
+        </TabsList>
+        <div className="ml-auto flex items-center gap-2">
+          <Input
+            placeholder="Search companies..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="h-8 w-[150px] lg:w-[250px]"
+          />
+          <Button size="sm" className="h-8 gap-1">
+            <PlusCircle className="h-3.5 w-3.5" />
+            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+              Add Company
+            </span>
+          </Button>
+        </div>
+      </div>
+      <TabsContent value="all">
+        <Card>
+          <CardHeader>
+            <CardTitle>Companies</CardTitle>
             <CardDescription>
-              A list of approved companies and their sales figures.
+              A list of all companies.
             </CardDescription>
-          </div>
-          <div className="relative w-full sm:w-64">
-             <Input
-                type="text"
-                placeholder="Search companies..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-4"
-              />
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-2/3">
-                  <Button
-                    variant="ghost"
-                    onClick={() => requestSort('name')}
-                    className="px-2"
-                  >
-                    Company Name
-                    {getSortIndicator('name')}
-                  </Button>
-                </TableHead>
-                <TableHead className="w-1/3 text-right">
-                  <Button
-                    variant="ghost"
-                    onClick={() => requestSort('sales')}
-                    className="px-2"
-                  >
-                    Sales
-                    {getSortIndicator('sales')}
-                  </Button>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAndSortedCompanies.length > 0 ? (
-                filteredAndSortedCompanies.map((company) => (
-                  <TableRow key={company.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-4">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={company.logoUrl} alt={`${company.name} logo`} data-ai-hint={company.hint} />
-                          <AvatarFallback>
-                            {company.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="font-medium">{company.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right font-mono">
-                      {new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: 'USD',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      }).format(company.sales)}
-                    </TableCell>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-2/3">
+                      <Button
+                        variant="ghost"
+                        onClick={() => requestSort('name')}
+                        className="px-2"
+                      >
+                        Company Name
+                        {getSortIndicator('name')}
+                      </Button>
+                    </TableHead>
+                    <TableHead className="w-1/3 text-right">
+                      <Button
+                        variant="ghost"
+                        onClick={() => requestSort('sales')}
+                        className="px-2"
+                      >
+                        Sales
+                        {getSortIndicator('sales')}
+                      </Button>
+                    </TableHead>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={2}
-                    className="text-center h-24 text-muted-foreground"
-                  >
-                    No companies found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+                </TableHeader>
+                <TableBody>
+                  {filteredAndSortedCompanies.length > 0 ? (
+                    filteredAndSortedCompanies.map((company) => (
+                      <TableRow key={company.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-4">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage
+                                src={company.logoUrl}
+                                alt={`${company.name} logo`}
+                                data-ai-hint={company.hint}
+                              />
+                              <AvatarFallback>
+                                {company.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-medium">{company.name}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right font-mono">
+                          {new Intl.NumberFormat('en-US', {
+                            style: 'currency',
+                            currency: 'USD',
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          }).format(company.sales)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={2}
+                        className="text-center h-24 text-muted-foreground"
+                      >
+                        No companies found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </TabsContent>
+    </Tabs>
   );
 }
