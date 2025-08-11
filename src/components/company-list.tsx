@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import type { Company } from '@/types';
-import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

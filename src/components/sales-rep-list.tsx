@@ -49,6 +49,7 @@ export default function SalesRepList({ salesReps: initialSalesReps }: { salesRep
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
   const [isAddSalesRepOpen, setIsAddSalesRepOpen] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState('all');
 
   const handleStatusChange = (repId: string, status: 'Active' | 'Inactive') => {
     setSalesReps(salesReps.map(rep => rep.id === repId ? { ...rep, status } : rep));
@@ -69,6 +70,12 @@ export default function SalesRepList({ salesReps: initialSalesReps }: { salesRep
 
   const filteredAndSortedSalesReps = React.useMemo(() => {
     let sortableItems = [...salesReps];
+
+    if (activeTab !== 'all') {
+      sortableItems = sortableItems.filter(
+        (rep) => rep.status.toLowerCase() === activeTab
+      );
+    }
 
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
@@ -94,7 +101,7 @@ export default function SalesRepList({ salesReps: initialSalesReps }: { salesRep
     }
 
     return sortableItems;
-  }, [salesReps, searchTerm, sortConfig]);
+  }, [salesReps, searchTerm, sortConfig, activeTab]);
 
   const getSortIndicator = (key: SortableKeys) => {
     if (sortConfig?.key !== key) {
@@ -122,7 +129,7 @@ export default function SalesRepList({ salesReps: initialSalesReps }: { salesRep
 
   return (
     <Dialog open={isAddSalesRepOpen} onOpenChange={setIsAddSalesRepOpen}>
-      <Tabs defaultValue="all">
+      <Tabs defaultValue="all" onValueChange={setActiveTab}>
         <div className="flex items-center">
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
@@ -147,7 +154,7 @@ export default function SalesRepList({ salesReps: initialSalesReps }: { salesRep
             </DialogTrigger>
           </div>
         </div>
-        <TabsContent value="all">
+        <TabsContent value={activeTab}>
           <Card>
             <CardHeader>
               <CardTitle>Sales Representatives</CardTitle>

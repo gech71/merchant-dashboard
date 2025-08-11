@@ -49,6 +49,8 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
   const [isAddMerchantOpen, setIsAddMerchantOpen] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState('all');
+
 
   const handleStatusChange = (merchantId: string, status: 'Active' | 'Disabled') => {
     setMerchants(merchants.map(m => m.id === merchantId ? { ...m, status } : m));
@@ -68,6 +70,12 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
 
   const filteredAndSortedMerchants = React.useMemo(() => {
     let sortableItems = [...merchants];
+
+    if (activeTab !== 'all') {
+      sortableItems = sortableItems.filter(
+        (merchant) => merchant.status.toLowerCase() === activeTab
+      );
+    }
 
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
@@ -93,7 +101,7 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
     }
 
     return sortableItems;
-  }, [merchants, searchTerm, sortConfig]);
+  }, [merchants, searchTerm, sortConfig, activeTab]);
 
   const getSortIndicator = (key: SortableKeys) => {
     if (sortConfig?.key !== key) {
@@ -122,7 +130,7 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
 
   return (
     <Dialog open={isAddMerchantOpen} onOpenChange={setIsAddMerchantOpen}>
-      <Tabs defaultValue="all">
+      <Tabs defaultValue="all" onValueChange={setActiveTab}>
         <div className="flex items-center">
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
@@ -147,7 +155,7 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
             </DialogTrigger>
           </div>
         </div>
-        <TabsContent value="all">
+        <TabsContent value={activeTab}>
           <Card>
             <CardHeader>
               <CardTitle>Merchants</CardTitle>
