@@ -54,7 +54,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-screen">
         <Sidebar collapsible="icon">
           <SidebarContent>
-            <SidebarHeader className="p-4">
+            <SidebarHeader className="flex items-center justify-between p-4">
               <div className="flex items-center gap-2">
                 <div
                   className={cn(
@@ -67,6 +67,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   MerchantView
                 </h1>
               </div>
+              <SidebarTrigger />
             </SidebarHeader>
             <SidebarMenu>
               {NAV_ITEMS.map((item) => (
@@ -114,12 +115,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </Sidebar>
 
         <div className="flex flex-1 flex-col">
-           <header className="flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
-            <SidebarTrigger className="md:hidden" />
-            <div className="flex-1">
-              {/* Add breadcrumbs or page title here if needed */}
-            </div>
-          </header>
           <main className="flex-1 overflow-y-auto p-4 sm:p-6">
             {children}
           </main>
