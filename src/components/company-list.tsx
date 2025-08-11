@@ -36,12 +36,13 @@ import { EditCompanyForm } from './edit-company-form';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { useDataContext } from '@/context/data-context';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type SortableKeys = 'fieldName' | 'accountNumber' | 'branch' | 'status' | 'approveUser' | 'approved';
 const ITEMS_PER_PAGE = 15;
 
 export default function CompanyList({ companies: initialCompanies, approvalView = false }: { companies: Company[], approvalView?: boolean }) {
-  const { updateCompanyApproval, currentUser } = useDataContext();
+  const { updateCompanyApproval, currentUser, branches } = useDataContext();
   const [companies, setCompanies] = React.useState(initialCompanies);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -53,6 +54,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
   const [selectedCompany, setSelectedCompany] = React.useState<EditableItem>(null);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [branchFilter, setBranchFilter] = React.useState('all');
 
   React.useEffect(() => {
     setCompanies(initialCompanies);
@@ -91,6 +93,12 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
         (company) => company.status.toLowerCase() === activeTab
       );
     }
+
+    if (branchFilter !== 'all') {
+        sortableItems = sortableItems.filter(
+          (company) => company.branch === branchFilter
+        );
+    }
     
     if (searchTerm) {
       sortableItems = sortableItems.filter((company) =>
@@ -116,7 +124,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
     }
 
     return sortableItems;
-  }, [companies, searchTerm, sortConfig, activeTab, approvalView]);
+  }, [companies, searchTerm, sortConfig, activeTab, approvalView, branchFilter]);
   
   const paginatedCompanies = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -169,6 +177,19 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-8 w-[150px] lg:w-[250px]"
             />
+            {!approvalView && (
+                <Select value={branchFilter} onValueChange={setBranchFilter}>
+                    <SelectTrigger className="h-8 w-[150px] lg:w-[180px]">
+                        <SelectValue placeholder="Filter by branch" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Branches</SelectItem>
+                        {branches.map(branch => (
+                            <SelectItem key={branch.id} value={branch.name}>{branch.name}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            )}
             {!approvalView && (
               <DialogTrigger asChild>
                 <Button size="sm" className="h-8 gap-1">
