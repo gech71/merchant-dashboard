@@ -27,6 +27,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -42,6 +43,7 @@ import { EditMerchantForm } from './edit-merchant-form';
 import { useDataContext } from '@/context/data-context';
 
 type SortableKeys = 'name' | 'company' | 'email' | 'status' | 'role';
+const ITEMS_PER_PAGE = 15;
 
 export default function MerchantList({ merchants: initialMerchants, approvalView = false }: { merchants: Merchant[], approvalView?: boolean }) {
   const { merchants: contextMerchants, updateMerchantStatus } = useDataContext();
@@ -55,6 +57,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
   const [isEditMerchantOpen, setIsEditMerchantOpen] = React.useState(false);
   const [selectedMerchant, setSelectedMerchant] = React.useState<EditableItem>(null);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
+  const [currentPage, setCurrentPage] = React.useState(1);
 
   React.useEffect(() => {
     setMerchants(initialMerchants);
@@ -130,6 +133,12 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
 
     return sortableItems;
   }, [merchants, contextMerchants, searchTerm, sortConfig, activeTab, approvalView]);
+  
+  const paginatedMerchants = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredAndSortedMerchants.slice(startIndex, endIndex);
+  }, [filteredAndSortedMerchants, currentPage]);
 
   const getSortIndicator = (key: SortableKeys) => {
     if (sortConfig?.key !== key) {
@@ -237,8 +246,8 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredAndSortedMerchants.length > 0 ? (
-                      filteredAndSortedMerchants.map((merchant) => (
+                    {paginatedMerchants.length > 0 ? (
+                      paginatedMerchants.map((merchant) => (
                         <TableRow key={merchant.id}>
                           <TableCell className="font-medium">{merchant.name}</TableCell>
                           <TableCell>{merchant.company}</TableCell>
@@ -288,6 +297,29 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                 </Table>
               </div>
             </CardContent>
+            <CardFooter>
+                <div className="text-xs text-muted-foreground">
+                    Showing <strong>{paginatedMerchants.length}</strong> of <strong>{filteredAndSortedMerchants.length}</strong> users
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => prev + 1)}
+                        disabled={currentPage * ITEMS_PER_PAGE >= filteredAndSortedMerchants.length}
+                    >
+                        Next
+                    </Button>
+                </div>
+            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>

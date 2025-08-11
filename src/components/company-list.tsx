@@ -20,6 +20,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -37,6 +38,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { useDataContext } from '@/context/data-context';
 
 type SortableKeys = 'fieldName' | 'accountNumber' | 'branch' | 'status' | 'approveUser' | 'approved';
+const ITEMS_PER_PAGE = 15;
 
 export default function CompanyList({ companies: initialCompanies, approvalView = false }: { companies: Company[], approvalView?: boolean }) {
   const { updateCompanyApproval } = useDataContext();
@@ -50,6 +52,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
   const [isEditCompanyOpen, setIsEditCompanyOpen] = React.useState(false);
   const [selectedCompany, setSelectedCompany] = React.useState<EditableItem>(null);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
+  const [currentPage, setCurrentPage] = React.useState(1);
 
   React.useEffect(() => {
     setCompanies(initialCompanies);
@@ -114,6 +117,12 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
 
     return sortableItems;
   }, [companies, searchTerm, sortConfig, activeTab, approvalView]);
+  
+  const paginatedCompanies = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredAndSortedCompanies.slice(startIndex, endIndex);
+  }, [filteredAndSortedCompanies, currentPage]);
 
   const getSortIndicator = (key: SortableKeys) => {
     if (sortConfig?.key !== key) {
@@ -251,15 +260,11 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredAndSortedCompanies.length > 0 ? (
-                      filteredAndSortedCompanies.map((company) => (
+                    {paginatedCompanies.length > 0 ? (
+                      paginatedCompanies.map((company) => (
                         <TableRow key={company.id}>
                           <TableCell>
-                            <div className="flex items-center gap-4">
-                              <div className="flex flex-col">
-                                <Link href={`/dashboard/companies/${company.id}`} className="font-medium hover:underline">{company.fieldName}</Link>
-                              </div>
-                            </div>
+                            <Link href={`/dashboard/companies/${company.id}`} className="font-medium hover:underline">{company.fieldName}</Link>
                           </TableCell>
                           <TableCell>{company.accountNumber}</TableCell>
                           <TableCell>{company.branch}</TableCell>
@@ -312,6 +317,29 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                 </Table>
               </div>
             </CardContent>
+            <CardFooter>
+                <div className="text-xs text-muted-foreground">
+                    Showing <strong>{paginatedCompanies.length}</strong> of <strong>{filteredAndSortedCompanies.length}</strong> companies
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => prev + 1)}
+                        disabled={currentPage * ITEMS_PER_PAGE >= filteredAndSortedCompanies.length}
+                    >
+                        Next
+                    </Button>
+                </div>
+            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>

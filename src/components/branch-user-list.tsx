@@ -27,6 +27,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -42,6 +43,7 @@ import { EditBranchUserForm } from './edit-branch-user-form';
 import { useDataContext } from '@/context/data-context';
 
 type SortableKeys = 'name' | 'email' | 'branch' | 'status';
+const ITEMS_PER_PAGE = 15;
 
 export default function BranchUserList({ branchUsers: initialBranchUsers, approvalView = false }: { branchUsers: BranchUser[], approvalView?: boolean }) {
   const { updateBranchUserStatus } = useDataContext();
@@ -55,6 +57,7 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
   const [isEditUserOpen, setIsEditUserOpen] = React.useState(false);
   const [selectedUser, setSelectedUser] = React.useState<EditableItem>(null);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
+  const [currentPage, setCurrentPage] = React.useState(1);
   
   React.useEffect(() => {
     setBranchUsers(initialBranchUsers);
@@ -115,6 +118,12 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
 
     return sortableItems;
   }, [branchUsers, searchTerm, sortConfig, activeTab]);
+
+  const paginatedUsers = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredAndSortedUsers.slice(startIndex, endIndex);
+  }, [filteredAndSortedUsers, currentPage]);
 
   const getSortIndicator = (key: SortableKeys) => {
     if (sortConfig?.key !== key) {
@@ -215,8 +224,8 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredAndSortedUsers.length > 0 ? (
-                      filteredAndSortedUsers.map((user) => (
+                    {paginatedUsers.length > 0 ? (
+                      paginatedUsers.map((user) => (
                         <TableRow key={user.id}>
                           <TableCell className="font-medium">{user.name}</TableCell>
                           <TableCell className="hidden md:table-cell">{user.email}</TableCell>
@@ -234,7 +243,7 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem onClick={() => handleEdit(user)}>Edit</DropdownMenuItem>
+                                {!approvalView && <DropdownMenuItem onClick={() => handleEdit(user)}>Edit</DropdownMenuItem>}
                                 {user.status === 'Pending' && (
                                   <>
                                     <DropdownMenuItem onClick={() => handleStatusChange(user.id, 'Active')}>
@@ -263,6 +272,29 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
                 </Table>
               </div>
             </CardContent>
+            <CardFooter>
+                <div className="text-xs text-muted-foreground">
+                    Showing <strong>{paginatedUsers.length}</strong> of <strong>{filteredAndSortedUsers.length}</strong> users
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => prev + 1)}
+                        disabled={currentPage * ITEMS_PER_PAGE >= filteredAndSortedUsers.length}
+                    >
+                        Next
+                    </Button>
+                </div>
+            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>

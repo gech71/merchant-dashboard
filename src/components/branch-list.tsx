@@ -26,6 +26,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -36,6 +37,7 @@ import { Badge } from '@/components/ui/badge';
 import { useDataContext } from '@/context/data-context';
 
 type SortableKeys = 'name' | 'code' | 'address' | 'contact' | 'status';
+const ITEMS_PER_PAGE = 15;
 
 export default function BranchList({ branches: initialBranches, approvalView = false }: { branches: Branch[], approvalView?: boolean }) {
   const { updateBranchStatus } = useDataContext();
@@ -48,6 +50,7 @@ export default function BranchList({ branches: initialBranches, approvalView = f
   const [isAddBranchOpen, setIsAddBranchOpen] = React.useState(false);
   const [isEditBranchOpen, setIsEditBranchOpen] = React.useState(false);
   const [selectedBranch, setSelectedBranch] = React.useState<EditableItem>(null);
+  const [currentPage, setCurrentPage] = React.useState(1);
   
   React.useEffect(() => {
     setBranches(initialBranches);
@@ -102,6 +105,12 @@ export default function BranchList({ branches: initialBranches, approvalView = f
 
     return sortableItems;
   }, [branches, searchTerm, sortConfig]);
+  
+  const paginatedBranches = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredAndSortedBranches.slice(startIndex, endIndex);
+  }, [filteredAndSortedBranches, currentPage]);
 
   const getSortIndicator = (key: SortableKeys) => {
     if (sortConfig?.key !== key) {
@@ -216,8 +225,8 @@ export default function BranchList({ branches: initialBranches, approvalView = f
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredAndSortedBranches.length > 0 ? (
-                  filteredAndSortedBranches.map((branch) => (
+                {paginatedBranches.length > 0 ? (
+                  paginatedBranches.map((branch) => (
                     <TableRow key={branch.id}>
                       <TableCell className="font-medium">{branch.name}</TableCell>
                       <TableCell>{branch.code}</TableCell>
@@ -265,6 +274,29 @@ export default function BranchList({ branches: initialBranches, approvalView = f
             </Table>
           </div>
         </CardContent>
+        <CardFooter>
+            <div className="text-xs text-muted-foreground">
+                Showing <strong>{paginatedBranches.length}</strong> of <strong>{filteredAndSortedBranches.length}</strong> branches
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                >
+                    Previous
+                </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(prev => prev + 1)}
+                    disabled={currentPage * ITEMS_PER_PAGE >= filteredAndSortedBranches.length}
+                >
+                    Next
+                </Button>
+            </div>
+        </CardFooter>
       </Card>
       <DialogContent>
         <DialogHeader>
