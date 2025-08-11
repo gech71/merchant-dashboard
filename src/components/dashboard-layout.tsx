@@ -54,7 +54,10 @@ function UserProfile() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 p-2"
+          className={cn(
+            'w-full justify-start gap-2 p-2',
+            state === 'collapsed' && 'justify-center'
+          )}
         >
           <Avatar className="h-8 w-8">
             <AvatarImage src="https://placehold.co/40x40.png" />
