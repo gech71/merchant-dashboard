@@ -70,13 +70,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
-                    as={Link}
-                    href={item.href}
+                    asChild
                     isActive={pathname.startsWith(item.href)}
                     tooltip={{ children: item.label }}
                   >
-                    <item.icon />
-                    <span>{item.label}</span>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
