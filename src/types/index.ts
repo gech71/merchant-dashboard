@@ -3,6 +3,7 @@ export type Company = {
   id: string;
   accountNumber: string;
   fieldName: string;
+  branch: string;
   approveUser?: string;
   logoUrl: string;
   hint: string;

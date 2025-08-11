@@ -34,7 +34,7 @@ import { AddCompanyForm } from './add-company-form';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from './ui/dropdown-menu';
 
-type SortableKeys = 'fieldName' | 'accountNumber' | 'status' | 'approveUser' | 'approved';
+type SortableKeys = 'fieldName' | 'accountNumber' | 'branch' | 'status' | 'approveUser' | 'approved';
 
 export default function CompanyList({ companies: initialCompanies, approvalView = false }: { companies: Company[], approvalView?: boolean }) {
   const [companies, setCompanies] = React.useState(initialCompanies);
@@ -202,6 +202,16 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                       <TableHead>
                         <Button
                           variant="ghost"
+                          onClick={() => requestSort('branch')}
+                          className="px-2"
+                        >
+                          Branch
+                          {getSortIndicator('branch')}
+                        </Button>
+                      </TableHead>
+                      <TableHead>
+                        <Button
+                          variant="ghost"
                           onClick={() => requestSort('approved')}
                           className="px-2"
                         >
@@ -256,6 +266,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                             </div>
                           </TableCell>
                           <TableCell>{company.accountNumber}</TableCell>
+                          <TableCell>{company.branch}</TableCell>
                            <TableCell>
                              <Badge variant={company.approved ? 'default' : 'secondary'}>{company.approved ? 'Yes' : 'No'}</Badge>
                           </TableCell>
@@ -294,7 +305,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                     ) : (
                       <TableRow>
                         <TableCell
-                          colSpan={6}
+                          colSpan={7}
                           className="text-center h-24 text-muted-foreground"
                         >
                           No companies found.

@@ -17,13 +17,25 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 const companyFormSchema = z.object({
   fieldName: z.string().min(2, 'Field name must be at least 2 characters.'),
   accountNumber: z.string().min(4, 'Account number must be at least 4 characters.'),
+  branch: z.string({ required_error: 'Please select a branch.' }),
 });
 
 type CompanyFormValues = z.infer<typeof companyFormSchema>;
+
+// In a real app, this would be fetched from your API
+const MOCK_BRANCHES = [
+  { id: '1', name: 'Downtown Branch' },
+  { id: '2', name: 'Uptown Branch' },
+  { id: '3', name: 'Westside Branch' },
+  { id: '4', name: 'Eastside Branch' },
+  { id: '5', name: 'South Branch' },
+];
+
 
 export function AddCompanyForm({ setOpen }: { setOpen: (open: boolean) => void }) {
   const { toast } = useToast();
@@ -70,6 +82,28 @@ export function AddCompanyForm({ setOpen }: { setOpen: (open: boolean) => void }
               <FormControl>
                 <Input placeholder="ACC12345" {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="branch"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Branch</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a branch" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {MOCK_BRANCHES.map(branch => (
+                     <SelectItem key={branch.id} value={branch.name}>{branch.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
