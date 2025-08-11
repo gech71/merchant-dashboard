@@ -15,17 +15,12 @@ import {
 
 import {
   Sidebar,
-  SidebarProvider,
-  SidebarTrigger,
   SidebarContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
@@ -48,26 +43,19 @@ const NAV_ITEMS = [
 ];
 
 function UserProfile() {
-  const { state } = useSidebar();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className={cn(
-            'w-full justify-start gap-2 p-2',
-            state === 'collapsed' && 'justify-center'
-          )}
+          className='w-full justify-start gap-2 p-2'
         >
           <Avatar className="h-8 w-8">
             <AvatarImage src="https://placehold.co/40x40.png" />
             <AvatarFallback>SA</AvatarFallback>
           </Avatar>
           <div
-            className={cn(
-              'flex flex-col text-left transition-opacity duration-200',
-              state === 'collapsed' && 'opacity-0'
-            )}
+            className='flex flex-col text-left transition-opacity duration-200'
           >
             <p className="text-sm font-medium">System Admin</p>
             <p className="text-xs text-muted-foreground">
@@ -94,7 +82,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   return (
       <div className="flex min-h-screen">
-        <Sidebar collapsible="icon">
+        <Sidebar>
           <SidebarContent>
             <SidebarHeader className="flex items-center justify-between p-4">
               <div className="flex items-center gap-2">
@@ -105,11 +93,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 >
                   <Briefcase className="h-6 w-6" />
                 </div>
-                <h1 className="text-lg font-semibold text-primary transition-opacity duration-200 group-data-[collapsible=icon]:opacity-0">
+                <h1 className="text-lg font-semibold text-primary transition-opacity duration-200">
                   MerchantView
                 </h1>
               </div>
-              <SidebarTrigger />
             </SidebarHeader>
             <SidebarMenu>
               {NAV_ITEMS.map((item) => (
@@ -117,7 +104,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   <SidebarMenuButton
                     asChild
                     isActive={pathname === item.href}
-                    tooltip={item.label}
                   >
                     <Link href={item.href}>
                       <item.icon />
