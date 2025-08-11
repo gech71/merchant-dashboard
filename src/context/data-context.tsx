@@ -57,7 +57,6 @@ type DataContextType = {
   updateBranch: (branch: Branch) => void;
   addCompany: (company: Omit<Company, 'branch'>) => void;
   updateCompany: (company: Company) => void;
-  addMerchant: (merchant: Merchant) => void;
   updateMerchant: (merchant: Merchant) => void;
   addBranchUser: (user: BranchUser) => void;
   updateBranchUser: (user: BranchUser) => void;
@@ -97,7 +96,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setCompanies(prev => prev.map(c => c.id === updatedCompany.id ? updatedCompany : c));
   };
   
-  const addMerchant = (merchant: Merchant) => setMerchants(prev => [...prev, merchant]);
   const updateMerchant = (updatedMerchant: Merchant) => {
     setMerchants(prev => prev.map(m => m.id === updatedMerchant.id ? updatedMerchant : m));
   };
@@ -141,7 +139,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     updateBranch,
     addCompany,
     updateCompany,
-    addMerchant,
     updateMerchant,
     addBranchUser,
     updateBranchUser,

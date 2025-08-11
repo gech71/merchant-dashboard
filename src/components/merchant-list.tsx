@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import type { Merchant, EditableItem } from '@/types';
-import { ArrowUpDown, UserPlus, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowUpDown, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -37,8 +37,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AddMerchantForm } from './add-merchant-form';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EditMerchantForm } from './edit-merchant-form';
 import { useDataContext } from '@/context/data-context';
 
@@ -53,7 +52,6 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
-  const [isAddMerchantOpen, setIsAddMerchantOpen] = React.useState(false);
   const [isEditMerchantOpen, setIsEditMerchantOpen] = React.useState(false);
   const [selectedMerchant, setSelectedMerchant] = React.useState<EditableItem>(null);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
@@ -167,7 +165,6 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
 
   return (
     <>
-    <Dialog open={isAddMerchantOpen} onOpenChange={setIsAddMerchantOpen}>
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
         <div className="flex items-center">
           {!approvalView && (
@@ -185,16 +182,6 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-8 w-[150px] lg:w-[250px]"
             />
-            {!approvalView && (
-              <DialogTrigger asChild>
-                <Button size="sm" className="h-8 gap-1">
-                  <UserPlus className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Add Merchant User
-                  </span>
-                </Button>
-              </DialogTrigger>
-            )}
           </div>
         </div>
         <TabsContent value={activeTab}>
@@ -323,13 +310,6 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
           </Card>
         </TabsContent>
       </Tabs>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add New Merchant User</DialogTitle>
-        </DialogHeader>
-        <AddMerchantForm setOpen={setIsAddMerchantOpen} />
-      </DialogContent>
-    </Dialog>
     <Dialog open={isEditMerchantOpen} onOpenChange={setIsEditMerchantOpen}>
         <DialogContent>
             <DialogHeader>
