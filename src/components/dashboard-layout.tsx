@@ -51,7 +51,6 @@ const NAV_ITEMS = [
 
 const APPROVAL_NAV_ITEMS = [
   { href: '/dashboard/approvals/companies', icon: Building, label: 'Companies' },
-  { href: '/dashboard/approvals/branches', icon: Home, label: 'Branches' },
   { href: '/dashboard/approvals/merchants', icon: Briefcase, label: 'Merchant Users' },
 ]
 

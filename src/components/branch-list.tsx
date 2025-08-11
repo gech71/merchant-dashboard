@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import type { Branch, EditableItem } from '@/types';
-import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowUpDown, PlusCircle, MoreHorizontal } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,7 +39,7 @@ import { useDataContext } from '@/context/data-context';
 type SortableKeys = 'name' | 'code' | 'address' | 'contact' | 'status';
 const ITEMS_PER_PAGE = 15;
 
-export default function BranchList({ branches: initialBranches, approvalView = false }: { branches: Branch[], approvalView?: boolean }) {
+export default function BranchList({ branches: initialBranches }: { branches: Branch[], approvalView?: boolean }) {
   const { updateBranchStatus } = useDataContext();
   const [branches, setBranches] = React.useState(initialBranches);
   const [searchTerm, setSearchTerm] = React.useState('');
@@ -56,10 +56,6 @@ export default function BranchList({ branches: initialBranches, approvalView = f
     setBranches(initialBranches);
   }, [initialBranches]);
 
-  const handleStatusChange = (branchId: string, status: 'Approved' | 'Rejected') => {
-    updateBranchStatus(branchId, status);
-  };
-  
   const handleEdit = (branch: Branch) => {
     setSelectedBranch(branch);
     setIsEditBranchOpen(true);
@@ -141,9 +137,9 @@ export default function BranchList({ branches: initialBranches, approvalView = f
     <Dialog open={isAddBranchOpen} onOpenChange={setIsAddBranchOpen}>
       <Card>
         <CardHeader>
-          <CardTitle>{approvalView ? 'Branch Approvals' : 'Branches'}</CardTitle>
+          <CardTitle>Branches</CardTitle>
           <CardDescription>
-            {approvalView ? 'Review and approve pending branches.' : 'A list of all registered bank branches.'}
+            A list of all registered bank branches.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -154,16 +150,14 @@ export default function BranchList({ branches: initialBranches, approvalView = f
               onChange={(e) => setSearchTerm(e.target.value)}
               className="max-w-sm"
             />
-            {!approvalView && (
-              <DialogTrigger asChild>
-                <Button size="sm" className="h-8 gap-1">
-                  <PlusCircle className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Add Branch
-                  </span>
-                </Button>
-              </DialogTrigger>
-            )}
+            <DialogTrigger asChild>
+              <Button size="sm" className="h-8 gap-1">
+                <PlusCircle className="h-3.5 w-3.5" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                  Add Branch
+                </span>
+              </Button>
+            </DialogTrigger>
           </div>
           <div className="rounded-md border">
             <Table>
@@ -245,19 +239,7 @@ export default function BranchList({ branches: initialBranches, approvalView = f
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            {!approvalView && <DropdownMenuItem onClick={() => handleEdit(branch)}>Edit</DropdownMenuItem>}
-                            {branch.status === 'Pending' && (
-                              <>
-                                <DropdownMenuItem onClick={() => handleStatusChange(branch.id, 'Approved')}>
-                                  <CheckCircle className="mr-2 h-4 w-4" />
-                                  Approve
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleStatusChange(branch.id, 'Rejected')}>
-                                  <XCircle className="mr-2 h-4 w-4" />
-                                  Reject
-                                </DropdownMenuItem>
-                              </>
-                            )}
+                            <DropdownMenuItem onClick={() => handleEdit(branch)}>Edit</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
