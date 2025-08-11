@@ -1,7 +1,7 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { ClientSidebarProvider } from '@/components/client-sidebar-provider';
 
 export const metadata: Metadata = {
   title: 'MerchantView',
@@ -21,9 +21,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></link>
       </head>
       <body className="font-body antialiased">
-        <SidebarProvider>
+        <ClientSidebarProvider>
           {children}
-        </SidebarProvider>
+        </ClientSidebarProvider>
         <Toaster />
       </body>
     </html>
