@@ -90,7 +90,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <SidebarProvider>
       <div className="flex min-h-screen">
         <Sidebar collapsible="icon">
           <SidebarContent>
@@ -131,12 +130,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </SidebarFooter>
         </Sidebar>
 
-        <div className="flex flex-1 flex-col">
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
             {children}
-          </main>
-        </div>
+        </main>
       </div>
-    </SidebarProvider>
   );
 }
