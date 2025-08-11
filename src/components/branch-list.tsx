@@ -35,7 +35,7 @@ import { Badge } from '@/components/ui/badge';
 
 type SortableKeys = 'name' | 'code' | 'address' | 'contact' | 'status';
 
-export default function BranchList({ branches: initialBranches }: { branches: Branch[] }) {
+export default function BranchList({ branches: initialBranches, approvalView = false }: { branches: Branch[], approvalView?: boolean }) {
   const [branches, setBranches] = React.useState(initialBranches);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -117,9 +117,9 @@ export default function BranchList({ branches: initialBranches }: { branches: Br
     <Dialog open={isAddBranchOpen} onOpenChange={setIsAddBranchOpen}>
       <Card>
         <CardHeader>
-          <CardTitle>Branches</CardTitle>
+          <CardTitle>{approvalView ? 'Branch Approvals' : 'Branches'}</CardTitle>
           <CardDescription>
-            A list of all registered bank branches.
+            {approvalView ? 'Review and approve pending branches.' : 'A list of all registered bank branches.'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -130,14 +130,16 @@ export default function BranchList({ branches: initialBranches }: { branches: Br
               onChange={(e) => setSearchTerm(e.target.value)}
               className="max-w-sm"
             />
-            <DialogTrigger asChild>
-              <Button size="sm" className="h-8 gap-1">
-                <PlusCircle className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                  Add Branch
-                </span>
-              </Button>
-            </DialogTrigger>
+            {!approvalView && (
+              <DialogTrigger asChild>
+                <Button size="sm" className="h-8 gap-1">
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                    Add Branch
+                  </span>
+                </Button>
+              </DialogTrigger>
+            )}
           </div>
           <div className="rounded-md border">
             <Table>

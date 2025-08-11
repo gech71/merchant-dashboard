@@ -36,7 +36,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 
 type SortableKeys = 'name' | 'sales' | 'status';
 
-export default function CompanyList({ companies: initialCompanies }: { companies: Company[] }) {
+export default function CompanyList({ companies: initialCompanies, approvalView = false }: { companies: Company[], approvalView?: boolean }) {
   const [companies, setCompanies] = React.useState(initialCompanies);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -44,7 +44,7 @@ export default function CompanyList({ companies: initialCompanies }: { companies
     direction: 'ascending' | 'descending';
   } | null>({ key: 'sales', direction: 'descending' });
   const [isAddCompanyOpen, setIsAddCompanyOpen] = React.useState(false);
-  const [activeTab, setActiveTab] = React.useState('all');
+  const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
 
   const handleStatusChange = (companyId: string, status: 'Approved' | 'Rejected') => {
     setCompanies(companies.map(c => c.id === companyId ? { ...c, status } : c));
@@ -119,14 +119,16 @@ export default function CompanyList({ companies: initialCompanies }: { companies
 
   return (
     <Dialog open={isAddCompanyOpen} onOpenChange={setIsAddCompanyOpen}>
-      <Tabs defaultValue="all" onValueChange={setActiveTab}>
+      <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
         <div className="flex items-center">
-          <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="approved">Approved</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="rejected">Rejected</TabsTrigger>
-          </TabsList>
+          {!approvalView && (
+            <TabsList>
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="approved">Approved</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
+              <TabsTrigger value="rejected">Rejected</TabsTrigger>
+            </TabsList>
+          )}
           <div className="ml-auto flex items-center gap-2">
             <Input
               placeholder="Search companies..."
@@ -134,22 +136,24 @@ export default function CompanyList({ companies: initialCompanies }: { companies
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-8 w-[150px] lg:w-[250px]"
             />
-            <DialogTrigger asChild>
-              <Button size="sm" className="h-8 gap-1">
-                <PlusCircle className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                  Add Company
-                </span>
-              </Button>
-            </DialogTrigger>
+            {!approvalView && (
+              <DialogTrigger asChild>
+                <Button size="sm" className="h-8 gap-1">
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                    Add Company
+                  </span>
+                </Button>
+              </DialogTrigger>
+            )}
           </div>
         </div>
         <TabsContent value={activeTab}>
           <Card>
             <CardHeader>
-              <CardTitle>Companies</CardTitle>
+              <CardTitle>{approvalView ? 'Company Approvals' : 'Companies'}</CardTitle>
               <CardDescription>
-                A list of all companies.
+                {approvalView ? 'Review and approve pending companies.' : 'A list of all companies.'}
               </CardDescription>
             </CardHeader>
             <CardContent>

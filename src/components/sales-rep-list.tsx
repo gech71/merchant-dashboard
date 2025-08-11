@@ -41,7 +41,7 @@ import { AddSalesRepForm } from './add-sales-rep-form';
 
 type SortableKeys = 'name' | 'email' | 'company' | 'status';
 
-export default function SalesRepList({ salesReps: initialSalesReps }: { salesReps: SalesRep[] }) {
+export default function SalesRepList({ salesReps: initialSalesReps, approvalView = false }: { salesReps: SalesRep[], approvalView?: boolean }) {
   const [salesReps, setSalesReps] = React.useState(initialSalesReps);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -49,7 +49,7 @@ export default function SalesRepList({ salesReps: initialSalesReps }: { salesRep
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
   const [isAddSalesRepOpen, setIsAddSalesRepOpen] = React.useState(false);
-  const [activeTab, setActiveTab] = React.useState('all');
+  const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
 
   const handleStatusChange = (repId: string, status: 'Active' | 'Inactive') => {
     setSalesReps(salesReps.map(rep => rep.id === repId ? { ...rep, status } : rep));
@@ -129,14 +129,16 @@ export default function SalesRepList({ salesReps: initialSalesReps }: { salesRep
 
   return (
     <Dialog open={isAddSalesRepOpen} onOpenChange={setIsAddSalesRepOpen}>
-      <Tabs defaultValue="all" onValueChange={setActiveTab}>
+      <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
         <div className="flex items-center">
-          <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="active">Active</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="inactive">Inactive</TabsTrigger>
-          </TabsList>
+          {!approvalView && (
+            <TabsList>
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="active">Active</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
+              <TabsTrigger value="inactive">Inactive</TabsTrigger>
+            </TabsList>
+          )}
           <div className="ml-auto flex items-center gap-2">
             <Input
               placeholder="Search sales reps..."
@@ -144,22 +146,24 @@ export default function SalesRepList({ salesReps: initialSalesReps }: { salesRep
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-8 w-[150px] lg:w-[250px]"
             />
-            <DialogTrigger asChild>
-              <Button size="sm" className="h-8 gap-1">
-                <PlusCircle className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                  Add Sales Rep
-                </span>
-              </Button>
-            </DialogTrigger>
+            {!approvalView && (
+              <DialogTrigger asChild>
+                <Button size="sm" className="h-8 gap-1">
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                    Add Sales Rep
+                  </span>
+                </Button>
+              </DialogTrigger>
+            )}
           </div>
         </div>
         <TabsContent value={activeTab}>
           <Card>
             <CardHeader>
-              <CardTitle>Sales Representatives</CardTitle>
+              <CardTitle>{approvalView ? 'Sales Rep Approvals' : 'Sales Representatives'}</CardTitle>
               <CardDescription>
-                Manage sales representatives for all companies.
+                {approvalView ? 'Review and approve pending sales reps.' : 'Manage sales representatives for all companies.'}
               </CardDescription>
             </CardHeader>
             <CardContent>

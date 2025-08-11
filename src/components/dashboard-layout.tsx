@@ -11,6 +11,7 @@ import {
   Briefcase,
   ChevronDown,
   UserCircle,
+  CheckSquare,
 } from 'lucide-react';
 
 import {
@@ -22,6 +23,10 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   useSidebar,
+  SidebarTrigger,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import {
@@ -42,7 +47,15 @@ const NAV_ITEMS = [
   { href: '/dashboard/sales-reps', icon: Users, label: 'Sales Reps' },
 ];
 
+const APPROVAL_NAV_ITEMS = [
+  { href: '/dashboard/approvals/companies', icon: Building, label: 'Companies' },
+  { href: '/dashboard/approvals/branches', icon: Home, label: 'Branches' },
+  { href: '/dashboard/approvals/merchants', icon: Briefcase, label: 'Merchants' },
+  { href: '/dashboard/approvals/sales-reps', icon: Users, label: 'Sales Reps' },
+]
+
 function UserProfile() {
+  const { state } = useSidebar();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -55,7 +68,10 @@ function UserProfile() {
             <AvatarFallback>SA</AvatarFallback>
           </Avatar>
           <div
-            className='flex flex-col text-left transition-opacity duration-200'
+            className={cn(
+                'flex flex-col text-left transition-opacity duration-200',
+                state === 'collapsed' && 'opacity-0'
+            )}
           >
             <p className="text-sm font-medium">System Admin</p>
             <p className="text-xs text-muted-foreground">
@@ -79,44 +95,73 @@ function UserProfile() {
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { state } = useSidebar();
 
   return (
       <div className="flex min-h-screen">
         <Sidebar>
-          <SidebarContent>
-            <SidebarHeader className="flex items-center justify-between p-4">
-              <div className="flex items-center gap-2">
-                <div
-                  className={cn(
-                    'flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground'
-                  )}
-                >
-                  <Briefcase className="h-6 w-6" />
-                </div>
-                <h1 className="text-lg font-semibold text-primary transition-opacity duration-200">
-                  MerchantView
-                </h1>
-              </div>
-            </SidebarHeader>
-            <SidebarMenu>
-              {NAV_ITEMS.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
+          <SidebarContent className="flex flex-col justify-between">
+            <div>
+              <SidebarHeader className="flex items-center justify-between p-4">
+                <div className="flex items-center gap-2">
+                  <div
+                    className={cn(
+                      'flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground'
+                    )}
                   >
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+                    <Briefcase className="h-6 w-6" />
+                  </div>
+                  <h1 className={cn("text-lg font-semibold text-primary transition-opacity duration-200", state === 'collapsed' && 'hidden')}>
+                    MerchantView
+                  </h1>
+                </div>
+                <SidebarTrigger className={cn(state === 'collapsed' && 'absolute left-1/2 -translate-x-1/2')} />
+              </SidebarHeader>
+              <SidebarMenu>
+                {NAV_ITEMS.map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.href}
+                      className="justify-center data-[state=expanded]:justify-start"
+                    >
+                      <Link href={item.href}>
+                        <item.icon />
+                        <span className={cn(state === 'collapsed' && 'hidden')}>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+              <SidebarSeparator />
+              <SidebarGroup>
+                <SidebarGroupLabel className="flex items-center gap-2">
+                  <CheckSquare />
+                  <span className={cn(state === 'collapsed' && 'hidden')}>Approvals</span>
+                </SidebarGroupLabel>
+                <SidebarMenu>
+                  {APPROVAL_NAV_ITEMS.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname === item.href}
+                        className="justify-center data-[state=expanded]:justify-start"
+                      >
+                        <Link href={item.href}>
+                          <item.icon />
+                          <span className={cn(state === 'collapsed' && 'hidden')}>{item.label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroup>
+
+            </div>
+            <SidebarFooter>
+              <UserProfile />
+            </SidebarFooter>
           </SidebarContent>
-          <SidebarFooter>
-            <UserProfile />
-          </SidebarFooter>
         </Sidebar>
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">

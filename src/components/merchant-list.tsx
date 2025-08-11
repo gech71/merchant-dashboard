@@ -41,7 +41,7 @@ import { AddMerchantForm } from './add-merchant-form';
 
 type SortableKeys = 'name' | 'company' | 'email' | 'status';
 
-export default function MerchantList({ merchants: initialMerchants }: { merchants: Merchant[] }) {
+export default function MerchantList({ merchants: initialMerchants, approvalView = false }: { merchants: Merchant[], approvalView?: boolean }) {
   const [merchants, setMerchants] = React.useState(initialMerchants);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -49,7 +49,7 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
   const [isAddMerchantOpen, setIsAddMerchantOpen] = React.useState(false);
-  const [activeTab, setActiveTab] = React.useState('all');
+  const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
 
 
   const handleStatusChange = (merchantId: string, status: 'Active' | 'Disabled') => {
@@ -130,14 +130,16 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
 
   return (
     <Dialog open={isAddMerchantOpen} onOpenChange={setIsAddMerchantOpen}>
-      <Tabs defaultValue="all" onValueChange={setActiveTab}>
+      <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
         <div className="flex items-center">
-          <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="active">Active</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="disabled">Disabled</TabsTrigger>
-          </TabsList>
+          {!approvalView && (
+            <TabsList>
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="active">Active</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
+              <TabsTrigger value="disabled">Disabled</TabsTrigger>
+            </TabsList>
+          )}
           <div className="ml-auto flex items-center gap-2">
             <Input
               placeholder="Search merchants..."
@@ -145,22 +147,24 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-8 w-[150px] lg:w-[250px]"
             />
-            <DialogTrigger asChild>
-              <Button size="sm" className="h-8 gap-1">
-                <PlusCircle className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                  Add Merchant
-                </span>
-              </Button>
-            </DialogTrigger>
+            {!approvalView && (
+              <DialogTrigger asChild>
+                <Button size="sm" className="h-8 gap-1">
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                    Add Merchant
+                  </span>
+                </Button>
+              </DialogTrigger>
+            )}
           </div>
         </div>
         <TabsContent value={activeTab}>
           <Card>
             <CardHeader>
-              <CardTitle>Merchants</CardTitle>
+              <CardTitle>{approvalView ? 'Merchant Approvals' : 'Merchants'}</CardTitle>
               <CardDescription>
-                Manage company merchants.
+                {approvalView ? 'Review and approve pending merchants.' : 'Manage company merchants.'}
               </CardDescription>
             </CardHeader>
             <CardContent>
