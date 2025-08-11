@@ -152,7 +152,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                 <Button size="sm" className="h-8 gap-1">
                   <UserPlus className="h-3.5 w-3.5" />
                   <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Add Merchant Admin
+                    Add Merchant User
                   </span>
                 </Button>
               </DialogTrigger>
@@ -264,7 +264,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
       </Tabs>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Merchant Admin</DialogTitle>
+          <DialogTitle>Add New Merchant User</DialogTitle>
         </DialogHeader>
         <AddMerchantForm setOpen={setIsAddMerchantOpen} />
       </DialogContent>

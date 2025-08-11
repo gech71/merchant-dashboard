@@ -17,14 +17,41 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Merchant, Company } from '@/types';
 
 const merchantFormSchema = z.object({
-  name: z.string().min(2, 'Admin name must be at least 2 characters.'),
-  company: z.string().min(2, 'Company name must be at least 2 characters.'),
+  name: z.string().min(2, 'Full name must be at least 2 characters.'),
+  company: z.string({ required_error: 'Please select a company.' }),
   email: z.string().email('Please enter a valid email address.'),
+  role: z.enum(['Admin', 'Sales'], { required_error: 'Please select a role.' }),
 });
 
 type MerchantFormValues = z.infer<typeof merchantFormSchema>;
+
+// In a real app, this would be fetched from your API
+const MOCK_COMPANIES: Pick<Company, 'id' | 'fieldName'>[] = [
+    { id: '1', fieldName: 'Innovate Inc.'},
+    { id: '2', fieldName: 'Apex Solutions'},
+    { id: '3', fieldName: 'Quantum Corp'},
+    { id: '4', fieldName: 'Synergy Systems'},
+    { id: '5', fieldName: 'Pioneer Ltd.'},
+    { id: '6', fieldName: 'Zenith Ventures'},
+    { id: '7', fieldName: 'Starlight Co.'},
+    { id: '8', fieldName: 'Momentum'},
+    { id: '9', fieldName: 'Nexus Group'},
+    { id: '10', fieldName: 'Horizon Dynamics'},
+];
+
+// In a real app, this would be fetched from your API
+const MOCK_EXISTING_MERCHANTS: Pick<Merchant, 'company' | 'role'>[] = [
+    { company: 'Innovate Inc.', role: 'Admin' },
+    { company: 'Apex Solutions', role: 'Admin' },
+    { company: 'Quantum Corp', role: 'Admin' },
+    { company: 'Synergy Systems', role: 'Admin' },
+    { company: 'Pioneer Ltd.', role: 'Admin' },
+];
+
 
 export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void }) {
   const { toast } = useToast();
@@ -32,17 +59,27 @@ export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void 
     resolver: zodResolver(merchantFormSchema),
     defaultValues: {
       name: '',
-      company: '',
       email: '',
     },
   });
 
   function onSubmit(data: MerchantFormValues) {
-    // In a real app, you'd check if an admin for this company already exists.
-    // For now, we'll assume it's valid.
-    console.log({ ...data, role: 'Admin', status: 'Pending' }); 
+    if (data.role === 'Admin') {
+      const adminExists = MOCK_EXISTING_MERCHANTS.some(
+        (merchant) => merchant.company === data.company && merchant.role === 'Admin'
+      );
+      if (adminExists) {
+        form.setError('company', { 
+            type: 'manual', 
+            message: `An Admin user already exists for ${data.company}.` 
+        });
+        return;
+      }
+    }
+
+    console.log({ ...data, status: 'Pending' }); 
     toast({
-      title: 'Merchant Admin Submitted for Approval',
+      title: 'Merchant User Submitted for Approval',
       description: `${data.name} has been successfully submitted for verification.`,
     });
     setOpen(false);
@@ -56,7 +93,7 @@ export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void 
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Admin Full Name</FormLabel>
+              <FormLabel>Full Name</FormLabel>
               <FormControl>
                 <Input placeholder="John Doe" {...field} />
               </FormControl>
@@ -70,9 +107,39 @@ export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void 
           render={({ field }) => (
             <FormItem>
               <FormLabel>Company</FormLabel>
-              <FormControl>
-                <Input placeholder="Innovate Inc." {...field} />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a company" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {MOCK_COMPANIES.map(company => (
+                     <SelectItem key={company.id} value={company.fieldName}>{company.fieldName}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+         <FormField
+          control={form.control}
+          name="role"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Role</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Admin">Admin</SelectItem>
+                  <SelectItem value="Sales">Sales</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -84,7 +151,7 @@ export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void 
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="admin@innovate.com" {...field} />
+                <Input placeholder="user@company.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -92,7 +159,7 @@ export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void 
         />
         <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit">Add Admin User</Button>
+            <Button type="submit">Add User</Button>
         </div>
       </form>
     </Form>
