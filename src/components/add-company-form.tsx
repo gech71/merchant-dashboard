@@ -36,8 +36,8 @@ export function AddCompanyForm({ setOpen }: { setOpen: (open: boolean) => void }
   });
 
   function onSubmit(data: CompanyFormValues) {
-    // In a real app, you'd handle form submission here, setting status to 'Pending'
-    console.log({ ...data, status: 'Pending' }); 
+    // In a real app, you'd handle form submission here
+    console.log({ ...data, approved: false, status: 'Pending' }); 
     toast({
       title: 'Company Submitted for Approval',
       description: `${data.fieldName} has been sent for verification.`,

@@ -34,7 +34,7 @@ import { AddCompanyForm } from './add-company-form';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from './ui/dropdown-menu';
 
-type SortableKeys = 'fieldName' | 'accountNumber' | 'status' | 'approveUser';
+type SortableKeys = 'fieldName' | 'accountNumber' | 'status' | 'approveUser' | 'approved';
 
 export default function CompanyList({ companies: initialCompanies, approvalView = false }: { companies: Company[], approvalView?: boolean }) {
   const [companies, setCompanies] = React.useState(initialCompanies);
@@ -46,9 +46,19 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
   const [isAddCompanyOpen, setIsAddCompanyOpen] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
 
-  const handleStatusChange = (companyId: string, status: 'Approved' | 'Rejected') => {
-    setCompanies(companies.map(c => c.id === companyId ? { ...c, status, approveUser: status === 'Approved' ? 'admin' : undefined } : c));
+  const handleApproval = (companyId: string, isApproved: boolean) => {
+    setCompanies(companies.map(c => 
+      c.id === companyId 
+        ? { 
+            ...c, 
+            approved: isApproved, 
+            status: isApproved ? 'Active' : 'Inactive', // Or 'Rejected', 'Inactive' etc.
+            approveUser: isApproved ? 'admin' : undefined 
+          } 
+        : c
+    ).filter(c => approvalView ? c.status === 'Pending' : true));
   };
+  
 
   const requestSort = (key: SortableKeys) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -65,7 +75,10 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
   const filteredAndSortedCompanies = React.useMemo(() => {
     let sortableItems = [...companies];
 
-    if (activeTab !== 'all') {
+    if (approvalView) {
+      sortableItems = sortableItems.filter(c => c.status === 'Pending');
+    }
+    else if (activeTab !== 'all') {
       sortableItems = sortableItems.filter(
         (company) => company.status.toLowerCase() === activeTab
       );
@@ -81,6 +94,9 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
       sortableItems.sort((a, b) => {
         const valA = a[sortConfig.key] ?? '';
         const valB = b[sortConfig.key] ?? '';
+        if (typeof valA === 'boolean' && typeof valB === 'boolean') {
+          return sortConfig.direction === 'ascending' ? (valA === valB ? 0 : valA ? -1 : 1) : (valA === valB ? 0 : valA ? 1 : -1)
+        }
         if (valA < valB) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
@@ -92,7 +108,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
     }
 
     return sortableItems;
-  }, [companies, searchTerm, sortConfig, activeTab]);
+  }, [companies, searchTerm, sortConfig, activeTab, approvalView]);
 
   const getSortIndicator = (key: SortableKeys) => {
     if (sortConfig?.key !== key) {
@@ -107,11 +123,11 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
   
   const getStatusVariant = (status: Company['status']) => {
     switch (status) {
-      case 'Approved':
+      case 'Active':
         return 'default';
       case 'Pending':
         return 'secondary';
-      case 'Rejected':
+      case 'Inactive':
         return 'destructive';
       default:
         return 'outline';
@@ -126,9 +142,9 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
           {!approvalView && (
             <TabsList>
               <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="approved">Approved</TabsTrigger>
+              <TabsTrigger value="active">Active</TabsTrigger>
               <TabsTrigger value="pending">Pending</TabsTrigger>
-              <TabsTrigger value="rejected">Rejected</TabsTrigger>
+              <TabsTrigger value="inactive">Inactive</TabsTrigger>
             </TabsList>
           )}
           <div className="ml-auto flex items-center gap-2">
@@ -150,7 +166,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
             )}
           </div>
         </div>
-        <TabsContent value={activeTab}>
+        <TabsContent value={approvalView ? 'pending' : activeTab}>
           <Card>
             <CardHeader>
               <CardTitle>{approvalView ? 'Company Approvals' : 'Companies'}</CardTitle>
@@ -181,6 +197,16 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                         >
                           Account Number
                           {getSortIndicator('accountNumber')}
+                        </Button>
+                      </TableHead>
+                      <TableHead>
+                        <Button
+                          variant="ghost"
+                          onClick={() => requestSort('approved')}
+                          className="px-2"
+                        >
+                          Approved
+                          {getSortIndicator('approved')}
                         </Button>
                       </TableHead>
                        <TableHead>
@@ -230,6 +256,9 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                             </div>
                           </TableCell>
                           <TableCell>{company.accountNumber}</TableCell>
+                           <TableCell>
+                             <Badge variant={company.approved ? 'default' : 'secondary'}>{company.approved ? 'Yes' : 'No'}</Badge>
+                          </TableCell>
                           <TableCell>
                              <Badge variant={getStatusVariant(company.status)}>{company.status}</Badge>
                           </TableCell>
@@ -247,11 +276,11 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                                 <DropdownMenuItem>Edit</DropdownMenuItem>
                                 {company.status === 'Pending' && (
                                   <>
-                                    <DropdownMenuItem onClick={() => handleStatusChange(company.id, 'Approved')}>
+                                    <DropdownMenuItem onClick={() => handleApproval(company.id, true)}>
                                       <CheckCircle className="mr-2 h-4 w-4" />
                                       Approve
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleStatusChange(company.id, 'Rejected')}>
+                                    <DropdownMenuItem onClick={() => handleApproval(company.id, false)}>
                                       <XCircle className="mr-2 h-4 w-4" />
                                       Reject
                                     </DropdownMenuItem>
@@ -265,7 +294,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                     ) : (
                       <TableRow>
                         <TableCell
-                          colSpan={5}
+                          colSpan={6}
                           className="text-center h-24 text-muted-foreground"
                         >
                           No companies found.

@@ -6,7 +6,8 @@ export type Company = {
   approveUser?: string;
   logoUrl: string;
   hint: string;
-  status: 'Approved' | 'Pending' | 'Rejected';
+  approved: boolean;
+  status: 'Active' | 'Inactive' | 'Pending';
 };
 
 export type Branch = {
