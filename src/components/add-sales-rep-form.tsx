@@ -17,19 +17,11 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 const salesRepFormSchema = z.object({
   name: z.string().min(2, 'Sales rep name must be at least 2 characters.'),
   company: z.string().min(2, 'Company name must be at least 2 characters.'),
   email: z.string().email('Please enter a valid email address.'),
-  status: z.enum(['Active', 'Inactive']),
 });
 
 type SalesRepFormValues = z.infer<typeof salesRepFormSchema>;
@@ -42,15 +34,14 @@ export function AddSalesRepForm({ setOpen }: { setOpen: (open: boolean) => void 
       name: '',
       company: '',
       email: '',
-      status: 'Active',
     },
   });
 
   function onSubmit(data: SalesRepFormValues) {
-    console.log(data); // In a real app, you'd handle form submission here
+    console.log({ ...data, status: 'Pending' }); // In a real app, you'd handle form submission here
     toast({
-      title: 'Sales Rep Added',
-      description: `${data.name} has been successfully added.`,
+      title: 'Sales Rep Submitted for Approval',
+      description: `${data.name} has been successfully added and is awaiting verification.`,
     });
     setOpen(false);
   }
@@ -93,27 +84,6 @@ export function AddSalesRepForm({ setOpen }: { setOpen: (open: boolean) => void 
               <FormControl>
                 <Input placeholder="Innovate Inc." {...field} />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
               <FormMessage />
             </FormItem>
           )}

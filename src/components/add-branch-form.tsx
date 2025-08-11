@@ -40,10 +40,10 @@ export function AddBranchForm({ setOpen }: { setOpen: (open: boolean) => void })
   });
 
   function onSubmit(data: BranchFormValues) {
-    console.log(data); // In a real app, you'd handle form submission here
+    console.log({ ...data, status: 'Pending' }); // In a real app, you'd handle form submission here
     toast({
-      title: 'Branch Added',
-      description: `${data.name} has been successfully added.`,
+      title: 'Branch Submitted for Approval',
+      description: `${data.name} has been successfully submitted for verification.`,
     });
     setOpen(false);
   }

@@ -4,6 +4,7 @@ export type Company = {
   sales: number;
   logoUrl: string;
   hint: string;
+  status: 'Approved' | 'Pending' | 'Rejected';
 };
 
 export type Branch = {
@@ -12,6 +13,7 @@ export type Branch = {
   code: string;
   address: string;
   contact: string;
+  status: 'Approved' | 'Pending' | 'Rejected';
 };
 
 export type Merchant = {
@@ -27,5 +29,5 @@ export type SalesRep = {
   name: string;
   email: string;
   company: string;
-  status: 'Active' | 'Inactive';
+  status: 'Active' | 'Inactive' | 'Pending';
 };

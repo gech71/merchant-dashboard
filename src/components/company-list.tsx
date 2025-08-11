@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import type { Company } from '@/types';
-import { ArrowUpDown, PlusCircle } from 'lucide-react';
+import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle, Clock } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,16 +31,24 @@ import {
 } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AddCompanyForm } from './add-company-form';
+import { Badge } from '@/components/ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from './ui/dropdown-menu';
 
-type SortableKeys = 'name' | 'sales';
+type SortableKeys = 'name' | 'sales' | 'status';
 
-export default function CompanyList({ companies }: { companies: Company[] }) {
+export default function CompanyList({ companies: initialCompanies }: { companies: Company[] }) {
+  const [companies, setCompanies] = React.useState(initialCompanies);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'sales', direction: 'descending' });
   const [isAddCompanyOpen, setIsAddCompanyOpen] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState('all');
+
+  const handleStatusChange = (companyId: string, status: 'Approved' | 'Rejected') => {
+    setCompanies(companies.map(c => c.id === companyId ? { ...c, status } : c));
+  };
 
   const requestSort = (key: SortableKeys) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -57,6 +65,12 @@ export default function CompanyList({ companies }: { companies: Company[] }) {
   const filteredAndSortedCompanies = React.useMemo(() => {
     let sortableItems = [...companies];
 
+    if (activeTab !== 'all') {
+      sortableItems = sortableItems.filter(
+        (company) => company.status.toLowerCase() === activeTab
+      );
+    }
+    
     if (searchTerm) {
       sortableItems = sortableItems.filter((company) =>
         company.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -76,27 +90,42 @@ export default function CompanyList({ companies }: { companies: Company[] }) {
     }
 
     return sortableItems;
-  }, [companies, searchTerm, sortConfig]);
+  }, [companies, searchTerm, sortConfig, activeTab]);
 
   const getSortIndicator = (key: SortableKeys) => {
     if (sortConfig?.key !== key) {
       return <ArrowUpDown className="ml-2 h-4 w-4 opacity-30" />;
     }
     return sortConfig.direction === 'ascending' ? (
-      <ArrowUpDown className="ml-2 h-4 w-4" /> // Replace with ArrowUp if you prefer distinct icons
+      <ArrowUpDown className="ml-2 h-4 w-4" /> 
     ) : (
-      <ArrowUpDown className="ml-2 h-4 w-4" /> // Replace with ArrowDown
+      <ArrowUpDown className="ml-2 h-4 w-4" />
     );
   };
+  
+  const getStatusVariant = (status: Company['status']) => {
+    switch (status) {
+      case 'Approved':
+        return 'default';
+      case 'Pending':
+        return 'secondary';
+      case 'Rejected':
+        return 'destructive';
+      default:
+        return 'outline';
+    }
+  };
+
 
   return (
     <Dialog open={isAddCompanyOpen} onOpenChange={setIsAddCompanyOpen}>
-      <Tabs defaultValue="all">
+      <Tabs defaultValue="all" onValueChange={setActiveTab}>
         <div className="flex items-center">
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="active">Approved</TabsTrigger>
+            <TabsTrigger value="approved">Approved</TabsTrigger>
             <TabsTrigger value="pending">Pending</TabsTrigger>
+            <TabsTrigger value="rejected">Rejected</TabsTrigger>
           </TabsList>
           <div className="ml-auto flex items-center gap-2">
             <Input
@@ -115,7 +144,7 @@ export default function CompanyList({ companies }: { companies: Company[] }) {
             </DialogTrigger>
           </div>
         </div>
-        <TabsContent value="all">
+        <TabsContent value={activeTab}>
           <Card>
             <CardHeader>
               <CardTitle>Companies</CardTitle>
@@ -128,7 +157,7 @@ export default function CompanyList({ companies }: { companies: Company[] }) {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-2/3">
+                      <TableHead>
                         <Button
                           variant="ghost"
                           onClick={() => requestSort('name')}
@@ -138,7 +167,17 @@ export default function CompanyList({ companies }: { companies: Company[] }) {
                           {getSortIndicator('name')}
                         </Button>
                       </TableHead>
-                      <TableHead className="w-1/3 text-right">
+                       <TableHead>
+                        <Button
+                          variant="ghost"
+                          onClick={() => requestSort('status')}
+                          className="px-2"
+                        >
+                          Status
+                          {getSortIndicator('status')}
+                        </Button>
+                      </TableHead>
+                      <TableHead className="text-right">
                         <Button
                           variant="ghost"
                           onClick={() => requestSort('sales')}
@@ -147,6 +186,9 @@ export default function CompanyList({ companies }: { companies: Company[] }) {
                           Sales
                           {getSortIndicator('sales')}
                         </Button>
+                      </TableHead>
+                       <TableHead>
+                        <span className="sr-only">Actions</span>
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -169,6 +211,9 @@ export default function CompanyList({ companies }: { companies: Company[] }) {
                               <span className="font-medium">{company.name}</span>
                             </div>
                           </TableCell>
+                          <TableCell>
+                             <Badge variant={getStatusVariant(company.status)}>{company.status}</Badge>
+                          </TableCell>
                           <TableCell className="text-right font-mono">
                             {new Intl.NumberFormat('en-US', {
                               style: 'currency',
@@ -177,12 +222,38 @@ export default function CompanyList({ companies }: { companies: Company[] }) {
                               maximumFractionDigits: 0,
                             }).format(company.sales)}
                           </TableCell>
+                           <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button aria-haspopup="true" size="icon" variant="ghost">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                  <span className="sr-only">Toggle menu</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                                {company.status === 'Pending' && (
+                                  <>
+                                    <DropdownMenuItem onClick={() => handleStatusChange(company.id, 'Approved')}>
+                                      <CheckCircle className="mr-2 h-4 w-4" />
+                                      Approve
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleStatusChange(company.id, 'Rejected')}>
+                                      <XCircle className="mr-2 h-4 w-4" />
+                                      Reject
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
                         <TableCell
-                          colSpan={2}
+                          colSpan={4}
                           className="text-center h-24 text-muted-foreground"
                         >
                           No companies found.

@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import type { SalesRep } from '@/types';
-import { ArrowUpDown, PlusCircle, MoreHorizontal } from 'lucide-react';
+import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -41,13 +41,19 @@ import { AddSalesRepForm } from './add-sales-rep-form';
 
 type SortableKeys = 'name' | 'email' | 'company' | 'status';
 
-export default function SalesRepList({ salesReps }: { salesReps: SalesRep[] }) {
+export default function SalesRepList({ salesReps: initialSalesReps }: { salesReps: SalesRep[] }) {
+  const [salesReps, setSalesReps] = React.useState(initialSalesReps);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
   const [isAddSalesRepOpen, setIsAddSalesRepOpen] = React.useState(false);
+
+  const handleStatusChange = (repId: string, status: 'Active' | 'Inactive') => {
+    setSalesReps(salesReps.map(rep => rep.id === repId ? { ...rep, status } : rep));
+  };
+
 
   const requestSort = (key: SortableKeys) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -100,6 +106,19 @@ export default function SalesRepList({ salesReps }: { salesReps: SalesRep[] }) {
       <ArrowUpDown className="ml-2 h-4 w-4" />
     );
   };
+  
+  const getStatusVariant = (status: SalesRep['status']) => {
+    switch (status) {
+      case 'Active':
+        return 'default';
+      case 'Pending':
+        return 'secondary';
+      case 'Inactive':
+        return 'destructive';
+      default:
+        return 'outline';
+    }
+  };
 
   return (
     <Dialog open={isAddSalesRepOpen} onOpenChange={setIsAddSalesRepOpen}>
@@ -108,6 +127,7 @@ export default function SalesRepList({ salesReps }: { salesReps: SalesRep[] }) {
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="active">Active</TabsTrigger>
+            <TabsTrigger value="pending">Pending</TabsTrigger>
             <TabsTrigger value="inactive">Inactive</TabsTrigger>
           </TabsList>
           <div className="ml-auto flex items-center gap-2">
@@ -177,7 +197,7 @@ export default function SalesRepList({ salesReps }: { salesReps: SalesRep[] }) {
                           <TableCell className="hidden md:table-cell">{rep.email}</TableCell>
                           <TableCell>{rep.company}</TableCell>
                           <TableCell>
-                            <Badge variant={rep.status === 'Active' ? 'default' : 'secondary'}>{rep.status}</Badge>
+                            <Badge variant={getStatusVariant(rep.status)}>{rep.status}</Badge>
                           </TableCell>
                           <TableCell>
                             <DropdownMenu>
@@ -190,7 +210,18 @@ export default function SalesRepList({ salesReps }: { salesReps: SalesRep[] }) {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 <DropdownMenuItem>Edit</DropdownMenuItem>
-                                <DropdownMenuItem>Delete</DropdownMenuItem>
+                                {rep.status === 'Pending' && (
+                                  <>
+                                    <DropdownMenuItem onClick={() => handleStatusChange(rep.id, 'Active')}>
+                                      <CheckCircle className="mr-2 h-4 w-4" />
+                                      Approve
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleStatusChange(rep.id, 'Inactive')}>
+                                      <XCircle className="mr-2 h-4 w-4" />
+                                      Reject
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>

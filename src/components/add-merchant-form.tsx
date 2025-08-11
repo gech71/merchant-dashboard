@@ -29,7 +29,6 @@ const merchantFormSchema = z.object({
   name: z.string().min(2, 'Merchant name must be at least 2 characters.'),
   company: z.string().min(2, 'Company name must be at least 2 characters.'),
   email: z.string().email('Please enter a valid email address.'),
-  status: z.enum(['Active', 'Pending', 'Disabled']),
 });
 
 type MerchantFormValues = z.infer<typeof merchantFormSchema>;
@@ -42,15 +41,14 @@ export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void 
       name: '',
       company: '',
       email: '',
-      status: 'Pending',
     },
   });
 
   function onSubmit(data: MerchantFormValues) {
-    console.log(data); // In a real app, you'd handle form submission here
+    console.log({ ...data, status: 'Pending' }); // In a real app, you'd handle form submission here
     toast({
-      title: 'Merchant Added',
-      description: `${data.name} has been successfully added.`,
+      title: 'Merchant Submitted for Approval',
+      description: `${data.name} has been successfully submitted for verification.`,
     });
     setOpen(false);
   }
@@ -93,28 +91,6 @@ export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void 
               <FormControl>
                 <Input placeholder="contact@cornercafe.com" {...field} />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Pending">Pending</SelectItem>
-                  <SelectItem value="Disabled">Disabled</SelectItem>
-                </SelectContent>
-              </Select>
               <FormMessage />
             </FormItem>
           )}

@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import type { Merchant } from '@/types';
-import { ArrowUpDown, PlusCircle, MoreHorizontal } from 'lucide-react';
+import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -41,13 +41,18 @@ import { AddMerchantForm } from './add-merchant-form';
 
 type SortableKeys = 'name' | 'company' | 'email' | 'status';
 
-export default function MerchantList({ merchants }: { merchants: Merchant[] }) {
+export default function MerchantList({ merchants: initialMerchants }: { merchants: Merchant[] }) {
+  const [merchants, setMerchants] = React.useState(initialMerchants);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
   const [isAddMerchantOpen, setIsAddMerchantOpen] = React.useState(false);
+
+  const handleStatusChange = (merchantId: string, status: 'Active' | 'Disabled') => {
+    setMerchants(merchants.map(m => m.id === merchantId ? { ...m, status } : m));
+  };
 
   const requestSort = (key: SortableKeys) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -100,6 +105,20 @@ export default function MerchantList({ merchants }: { merchants: Merchant[] }) {
       <ArrowUpDown className="ml-2 h-4 w-4" />
     );
   };
+  
+  const getStatusVariant = (status: Merchant['status']) => {
+    switch (status) {
+      case 'Active':
+        return 'default';
+      case 'Pending':
+        return 'secondary';
+      case 'Disabled':
+        return 'destructive';
+      default:
+        return 'outline';
+    }
+  };
+
 
   return (
     <Dialog open={isAddMerchantOpen} onOpenChange={setIsAddMerchantOpen}>
@@ -178,7 +197,7 @@ export default function MerchantList({ merchants }: { merchants: Merchant[] }) {
                           <TableCell>{merchant.company}</TableCell>
                           <TableCell className="hidden md:table-cell">{merchant.email}</TableCell>
                           <TableCell>
-                            <Badge variant={merchant.status === 'Active' ? 'default' : merchant.status === 'Pending' ? 'secondary' : 'destructive'}>{merchant.status}</Badge>
+                            <Badge variant={getStatusVariant(merchant.status)}>{merchant.status}</Badge>
                           </TableCell>
                           <TableCell>
                             <DropdownMenu>
@@ -191,7 +210,18 @@ export default function MerchantList({ merchants }: { merchants: Merchant[] }) {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 <DropdownMenuItem>Edit</DropdownMenuItem>
-                                <DropdownMenuItem>Delete</DropdownMenuItem>
+                                {merchant.status === 'Pending' && (
+                                  <>
+                                    <DropdownMenuItem onClick={() => handleStatusChange(merchant.id, 'Active')}>
+                                      <CheckCircle className="mr-2 h-4 w-4" />
+                                      Approve
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleStatusChange(merchant.id, 'Disabled')}>
+                                      <XCircle className="mr-2 h-4 w-4" />
+                                      Reject
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>

@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import type { Branch } from '@/types';
-import { ArrowUpDown, PlusCircle, MoreHorizontal } from 'lucide-react';
+import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,16 +31,22 @@ import {
 } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AddBranchForm } from './add-branch-form';
+import { Badge } from '@/components/ui/badge';
 
-type SortableKeys = 'name' | 'code' | 'address' | 'contact';
+type SortableKeys = 'name' | 'code' | 'address' | 'contact' | 'status';
 
-export default function BranchList({ branches }: { branches: Branch[] }) {
+export default function BranchList({ branches: initialBranches }: { branches: Branch[] }) {
+  const [branches, setBranches] = React.useState(initialBranches);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
   const [isAddBranchOpen, setIsAddBranchOpen] = React.useState(false);
+
+  const handleStatusChange = (branchId: string, status: 'Approved' | 'Rejected') => {
+    setBranches(branches.map(b => b.id === branchId ? { ...b, status } : b));
+  };
 
   const requestSort = (key: SortableKeys) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -92,6 +98,19 @@ export default function BranchList({ branches }: { branches: Branch[] }) {
     ) : (
       <ArrowUpDown className="ml-2 h-4 w-4" />
     );
+  };
+
+  const getStatusVariant = (status: Branch['status']) => {
+    switch (status) {
+      case 'Approved':
+        return 'default';
+      case 'Pending':
+        return 'secondary';
+      case 'Rejected':
+        return 'destructive';
+      default:
+        return 'outline';
+    }
   };
 
   return (
@@ -165,6 +184,16 @@ export default function BranchList({ branches }: { branches: Branch[] }) {
                     </Button>
                   </TableHead>
                   <TableHead>
+                    <Button
+                      variant="ghost"
+                      onClick={() => requestSort('status')}
+                      className="px-2"
+                    >
+                      Status
+                      {getSortIndicator('status')}
+                    </Button>
+                  </TableHead>
+                  <TableHead>
                     <span className="sr-only">Actions</span>
                   </TableHead>
                 </TableRow>
@@ -178,6 +207,9 @@ export default function BranchList({ branches }: { branches: Branch[] }) {
                       <TableCell className="hidden md:table-cell">{branch.address}</TableCell>
                       <TableCell>{branch.contact}</TableCell>
                       <TableCell>
+                        <Badge variant={getStatusVariant(branch.status)}>{branch.status}</Badge>
+                      </TableCell>
+                      <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button aria-haspopup="true" size="icon" variant="ghost">
@@ -188,7 +220,18 @@ export default function BranchList({ branches }: { branches: Branch[] }) {
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
+                            {branch.status === 'Pending' && (
+                              <>
+                                <DropdownMenuItem onClick={() => handleStatusChange(branch.id, 'Approved')}>
+                                  <CheckCircle className="mr-2 h-4 w-4" />
+                                  Approve
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleStatusChange(branch.id, 'Rejected')}>
+                                  <XCircle className="mr-2 h-4 w-4" />
+                                  Reject
+                                </DropdownMenuItem>
+                              </>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -196,7 +239,7 @@ export default function BranchList({ branches }: { branches: Branch[] }) {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
+                    <TableCell colSpan={6} className="h-24 text-center">
                       No branches found.
                     </TableCell>
                   </TableRow>
