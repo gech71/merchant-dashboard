@@ -13,6 +13,7 @@ import {
   UserCircle,
   CheckSquare,
   UserCog,
+  LayoutGrid
 } from 'lucide-react';
 
 import {
@@ -40,6 +41,7 @@ import {
 import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
+  { href: '/dashboard', icon: LayoutGrid, label: 'Dashboard' },
   { href: '/dashboard/companies', icon: Building, label: 'Companies' },
   { href: '/dashboard/branches', icon: Home, label: 'Branches' },
   { href: '/dashboard/branch-users', icon: UserCog, label: 'Branch Users' },
@@ -66,7 +68,7 @@ function UserProfile() {
                 'flex flex-col text-left transition-opacity duration-200'
             )}
           >
-            <p className="text-sm font-medium">System Admin</p>
+            <p className="font-medium">System Admin</p>
             <p className="text-xs text-muted-foreground">
               admin@merchantview.com
             </p>
