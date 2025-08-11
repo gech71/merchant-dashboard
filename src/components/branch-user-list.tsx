@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import type { BranchUser } from '@/types';
+import type { BranchUser, EditableItem } from '@/types';
 import { ArrowUpDown, UserPlus, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AddBranchUserForm } from './add-branch-user-form';
+import { EditBranchUserForm } from './edit-branch-user-form';
 import { useDataContext } from '@/context/data-context';
 
 type SortableKeys = 'name' | 'email' | 'branch' | 'status';
@@ -51,6 +52,8 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
   const [isAddUserOpen, setIsAddUserOpen] = React.useState(false);
+  const [isEditUserOpen, setIsEditUserOpen] = React.useState(false);
+  const [selectedUser, setSelectedUser] = React.useState<EditableItem>(null);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
   
   React.useEffect(() => {
@@ -59,6 +62,11 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
 
   const handleStatusChange = (userId: string, status: 'Active' | 'Inactive') => {
     updateBranchUserStatus(userId, status);
+  };
+  
+  const handleEdit = (user: BranchUser) => {
+    setSelectedUser(user);
+    setIsEditUserOpen(true);
   };
 
   const requestSort = (key: SortableKeys) => {
@@ -133,6 +141,7 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
   };
 
   return (
+    <>
     <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
         <div className="flex items-center">
@@ -225,7 +234,7 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleEdit(user)}>Edit</DropdownMenuItem>
                                 {user.status === 'Pending' && (
                                   <>
                                     <DropdownMenuItem onClick={() => handleStatusChange(user.id, 'Active')}>
@@ -264,5 +273,19 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
         <AddBranchUserForm setOpen={setIsAddUserOpen} />
       </DialogContent>
     </Dialog>
+    <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Edit Branch User</DialogTitle>
+            </DialogHeader>
+            {selectedUser && selectedUser.hasOwnProperty('branch') && (
+                <EditBranchUserForm
+                    user={selectedUser as BranchUser}
+                    setOpen={setIsEditUserOpen}
+                />
+            )}
+        </DialogContent>
+    </Dialog>
+    </>
   );
 }

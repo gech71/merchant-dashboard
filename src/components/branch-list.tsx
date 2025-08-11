@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch } from '@/types';
+import type { Branch, EditableItem } from '@/types';
 import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AddBranchForm } from './add-branch-form';
+import { EditBranchForm } from './edit-branch-form';
 import { Badge } from '@/components/ui/badge';
 import { useDataContext } from '@/context/data-context';
 
@@ -45,6 +46,8 @@ export default function BranchList({ branches: initialBranches, approvalView = f
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
   const [isAddBranchOpen, setIsAddBranchOpen] = React.useState(false);
+  const [isEditBranchOpen, setIsEditBranchOpen] = React.useState(false);
+  const [selectedBranch, setSelectedBranch] = React.useState<EditableItem>(null);
   
   React.useEffect(() => {
     setBranches(initialBranches);
@@ -52,6 +55,11 @@ export default function BranchList({ branches: initialBranches, approvalView = f
 
   const handleStatusChange = (branchId: string, status: 'Approved' | 'Rejected') => {
     updateBranchStatus(branchId, status);
+  };
+  
+  const handleEdit = (branch: Branch) => {
+    setSelectedBranch(branch);
+    setIsEditBranchOpen(true);
   };
 
   const requestSort = (key: SortableKeys) => {
@@ -120,6 +128,7 @@ export default function BranchList({ branches: initialBranches, approvalView = f
   };
 
   return (
+    <>
     <Dialog open={isAddBranchOpen} onOpenChange={setIsAddBranchOpen}>
       <Card>
         <CardHeader>
@@ -227,7 +236,7 @@ export default function BranchList({ branches: initialBranches, approvalView = f
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            {!approvalView && <DropdownMenuItem>Edit</DropdownMenuItem>}
+                            {!approvalView && <DropdownMenuItem onClick={() => handleEdit(branch)}>Edit</DropdownMenuItem>}
                             {branch.status === 'Pending' && (
                               <>
                                 <DropdownMenuItem onClick={() => handleStatusChange(branch.id, 'Approved')}>
@@ -264,5 +273,19 @@ export default function BranchList({ branches: initialBranches, approvalView = f
         <AddBranchForm setOpen={setIsAddBranchOpen} />
       </DialogContent>
     </Dialog>
+    <Dialog open={isEditBranchOpen} onOpenChange={setIsEditBranchOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Edit Branch</DialogTitle>
+            </DialogHeader>
+            {selectedBranch && selectedBranch.hasOwnProperty('code') && (
+                <EditBranchForm 
+                    branch={selectedBranch as Branch} 
+                    setOpen={setIsEditBranchOpen} 
+                />
+            )}
+        </DialogContent>
+    </Dialog>
+    </>
   );
 }

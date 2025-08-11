@@ -2,8 +2,8 @@
 'use client';
 
 import * as React from 'react';
-import type { Merchant } from '@/types';
-import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle, UserPlus } from 'lucide-react';
+import type { Merchant, EditableItem } from '@/types';
+import { ArrowUpDown, UserPlus, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AddMerchantForm } from './add-merchant-form';
+import { EditMerchantForm } from './edit-merchant-form';
 import { useDataContext } from '@/context/data-context';
 
 type SortableKeys = 'name' | 'company' | 'email' | 'status' | 'role';
@@ -51,6 +52,8 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
   const [isAddMerchantOpen, setIsAddMerchantOpen] = React.useState(false);
+  const [isEditMerchantOpen, setIsEditMerchantOpen] = React.useState(false);
+  const [selectedMerchant, setSelectedMerchant] = React.useState<EditableItem>(null);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
 
   React.useEffect(() => {
@@ -59,6 +62,11 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
   
   const handleStatusChange = (merchantId: string, status: 'Active' | 'Disabled') => {
     updateMerchantStatus(merchantId, status);
+  };
+  
+  const handleEdit = (merchant: Merchant) => {
+    setSelectedMerchant(merchant);
+    setIsEditMerchantOpen(true);
   };
 
   const requestSort = (key: SortableKeys) => {
@@ -149,6 +157,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
 
 
   return (
+    <>
     <Dialog open={isAddMerchantOpen} onOpenChange={setIsAddMerchantOpen}>
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
         <div className="flex items-center">
@@ -250,7 +259,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                {!approvalView && <DropdownMenuItem>Edit</DropdownMenuItem>}
+                                {!approvalView && <DropdownMenuItem onClick={() => handleEdit(merchant)}>Edit</DropdownMenuItem>}
                                 {approvalView && merchant.status === 'Pending' && (
                                   <>
                                     <DropdownMenuItem onClick={() => handleStatusChange(merchant.id, 'Active')}>
@@ -289,5 +298,19 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
         <AddMerchantForm setOpen={setIsAddMerchantOpen} />
       </DialogContent>
     </Dialog>
+    <Dialog open={isEditMerchantOpen} onOpenChange={setIsEditMerchantOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Edit Merchant User</DialogTitle>
+            </DialogHeader>
+            {selectedMerchant && selectedMerchant.hasOwnProperty('role') && (
+                <EditMerchantForm
+                    merchant={selectedMerchant as Merchant}
+                    setOpen={setIsEditMerchantOpen}
+                />
+            )}
+        </DialogContent>
+    </Dialog>
+    </>
   );
 }

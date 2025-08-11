@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Company } from '@/types';
+import type { Company, EditableItem } from '@/types';
 import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 
@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AddCompanyForm } from './add-company-form';
+import { EditCompanyForm } from './edit-company-form';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { useDataContext } from '@/context/data-context';
@@ -46,6 +47,8 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
     direction: 'ascending' | 'descending';
   } | null>({ key: 'fieldName', direction: 'ascending' });
   const [isAddCompanyOpen, setIsAddCompanyOpen] = React.useState(false);
+  const [isEditCompanyOpen, setIsEditCompanyOpen] = React.useState(false);
+  const [selectedCompany, setSelectedCompany] = React.useState<EditableItem>(null);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
 
   React.useEffect(() => {
@@ -55,6 +58,12 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
   const handleApproval = (companyId: string, isApproved: boolean) => {
     updateCompanyApproval(companyId, isApproved);
   };
+  
+  const handleEdit = (company: Company) => {
+    setSelectedCompany(company);
+    setIsEditCompanyOpen(true);
+  };
+
 
   const requestSort = (key: SortableKeys) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -132,6 +141,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
 
 
   return (
+    <>
     <Dialog open={isAddCompanyOpen} onOpenChange={setIsAddCompanyOpen}>
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
         <div className="flex items-center">
@@ -270,7 +280,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                {!approvalView && <DropdownMenuItem>Edit</DropdownMenuItem>}
+                                {!approvalView && <DropdownMenuItem onClick={() => handleEdit(company)}>Edit</DropdownMenuItem>}
                                 {company.status === 'Pending' && (
                                   <>
                                     <DropdownMenuItem onClick={() => handleApproval(company.id, true)}>
@@ -312,5 +322,19 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
         <AddCompanyForm setOpen={setIsAddCompanyOpen} />
       </DialogContent>
     </Dialog>
+    <Dialog open={isEditCompanyOpen} onOpenChange={setIsEditCompanyOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Edit Company</DialogTitle>
+            </DialogHeader>
+            {selectedCompany && selectedCompany.hasOwnProperty('fieldName') && (
+                <EditCompanyForm 
+                    company={selectedCompany as Company} 
+                    setOpen={setIsEditCompanyOpen} 
+                />
+            )}
+        </DialogContent>
+    </Dialog>
+    </>
   );
 }

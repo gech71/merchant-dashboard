@@ -36,3 +36,5 @@ export type BranchUser = {
   branch: string;
   status: 'Active' | 'Inactive' | 'Pending';
 };
+
+export type EditableItem = Company | Branch | Merchant | BranchUser | null;

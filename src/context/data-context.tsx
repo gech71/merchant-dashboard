@@ -51,9 +51,13 @@ type DataContextType = {
   merchants: Merchant[];
   branchUsers: BranchUser[];
   addBranch: (branch: Branch) => void;
+  updateBranch: (branch: Branch) => void;
   addCompany: (company: Company) => void;
+  updateCompany: (company: Company) => void;
   addMerchant: (merchant: Merchant) => void;
+  updateMerchant: (merchant: Merchant) => void;
   addBranchUser: (user: BranchUser) => void;
+  updateBranchUser: (user: BranchUser) => void;
   updateBranchStatus: (branchId: string, status: 'Approved' | 'Rejected') => void;
   updateCompanyApproval: (companyId: string, isApproved: boolean) => void;
   updateMerchantStatus: (merchantId: string, status: 'Active' | 'Disabled') => void;
@@ -69,9 +73,24 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [branchUsers, setBranchUsers] = React.useState<BranchUser[]>(MOCK_BRANCH_USERS);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
+  const updateBranch = (updatedBranch: Branch) => {
+    setBranches(prev => prev.map(b => b.id === updatedBranch.id ? updatedBranch : b));
+  };
+
   const addCompany = (company: Company) => setCompanies(prev => [...prev, company]);
+  const updateCompany = (updatedCompany: Company) => {
+    setCompanies(prev => prev.map(c => c.id === updatedCompany.id ? updatedCompany : c));
+  };
+  
   const addMerchant = (merchant: Merchant) => setMerchants(prev => [...prev, merchant]);
+  const updateMerchant = (updatedMerchant: Merchant) => {
+    setMerchants(prev => prev.map(m => m.id === updatedMerchant.id ? updatedMerchant : m));
+  };
+
   const addBranchUser = (user: BranchUser) => setBranchUsers(prev => [...prev, user]);
+  const updateBranchUser = (updatedUser: BranchUser) => {
+    setBranchUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+  };
 
   const updateBranchStatus = (branchId: string, status: 'Approved' | 'Rejected') => {
     setBranches(prev => prev.map(b => b.id === branchId ? { ...b, status } : b));
@@ -103,9 +122,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     merchants,
     branchUsers,
     addBranch,
+    updateBranch,
     addCompany,
+    updateCompany,
     addMerchant,
+    updateMerchant,
     addBranchUser,
+    updateBranchUser,
     updateBranchStatus,
     updateCompanyApproval,
     updateMerchantStatus,
