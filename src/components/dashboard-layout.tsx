@@ -6,29 +6,21 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Building2,
-  Home,
-  Users,
   Briefcase,
+  Users,
   User,
-  PanelLeft,
-  Search,
 } from 'lucide-react';
 
 import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
-  SidebarInset,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarTrigger,
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarInput,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -42,8 +34,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const menuItems = [
-  { href: '/dashboard/branches', label: 'Branches', icon: Building2 },
   { href: '/dashboard/companies', label: 'Companies', icon: Briefcase },
+  { href: '/dashboard/branches', label: 'Branches', icon: Building2 },
   { href: '/dashboard/merchants', label: 'Merchants', icon: Users },
   { href: '/dashboard/sales-reps', label: 'Sales Reps', icon: User },
 ];
@@ -88,10 +80,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
           <SidebarTrigger className="sm:hidden" />
-
-          <div className="relative ml-auto flex-1 md:grow-0">
-            {/* Search can be implemented later */}
-          </div>
+          <div className="ml-auto">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -114,6 +103,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <DropdownMenuItem>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </header>
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
           {children}
