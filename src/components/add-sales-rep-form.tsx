@@ -38,7 +38,7 @@ export function AddSalesRepForm({ setOpen }: { setOpen: (open: boolean) => void 
   });
 
   function onSubmit(data: SalesRepFormValues) {
-    console.log({ ...data, status: 'Pending' }); // In a real app, you'd handle form submission here
+    console.log({ ...data, role: 'Sales', status: 'Pending' }); 
     toast({
       title: 'Sales Rep Submitted for Approval',
       description: `${data.name} has been successfully added and is awaiting verification.`,

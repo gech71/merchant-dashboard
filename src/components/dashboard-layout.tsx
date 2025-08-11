@@ -43,14 +43,14 @@ import { cn } from '@/lib/utils';
 const NAV_ITEMS = [
   { href: '/dashboard/companies', icon: Building, label: 'Companies' },
   { href: '/dashboard/branches', icon: Home, label: 'Branches' },
-  { href: '/dashboard/merchants', icon: Briefcase, label: 'Merchants' },
+  { href: '/dashboard/merchants', icon: Briefcase, label: 'Merchant Users' },
   { href: '/dashboard/sales-reps', icon: Users, label: 'Sales Reps' },
 ];
 
 const APPROVAL_NAV_ITEMS = [
   { href: '/dashboard/approvals/companies', icon: Building, label: 'Companies' },
   { href: '/dashboard/approvals/branches', icon: Home, label: 'Branches' },
-  { href: '/dashboard/approvals/merchants', icon: Briefcase, label: 'Merchants' },
+  { href: '/dashboard/approvals/merchants', icon: Briefcase, label: 'Merchant Users' },
   { href: '/dashboard/approvals/sales-reps', icon: Users, label: 'Sales Reps' },
 ]
 
@@ -142,17 +142,17 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <SidebarMenu>
                   {APPROVAL_NAV_ITEMS.map((item) => (
                     <SidebarMenuItem key={item.href}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={pathname === item.href}
-                        className="justify-center data-[state=expanded]:justify-start"
-                      >
-                        <Link href={item.href}>
-                          <item.icon />
-                          <span className={cn(state === 'collapsed' && 'hidden')}>{item.label}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.href}
+                      className="justify-center data-[state=expanded]:justify-start"
+                    >
+                      <Link href={item.href}>
+                        <item.icon />
+                        <span className={cn(state === 'collapsed' && 'hidden')}>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                   ))}
                 </SidebarMenu>
               </SidebarGroup>

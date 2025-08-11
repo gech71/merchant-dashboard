@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import type { Merchant } from '@/types';
-import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle, UserPlus } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -39,7 +39,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AddMerchantForm } from './add-merchant-form';
 
-type SortableKeys = 'name' | 'company' | 'email' | 'status';
+type SortableKeys = 'name' | 'company' | 'email' | 'status' | 'role';
 
 export default function MerchantList({ merchants: initialMerchants, approvalView = false }: { merchants: Merchant[], approvalView?: boolean }) {
   const [merchants, setMerchants] = React.useState(initialMerchants);
@@ -142,7 +142,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
           )}
           <div className="ml-auto flex items-center gap-2">
             <Input
-              placeholder="Search merchants..."
+              placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-8 w-[150px] lg:w-[250px]"
@@ -150,9 +150,9 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
             {!approvalView && (
               <DialogTrigger asChild>
                 <Button size="sm" className="h-8 gap-1">
-                  <PlusCircle className="h-3.5 w-3.5" />
+                  <UserPlus className="h-3.5 w-3.5" />
                   <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Add Merchant
+                    Add Merchant Admin
                   </span>
                 </Button>
               </DialogTrigger>
@@ -162,9 +162,9 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
         <TabsContent value={activeTab}>
           <Card>
             <CardHeader>
-              <CardTitle>{approvalView ? 'Merchant Approvals' : 'Merchants'}</CardTitle>
+              <CardTitle>{approvalView ? 'Merchant User Approvals' : 'Merchant Users'}</CardTitle>
               <CardDescription>
-                {approvalView ? 'Review and approve pending merchants.' : 'Manage company merchants.'}
+                {approvalView ? 'Review and approve pending merchant users.' : 'Manage all merchant admins and sales representatives.'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -174,7 +174,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                     <TableRow>
                       <TableHead>
                         <Button variant="ghost" onClick={() => requestSort('name')} className="px-2">
-                          Merchant Name
+                          User Name
                           {getSortIndicator('name')}
                         </Button>
                       </TableHead>
@@ -182,6 +182,12 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                         <Button variant="ghost" onClick={() => requestSort('company')} className="px-2">
                           Company
                           {getSortIndicator('company')}
+                        </Button>
+                      </TableHead>
+                       <TableHead>
+                        <Button variant="ghost" onClick={() => requestSort('role')} className="px-2">
+                          Role
+                          {getSortIndicator('role')}
                         </Button>
                       </TableHead>
                       <TableHead>
@@ -207,6 +213,9 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                         <TableRow key={merchant.id}>
                           <TableCell className="font-medium">{merchant.name}</TableCell>
                           <TableCell>{merchant.company}</TableCell>
+                          <TableCell>
+                             <Badge variant={merchant.role === 'Admin' ? 'default' : 'secondary'}>{merchant.role}</Badge>
+                          </TableCell>
                           <TableCell className="hidden md:table-cell">{merchant.email}</TableCell>
                           <TableCell>
                             <Badge variant={getStatusVariant(merchant.status)}>{merchant.status}</Badge>
@@ -241,8 +250,8 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={5} className="h-24 text-center">
-                          No merchants found.
+                        <TableCell colSpan={6} className="h-24 text-center">
+                          No users found.
                         </TableCell>
                       </TableRow>
                     )}
@@ -255,7 +264,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
       </Tabs>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Merchant</DialogTitle>
+          <DialogTitle>Add New Merchant Admin</DialogTitle>
         </DialogHeader>
         <AddMerchantForm setOpen={setIsAddMerchantOpen} />
       </DialogContent>

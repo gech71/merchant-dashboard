@@ -24,6 +24,7 @@ export type Merchant = {
   name: string;
   company: string;
   email: string;
+  role: 'Admin' | 'Sales';
   status: 'Active' | 'Pending' | 'Disabled';
 };
 

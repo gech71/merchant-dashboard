@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import type { SalesRep } from '@/types';
-import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle, UserPlus } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -149,7 +149,7 @@ export default function SalesRepList({ salesReps: initialSalesReps, approvalView
             {!approvalView && (
               <DialogTrigger asChild>
                 <Button size="sm" className="h-8 gap-1">
-                  <PlusCircle className="h-3.5 w-3.5" />
+                  <UserPlus className="h-3.5 w-3.5" />
                   <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                     Add Sales Rep
                   </span>

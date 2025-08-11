@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
 const merchantFormSchema = z.object({
-  name: z.string().min(2, 'Merchant name must be at least 2 characters.'),
+  name: z.string().min(2, 'Admin name must be at least 2 characters.'),
   company: z.string().min(2, 'Company name must be at least 2 characters.'),
   email: z.string().email('Please enter a valid email address.'),
 });
@@ -38,9 +38,11 @@ export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void 
   });
 
   function onSubmit(data: MerchantFormValues) {
-    console.log({ ...data, status: 'Pending' }); // In a real app, you'd handle form submission here
+    // In a real app, you'd check if an admin for this company already exists.
+    // For now, we'll assume it's valid.
+    console.log({ ...data, role: 'Admin', status: 'Pending' }); 
     toast({
-      title: 'Merchant Submitted for Approval',
+      title: 'Merchant Admin Submitted for Approval',
       description: `${data.name} has been successfully submitted for verification.`,
     });
     setOpen(false);
@@ -54,9 +56,9 @@ export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void 
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Merchant Name</FormLabel>
+              <FormLabel>Admin Full Name</FormLabel>
               <FormControl>
-                <Input placeholder="The Corner Cafe" {...field} />
+                <Input placeholder="John Doe" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -82,7 +84,7 @@ export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void 
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="contact@cornercafe.com" {...field} />
+                <Input placeholder="admin@innovate.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -90,7 +92,7 @@ export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void 
         />
         <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit">Add Merchant</Button>
+            <Button type="submit">Add Admin User</Button>
         </div>
       </form>
     </Form>
