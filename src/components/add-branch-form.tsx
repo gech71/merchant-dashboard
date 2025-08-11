@@ -18,6 +18,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import type { Branch } from '@/types';
+import { useDataContext } from '@/context/data-context';
 
 const branchFormSchema = z.object({
   name: z.string().min(2, 'Branch name must be at least 2 characters.'),
@@ -30,12 +31,12 @@ type BranchFormValues = z.infer<typeof branchFormSchema>;
 
 export function AddBranchForm({ 
   setOpen, 
-  onAddBranch 
 }: { 
   setOpen: (open: boolean) => void,
-  onAddBranch: (branch: Branch) => void 
 }) {
   const { toast } = useToast();
+  const { addBranch } = useDataContext();
+
   const form = useForm<BranchFormValues>({
     resolver: zodResolver(branchFormSchema),
     defaultValues: {
@@ -52,7 +53,7 @@ export function AddBranchForm({
       ...data,
       status: 'Pending',
     };
-    onAddBranch(newBranch);
+    addBranch(newBranch);
     toast({
       title: 'Branch Submitted for Approval',
       description: `${data.name} has been successfully submitted for verification.`,

@@ -18,7 +18,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Merchant, Company } from '@/types';
+import { Merchant } from '@/types';
+import { useDataContext } from '@/context/data-context';
 
 const merchantFormSchema = z.object({
   name: z.string().min(2, 'Full name must be at least 2 characters.'),
@@ -29,38 +30,15 @@ const merchantFormSchema = z.object({
 
 type MerchantFormValues = z.infer<typeof merchantFormSchema>;
 
-// In a real app, this would be fetched from your API
-const MOCK_COMPANIES: Pick<Company, 'id' | 'fieldName'>[] = [
-    { id: '1', fieldName: 'Innovate Inc.'},
-    { id: '2', fieldName: 'Apex Solutions'},
-    { id: '3', fieldName: 'Quantum Corp'},
-    { id: '4', fieldName: 'Synergy Systems'},
-    { id: '5', fieldName: 'Pioneer Ltd.'},
-    { id: '6', fieldName: 'Zenith Ventures'},
-    { id: '7', fieldName: 'Starlight Co.'},
-    { id: '8', fieldName: 'Momentum'},
-    { id: '9', fieldName: 'Nexus Group'},
-    { id: '10', fieldName: 'Horizon Dynamics'},
-];
-
-// In a real app, this would be fetched from your API
-const MOCK_EXISTING_MERCHANTS: Pick<Merchant, 'company' | 'role'>[] = [
-    { company: 'Innovate Inc.', role: 'Admin' },
-    { company: 'Apex Solutions', role: 'Admin' },
-    { company: 'Quantum Corp', role: 'Admin' },
-    { company: 'Synergy Systems', role: 'Admin' },
-    { company: 'Pioneer Ltd.', role: 'Admin' },
-];
-
 
 export function AddMerchantForm({ 
   setOpen, 
-  onAddMerchant 
 }: { 
   setOpen: (open: boolean) => void,
-  onAddMerchant: (merchant: Merchant) => void 
 }) {
   const { toast } = useToast();
+  const { companies, merchants, addMerchant } = useDataContext();
+
   const form = useForm<MerchantFormValues>({
     resolver: zodResolver(merchantFormSchema),
     defaultValues: {
@@ -71,7 +49,7 @@ export function AddMerchantForm({
 
   function onSubmit(data: MerchantFormValues) {
     if (data.role === 'Admin') {
-      const adminExists = MOCK_EXISTING_MERCHANTS.some(
+      const adminExists = merchants.some(
         (merchant) => merchant.company === data.company && merchant.role === 'Admin'
       );
       if (adminExists) {
@@ -89,7 +67,7 @@ export function AddMerchantForm({
       status: 'Pending'
     };
 
-    onAddMerchant(newMerchant);
+    addMerchant(newMerchant);
     toast({
       title: 'Merchant User Submitted for Approval',
       description: `${data.name} has been successfully submitted for verification.`,
@@ -126,7 +104,7 @@ export function AddMerchantForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {MOCK_COMPANIES.map(company => (
+                  {companies.map(company => (
                      <SelectItem key={company.id} value={company.fieldName}>{company.fieldName}</SelectItem>
                   ))}
                 </SelectContent>

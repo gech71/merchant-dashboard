@@ -38,10 +38,12 @@ import {
 } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AddMerchantForm } from './add-merchant-form';
+import { useDataContext } from '@/context/data-context';
 
 type SortableKeys = 'name' | 'company' | 'email' | 'status' | 'role';
 
 export default function MerchantList({ merchants: initialMerchants, approvalView = false }: { merchants: Merchant[], approvalView?: boolean }) {
+  const { updateMerchantStatus } = useDataContext();
   const [merchants, setMerchants] = React.useState(initialMerchants);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -51,16 +53,12 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
   const [isAddMerchantOpen, setIsAddMerchantOpen] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
 
-
+  React.useEffect(() => {
+    setMerchants(initialMerchants);
+  }, [initialMerchants]);
+  
   const handleStatusChange = (merchantId: string, status: 'Active' | 'Disabled') => {
-    setMerchants(merchants.map(m => m.id === merchantId ? { ...m, status } : m).filter(m => {
-        if (!approvalView) return true;
-        return m.status === 'Pending';
-    }));
-  };
-
-  const handleAddMerchant = (newMerchant: Merchant) => {
-    setMerchants(prev => [...prev, newMerchant]);
+    updateMerchantStatus(merchantId, status);
   };
 
   const requestSort = (key: SortableKeys) => {
@@ -273,7 +271,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
         <DialogHeader>
           <DialogTitle>Add New Merchant User</DialogTitle>
         </DialogHeader>
-        <AddMerchantForm setOpen={setIsAddMerchantOpen} onAddMerchant={handleAddMerchant} />
+        <AddMerchantForm setOpen={setIsAddMerchantOpen} />
       </DialogContent>
     </Dialog>
   );

@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import type { BranchUser } from '@/types';
+import { useDataContext } from '@/context/data-context';
 
 const branchUserFormSchema = z.object({
   name: z.string().min(2, 'Full name must be at least 2 characters.'),
@@ -28,24 +29,13 @@ const branchUserFormSchema = z.object({
 
 type BranchUserFormValues = z.infer<typeof branchUserFormSchema>;
 
-// In a real app, this would be fetched from your API
-const MOCK_BRANCHES = [
-  { id: '1', name: 'Downtown Branch' },
-  { id: '2', name: 'Uptown Branch' },
-  { id: '3', name: 'Westside Branch' },
-  { id: '4', name: 'Eastside Branch' },
-  { id: '5', name: 'South Branch' },
-];
-
-
 export function AddBranchUserForm({ 
   setOpen, 
-  onAddUser 
 }: { 
   setOpen: (open: boolean) => void,
-  onAddUser: (user: BranchUser) => void 
 }) {
   const { toast } = useToast();
+  const { branches, addBranchUser } = useDataContext();
   const form = useForm<BranchUserFormValues>({
     resolver: zodResolver(branchUserFormSchema),
     defaultValues: {
@@ -60,7 +50,7 @@ export function AddBranchUserForm({
         ...data,
         status: 'Pending'
     }
-    onAddUser(newUser);
+    addBranchUser(newUser);
     toast({
       title: 'Branch User Submitted for Approval',
       description: `${data.name} has been successfully submitted and is awaiting verification.`,
@@ -110,7 +100,7 @@ export function AddBranchUserForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {MOCK_BRANCHES.map(branch => (
+                  {branches.map(branch => (
                      <SelectItem key={branch.id} value={branch.name}>{branch.name}</SelectItem>
                   ))}
                 </SelectContent>

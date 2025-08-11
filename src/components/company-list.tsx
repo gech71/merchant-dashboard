@@ -33,10 +33,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AddCompanyForm } from './add-company-form';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { useDataContext } from '@/context/data-context';
 
 type SortableKeys = 'fieldName' | 'accountNumber' | 'branch' | 'status' | 'approveUser' | 'approved';
 
 export default function CompanyList({ companies: initialCompanies, approvalView = false }: { companies: Company[], approvalView?: boolean }) {
+  const { updateCompanyApproval } = useDataContext();
   const [companies, setCompanies] = React.useState(initialCompanies);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -46,21 +48,12 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
   const [isAddCompanyOpen, setIsAddCompanyOpen] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
 
-  const handleApproval = (companyId: string, isApproved: boolean) => {
-    setCompanies(companies.map(c => 
-      c.id === companyId 
-        ? { 
-            ...c, 
-            approved: isApproved, 
-            status: isApproved ? 'Active' : 'Inactive',
-            approveUser: isApproved ? 'admin' : undefined 
-          } 
-        : c
-    ).filter(c => approvalView ? c.status === 'Pending' : true));
-  };
+  React.useEffect(() => {
+    setCompanies(initialCompanies);
+  }, [initialCompanies]);
   
-  const handleAddCompany = (newCompany: Company) => {
-    setCompanies(prev => [...prev, newCompany]);
+  const handleApproval = (companyId: string, isApproved: boolean) => {
+    updateCompanyApproval(companyId, isApproved);
   };
 
   const requestSort = (key: SortableKeys) => {
@@ -326,7 +319,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
         <DialogHeader>
           <DialogTitle>Add New Company</DialogTitle>
         </DialogHeader>
-        <AddCompanyForm setOpen={setIsAddCompanyOpen} onAddCompany={handleAddCompany}/>
+        <AddCompanyForm setOpen={setIsAddCompanyOpen} />
       </DialogContent>
     </Dialog>
   );

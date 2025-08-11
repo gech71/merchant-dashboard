@@ -38,10 +38,12 @@ import {
 } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AddBranchUserForm } from './add-branch-user-form';
+import { useDataContext } from '@/context/data-context';
 
 type SortableKeys = 'name' | 'email' | 'branch' | 'status';
 
 export default function BranchUserList({ branchUsers: initialBranchUsers, approvalView = false }: { branchUsers: BranchUser[], approvalView?: boolean }) {
+  const { updateBranchUserStatus } = useDataContext();
   const [branchUsers, setBranchUsers] = React.useState(initialBranchUsers);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -50,15 +52,14 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
   } | null>({ key: 'name', direction: 'ascending' });
   const [isAddUserOpen, setIsAddUserOpen] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
+  
+  React.useEffect(() => {
+    setBranchUsers(initialBranchUsers);
+  }, [initialBranchUsers]);
 
   const handleStatusChange = (userId: string, status: 'Active' | 'Inactive') => {
-    setBranchUsers(branchUsers.map(user => user.id === userId ? { ...user, status } : user));
+    updateBranchUserStatus(userId, status);
   };
-  
-  const handleAddUser = (newUser: BranchUser) => {
-    setBranchUsers(prev => [...prev, newUser]);
-  };
-
 
   const requestSort = (key: SortableKeys) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -260,7 +261,7 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
         <DialogHeader>
           <DialogTitle>Add New Branch User</DialogTitle>
         </DialogHeader>
-        <AddBranchUserForm setOpen={setIsAddUserOpen} onAddUser={handleAddUser} />
+        <AddBranchUserForm setOpen={setIsAddUserOpen} />
       </DialogContent>
     </Dialog>
   );

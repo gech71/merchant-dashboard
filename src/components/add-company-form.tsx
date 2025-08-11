@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import type { Company } from '@/types';
+import { useDataContext } from '@/context/data-context';
 
 const companyFormSchema = z.object({
   fieldName: z.string().min(2, 'Field name must be at least 2 characters.'),
@@ -28,24 +29,15 @@ const companyFormSchema = z.object({
 
 type CompanyFormValues = z.infer<typeof companyFormSchema>;
 
-// In a real app, this would be fetched from your API
-const MOCK_BRANCHES = [
-  { id: '1', name: 'Downtown Branch' },
-  { id: '2', name: 'Uptown Branch' },
-  { id: '3', name: 'Westside Branch' },
-  { id: '4', name: 'Eastside Branch' },
-  { id: '5', name: 'South Branch' },
-];
-
 
 export function AddCompanyForm({ 
   setOpen, 
-  onAddCompany 
 }: { 
   setOpen: (open: boolean) => void,
-  onAddCompany: (company: Company) => void 
 }) {
   const { toast } = useToast();
+  const { branches, addCompany } = useDataContext();
+
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companyFormSchema),
     defaultValues: {
@@ -63,7 +55,7 @@ export function AddCompanyForm({
       logoUrl: 'https://placehold.co/40x40.png',
       hint: 'logo new'
     };
-    onAddCompany(newCompany);
+    addCompany(newCompany);
     toast({
       title: 'Company Submitted for Approval',
       description: `${data.fieldName} has been sent for verification.`,
@@ -113,7 +105,7 @@ export function AddCompanyForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {MOCK_BRANCHES.map(branch => (
+                  {branches.map(branch => (
                      <SelectItem key={branch.id} value={branch.name}>{branch.name}</SelectItem>
                   ))}
                 </SelectContent>

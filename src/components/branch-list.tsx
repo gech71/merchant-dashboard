@@ -32,10 +32,12 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AddBranchForm } from './add-branch-form';
 import { Badge } from '@/components/ui/badge';
+import { useDataContext } from '@/context/data-context';
 
 type SortableKeys = 'name' | 'code' | 'address' | 'contact' | 'status';
 
 export default function BranchList({ branches: initialBranches, approvalView = false }: { branches: Branch[], approvalView?: boolean }) {
+  const { updateBranchStatus } = useDataContext();
   const [branches, setBranches] = React.useState(initialBranches);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -43,16 +45,13 @@ export default function BranchList({ branches: initialBranches, approvalView = f
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
   const [isAddBranchOpen, setIsAddBranchOpen] = React.useState(false);
+  
+  React.useEffect(() => {
+    setBranches(initialBranches);
+  }, [initialBranches]);
 
   const handleStatusChange = (branchId: string, status: 'Approved' | 'Rejected') => {
-    setBranches(branches.map(b => b.id === branchId ? { ...b, status } : b).filter(b => {
-        if (!approvalView) return true;
-        return b.status === 'Pending';
-    }));
-  };
-
-  const handleAddBranch = (newBranch: Branch) => {
-    setBranches(prev => [...prev, newBranch]);
+    updateBranchStatus(branchId, status);
   };
 
   const requestSort = (key: SortableKeys) => {
@@ -262,7 +261,7 @@ export default function BranchList({ branches: initialBranches, approvalView = f
         <DialogHeader>
           <DialogTitle>Add New Branch</DialogTitle>
         </DialogHeader>
-        <AddBranchForm setOpen={setIsAddBranchOpen} onAddBranch={handleAddBranch} />
+        <AddBranchForm setOpen={setIsAddBranchOpen} />
       </DialogContent>
     </Dialog>
   );
