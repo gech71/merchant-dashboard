@@ -34,7 +34,7 @@ import { AddCompanyForm } from './add-company-form';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from './ui/dropdown-menu';
 
-type SortableKeys = 'name' | 'accountNumber' | 'status' | 'approveUser';
+type SortableKeys = 'fieldName' | 'accountNumber' | 'status' | 'approveUser';
 
 export default function CompanyList({ companies: initialCompanies, approvalView = false }: { companies: Company[], approvalView?: boolean }) {
   const [companies, setCompanies] = React.useState(initialCompanies);
@@ -42,7 +42,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
-  } | null>({ key: 'name', direction: 'ascending' });
+  } | null>({ key: 'fieldName', direction: 'ascending' });
   const [isAddCompanyOpen, setIsAddCompanyOpen] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
 
@@ -73,7 +73,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
     
     if (searchTerm) {
       sortableItems = sortableItems.filter((company) =>
-        company.name.toLowerCase().includes(searchTerm.toLowerCase())
+        company.fieldName.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -166,11 +166,11 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                       <TableHead>
                         <Button
                           variant="ghost"
-                          onClick={() => requestSort('name')}
+                          onClick={() => requestSort('fieldName')}
                           className="px-2"
                         >
-                          Company Name
-                          {getSortIndicator('name')}
+                          Company
+                          {getSortIndicator('fieldName')}
                         </Button>
                       </TableHead>
                       <TableHead>
@@ -217,16 +217,15 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                               <Avatar className="h-10 w-10">
                                 <AvatarImage
                                   src={company.logoUrl}
-                                  alt={`${company.name} logo`}
+                                  alt={`${company.fieldName} logo`}
                                   data-ai-hint={company.hint}
                                 />
                                 <AvatarFallback>
-                                  {company.name.charAt(0)}
+                                  {company.fieldName.charAt(0)}
                                 </AvatarFallback>
                               </Avatar>
                               <div className="flex flex-col">
-                                <span className="font-medium">{company.name}</span>
-                                <span className="text-xs text-muted-foreground">{company.fieldName}</span>
+                                <span className="font-medium">{company.fieldName}</span>
                               </div>
                             </div>
                           </TableCell>

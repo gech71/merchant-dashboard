@@ -1,7 +1,6 @@
 
 export type Company = {
   id: string;
-  name: string;
   accountNumber: string;
   fieldName: string;
   approveUser?: string;

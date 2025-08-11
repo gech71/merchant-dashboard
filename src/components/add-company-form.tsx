@@ -19,7 +19,6 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
 const companyFormSchema = z.object({
-  name: z.string().min(2, 'Company name must be at least 2 characters.'),
   fieldName: z.string().min(2, 'Field name must be at least 2 characters.'),
   accountNumber: z.string().min(4, 'Account number must be at least 4 characters.'),
 });
@@ -31,7 +30,6 @@ export function AddCompanyForm({ setOpen }: { setOpen: (open: boolean) => void }
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companyFormSchema),
     defaultValues: {
-      name: '',
       fieldName: '',
       accountNumber: '',
     },
@@ -42,7 +40,7 @@ export function AddCompanyForm({ setOpen }: { setOpen: (open: boolean) => void }
     console.log({ ...data, status: 'Pending' }); 
     toast({
       title: 'Company Submitted for Approval',
-      description: `${data.name} has been sent for verification.`,
+      description: `${data.fieldName} has been sent for verification.`,
     });
     setOpen(false);
   }
@@ -50,19 +48,6 @@ export function AddCompanyForm({ setOpen }: { setOpen: (open: boolean) => void }
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Company Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Innovate Inc." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <FormField
           control={form.control}
           name="fieldName"
