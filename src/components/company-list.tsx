@@ -41,7 +41,7 @@ type SortableKeys = 'fieldName' | 'accountNumber' | 'branch' | 'status' | 'appro
 const ITEMS_PER_PAGE = 15;
 
 export default function CompanyList({ companies: initialCompanies, approvalView = false }: { companies: Company[], approvalView?: boolean }) {
-  const { updateCompanyApproval } = useDataContext();
+  const { updateCompanyApproval, currentUser } = useDataContext();
   const [companies, setCompanies] = React.useState(initialCompanies);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -186,7 +186,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
             <CardHeader>
               <CardTitle>{approvalView ? 'Company Approvals' : 'Companies'}</CardTitle>
               <CardDescription>
-                {approvalView ? 'Review and approve pending companies.' : 'A list of all companies.'}
+                {approvalView ? `Review and approve pending companies for ${currentUser.branch}.` : 'A list of all companies.'}
               </CardDescription>
             </CardHeader>
             <CardContent>

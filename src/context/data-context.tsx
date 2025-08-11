@@ -45,14 +45,17 @@ const MOCK_BRANCH_USERS: BranchUser[] = [
   { id: '5', name: 'David Williams', email: 'david.w@branch.com', branch: 'Uptown Branch', status: 'Active' },
 ];
 
+const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
+
 type DataContextType = {
   branches: Branch[];
   companies: Company[];
   merchants: Merchant[];
   branchUsers: BranchUser[];
+  currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
-  addCompany: (company: Company) => void;
+  addCompany: (company: Omit<Company, 'branch'>) => void;
   updateCompany: (company: Company) => void;
   addMerchant: (merchant: Merchant) => void;
   updateMerchant: (merchant: Merchant) => void;
@@ -71,13 +74,25 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [companies, setCompanies] = React.useState<Company[]>(MOCK_COMPANIES);
   const [merchants, setMerchants] = React.useState<Merchant[]>(MOCK_MERCHANTS);
   const [branchUsers, setBranchUsers] = React.useState<BranchUser[]>(MOCK_BRANCH_USERS);
+  const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
   const updateBranch = (updatedBranch: Branch) => {
     setBranches(prev => prev.map(b => b.id === updatedBranch.id ? updatedBranch : b));
   };
 
-  const addCompany = (company: Company) => setCompanies(prev => [...prev, company]);
+  const addCompany = (company: Omit<Company, 'branch' | 'id' | 'approved' | 'status' | 'logoUrl' | 'hint' >) => {
+    const newCompany: Company = {
+        id: new Date().toISOString(),
+        ...company,
+        branch: currentUser.branch,
+        approved: false,
+        status: 'Pending',
+        logoUrl: 'https://placehold.co/40x40.png',
+        hint: 'logo new'
+    };
+    setCompanies(prev => [...prev, newCompany]);
+  };
   const updateCompany = (updatedCompany: Company) => {
     setCompanies(prev => prev.map(c => c.id === updatedCompany.id ? updatedCompany : c));
   };
@@ -102,7 +117,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             ...c, 
             approved: isApproved, 
             status: isApproved ? 'Active' : 'Inactive',
-            approveUser: isApproved ? 'admin' : undefined 
+            approveUser: isApproved ? currentUser.name : undefined 
           } 
         : c
     ));
@@ -121,6 +136,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     companies,
     merchants,
     branchUsers,
+    currentUser,
     addBranch,
     updateBranch,
     addCompany,

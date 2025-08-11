@@ -38,7 +38,7 @@ export function EditCompanyForm({
   setOpen: (open: boolean) => void,
 }) {
   const { toast } = useToast();
-  const { branches, updateCompany } = useDataContext();
+  const { branches, updateCompany, currentUser } = useDataContext();
 
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companyFormSchema),
@@ -97,7 +97,7 @@ export function EditCompanyForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Branch</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={field.value} disabled>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a branch" />

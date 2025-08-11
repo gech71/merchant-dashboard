@@ -39,6 +39,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { useDataContext } from '@/context/data-context';
 
 const NAV_ITEMS = [
   { href: '/dashboard', icon: LayoutGrid, label: 'Dashboard' },
@@ -55,7 +56,7 @@ const APPROVAL_NAV_ITEMS = [
 ]
 
 function UserProfile() {
-  const { state } = useSidebar();
+  const { currentUser } = useDataContext();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -68,9 +69,9 @@ function UserProfile() {
                 'flex flex-col text-left transition-opacity duration-200'
             )}
           >
-            <p className="font-medium">System Admin</p>
+            <p className="font-medium">{currentUser.name}</p>
             <p className="text-xs text-muted-foreground">
-              admin@merchantview.com
+              {currentUser.email}
             </p>
           </div>
         </Button>
