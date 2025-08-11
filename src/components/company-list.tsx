@@ -270,7 +270,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                                {!approvalView && <DropdownMenuItem>Edit</DropdownMenuItem>}
                                 {company.status === 'Pending' && (
                                   <>
                                     <DropdownMenuItem onClick={() => handleApproval(company.id, true)}>

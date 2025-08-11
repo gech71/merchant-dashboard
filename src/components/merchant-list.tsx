@@ -250,7 +250,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                                {!approvalView && <DropdownMenuItem>Edit</DropdownMenuItem>}
                                 {approvalView && merchant.status === 'Pending' && (
                                   <>
                                     <DropdownMenuItem onClick={() => handleStatusChange(merchant.id, 'Active')}>

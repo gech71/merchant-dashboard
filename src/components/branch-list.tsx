@@ -227,7 +227,7 @@ export default function BranchList({ branches: initialBranches, approvalView = f
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                            {!approvalView && <DropdownMenuItem>Edit</DropdownMenuItem>}
                             {branch.status === 'Pending' && (
                               <>
                                 <DropdownMenuItem onClick={() => handleStatusChange(branch.id, 'Approved')}>
