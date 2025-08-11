@@ -4,6 +4,7 @@
 import * as React from 'react';
 import type { Company } from '@/types';
 import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -257,7 +258,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                                 </AvatarFallback>
                               </Avatar>
                               <div className="flex flex-col">
-                                <span className="font-medium">{company.fieldName}</span>
+                                <Link href={`/dashboard/companies/${company.id}`} className="font-medium hover:underline">{company.fieldName}</Link>
                               </div>
                             </div>
                           </TableCell>
