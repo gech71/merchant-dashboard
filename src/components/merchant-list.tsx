@@ -99,6 +99,10 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
 
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
+        // Always put Admin first
+        if (a.role === 'Admin' && b.role !== 'Admin') return -1;
+        if (a.role !== 'Admin' && b.role === 'Admin') return 1;
+
         if (a[sortConfig.key] < b[sortConfig.key]) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
@@ -107,6 +111,13 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
         }
         return 0;
       });
+    } else {
+        // Default sort: Admin first
+        sortableItems.sort((a, b) => {
+            if (a.role === 'Admin' && b.role !== 'Admin') return -1;
+            if (a.role !== 'Admin' && b.role === 'Admin') return 1;
+            return 0;
+        });
     }
 
     return sortableItems;
