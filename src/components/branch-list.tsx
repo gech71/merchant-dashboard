@@ -5,7 +5,6 @@ import * as React from 'react';
 import type { Branch } from '@/types';
 import { ArrowUpDown, PlusCircle, MoreHorizontal } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -30,6 +29,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AddBranchForm } from './add-branch-form';
 
 type SortableKeys = 'name' | 'code' | 'address' | 'contact';
 
@@ -39,6 +40,7 @@ export default function BranchList({ branches }: { branches: Branch[] }) {
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
+  const [isAddBranchOpen, setIsAddBranchOpen] = React.useState(false);
 
   const requestSort = (key: SortableKeys) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -93,113 +95,123 @@ export default function BranchList({ branches }: { branches: Branch[] }) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Branches</CardTitle>
-        <CardDescription>
-          A list of all registered bank branches.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center justify-between gap-2 py-4">
-          <Input
-            placeholder="Search branches..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
-          <Button size="sm" className="h-8 gap-1">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Add Branch
-            </span>
-          </Button>
-        </div>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    onClick={() => requestSort('name')}
-                    className="px-2"
-                  >
-                    Branch Name
-                    {getSortIndicator('name')}
-                  </Button>
-                </TableHead>
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    onClick={() => requestSort('code')}
-                    className="px-2"
-                  >
-                    Branch Code
-                    {getSortIndicator('code')}
-                  </Button>
-                </TableHead>
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    onClick={() => requestSort('address')}
-                    className="px-2"
-                  >
-                    Address
-                    {getSortIndicator('address')}
-                  </Button>
-                </TableHead>
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    onClick={() => requestSort('contact')}
-                    className="px-2"
-                  >
-                    Contact
-                    {getSortIndicator('contact')}
-                  </Button>
-                </TableHead>
-                <TableHead>
-                  <span className="sr-only">Actions</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAndSortedBranches.length > 0 ? (
-                filteredAndSortedBranches.map((branch) => (
-                  <TableRow key={branch.id}>
-                    <TableCell className="font-medium">{branch.name}</TableCell>
-                    <TableCell>{branch.code}</TableCell>
-                    <TableCell className="hidden md:table-cell">{branch.address}</TableCell>
-                    <TableCell>{branch.contact}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                          <DropdownMenuItem>Delete</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+    <Dialog open={isAddBranchOpen} onOpenChange={setIsAddBranchOpen}>
+      <Card>
+        <CardHeader>
+          <CardTitle>Branches</CardTitle>
+          <CardDescription>
+            A list of all registered bank branches.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between gap-2 py-4">
+            <Input
+              placeholder="Search branches..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
+            <DialogTrigger asChild>
+              <Button size="sm" className="h-8 gap-1">
+                <PlusCircle className="h-3.5 w-3.5" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                  Add Branch
+                </span>
+              </Button>
+            </DialogTrigger>
+          </div>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      onClick={() => requestSort('name')}
+                      className="px-2"
+                    >
+                      Branch Name
+                      {getSortIndicator('name')}
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      onClick={() => requestSort('code')}
+                      className="px-2"
+                    >
+                      Branch Code
+                      {getSortIndicator('code')}
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      onClick={() => requestSort('address')}
+                      className="px-2"
+                    >
+                      Address
+                      {getSortIndicator('address')}
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      onClick={() => requestSort('contact')}
+                      className="px-2"
+                    >
+                      Contact
+                      {getSortIndicator('contact')}
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredAndSortedBranches.length > 0 ? (
+                  filteredAndSortedBranches.map((branch) => (
+                    <TableRow key={branch.id}>
+                      <TableCell className="font-medium">{branch.name}</TableCell>
+                      <TableCell>{branch.code}</TableCell>
+                      <TableCell className="hidden md:table-cell">{branch.address}</TableCell>
+                      <TableCell>{branch.contact}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" size="icon" variant="ghost">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                            <DropdownMenuItem>Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center">
+                      No branches found.
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center">
-                    No branches found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add New Branch</DialogTitle>
+        </DialogHeader>
+        <AddBranchForm setOpen={setIsAddBranchOpen} />
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -28,6 +29,8 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AddCompanyForm } from './add-company-form';
 
 type SortableKeys = 'name' | 'sales';
 
@@ -37,6 +40,7 @@ export default function CompanyList({ companies }: { companies: Company[] }) {
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'sales', direction: 'descending' });
+  const [isAddCompanyOpen, setIsAddCompanyOpen] = React.useState(false);
 
   const requestSort = (key: SortableKeys) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -86,108 +90,118 @@ export default function CompanyList({ companies }: { companies: Company[] }) {
   };
 
   return (
-    <Tabs defaultValue="all">
-      <div className="flex items-center">
-        <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="active">Approved</TabsTrigger>
-          <TabsTrigger value="pending">Pending</TabsTrigger>
-        </TabsList>
-        <div className="ml-auto flex items-center gap-2">
-          <Input
-            placeholder="Search companies..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="h-8 w-[150px] lg:w-[250px]"
-          />
-          <Button size="sm" className="h-8 gap-1">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Add Company
-            </span>
-          </Button>
+    <Dialog open={isAddCompanyOpen} onOpenChange={setIsAddCompanyOpen}>
+      <Tabs defaultValue="all">
+        <div className="flex items-center">
+          <TabsList>
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="active">Approved</TabsTrigger>
+            <TabsTrigger value="pending">Pending</TabsTrigger>
+          </TabsList>
+          <div className="ml-auto flex items-center gap-2">
+            <Input
+              placeholder="Search companies..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-8 w-[150px] lg:w-[250px]"
+            />
+            <DialogTrigger asChild>
+              <Button size="sm" className="h-8 gap-1">
+                <PlusCircle className="h-3.5 w-3.5" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                  Add Company
+                </span>
+              </Button>
+            </DialogTrigger>
+          </div>
         </div>
-      </div>
-      <TabsContent value="all">
-        <Card>
-          <CardHeader>
-            <CardTitle>Companies</CardTitle>
-            <CardDescription>
-              A list of all companies.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-2/3">
-                      <Button
-                        variant="ghost"
-                        onClick={() => requestSort('name')}
-                        className="px-2"
-                      >
-                        Company Name
-                        {getSortIndicator('name')}
-                      </Button>
-                    </TableHead>
-                    <TableHead className="w-1/3 text-right">
-                      <Button
-                        variant="ghost"
-                        onClick={() => requestSort('sales')}
-                        className="px-2"
-                      >
-                        Sales
-                        {getSortIndicator('sales')}
-                      </Button>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredAndSortedCompanies.length > 0 ? (
-                    filteredAndSortedCompanies.map((company) => (
-                      <TableRow key={company.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-4">
-                            <Avatar className="h-10 w-10">
-                              <AvatarImage
-                                src={company.logoUrl}
-                                alt={`${company.name} logo`}
-                                data-ai-hint={company.hint}
-                              />
-                              <AvatarFallback>
-                                {company.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span className="font-medium">{company.name}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right font-mono">
-                          {new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: 'USD',
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 0,
-                          }).format(company.sales)}
+        <TabsContent value="all">
+          <Card>
+            <CardHeader>
+              <CardTitle>Companies</CardTitle>
+              <CardDescription>
+                A list of all companies.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-2/3">
+                        <Button
+                          variant="ghost"
+                          onClick={() => requestSort('name')}
+                          className="px-2"
+                        >
+                          Company Name
+                          {getSortIndicator('name')}
+                        </Button>
+                      </TableHead>
+                      <TableHead className="w-1/3 text-right">
+                        <Button
+                          variant="ghost"
+                          onClick={() => requestSort('sales')}
+                          className="px-2"
+                        >
+                          Sales
+                          {getSortIndicator('sales')}
+                        </Button>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredAndSortedCompanies.length > 0 ? (
+                      filteredAndSortedCompanies.map((company) => (
+                        <TableRow key={company.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-4">
+                              <Avatar className="h-10 w-10">
+                                <AvatarImage
+                                  src={company.logoUrl}
+                                  alt={`${company.name} logo`}
+                                  data-ai-hint={company.hint}
+                                />
+                                <AvatarFallback>
+                                  {company.name.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="font-medium">{company.name}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right font-mono">
+                            {new Intl.NumberFormat('en-US', {
+                              style: 'currency',
+                              currency: 'USD',
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            }).format(company.sales)}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={2}
+                          className="text-center h-24 text-muted-foreground"
+                        >
+                          No companies found.
                         </TableCell>
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={2}
-                        className="text-center h-24 text-muted-foreground"
-                      >
-                        No companies found.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-      </TabsContent>
-    </Tabs>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add New Company</DialogTitle>
+        </DialogHeader>
+        <AddCompanyForm setOpen={setIsAddCompanyOpen} />
+      </DialogContent>
+    </Dialog>
   );
 }

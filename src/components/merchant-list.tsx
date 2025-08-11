@@ -36,6 +36,8 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AddMerchantForm } from './add-merchant-form';
 
 type SortableKeys = 'name' | 'company' | 'email' | 'status';
 
@@ -45,6 +47,7 @@ export default function MerchantList({ merchants }: { merchants: Merchant[] }) {
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'name', direction: 'ascending' });
+  const [isAddMerchantOpen, setIsAddMerchantOpen] = React.useState(false);
 
   const requestSort = (key: SortableKeys) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -99,111 +102,121 @@ export default function MerchantList({ merchants }: { merchants: Merchant[] }) {
   };
 
   return (
-    <Tabs defaultValue="all">
-      <div className="flex items-center">
-        <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="active">Active</TabsTrigger>
-          <TabsTrigger value="pending">Pending</TabsTrigger>
-          <TabsTrigger value="disabled">Disabled</TabsTrigger>
-        </TabsList>
-        <div className="ml-auto flex items-center gap-2">
-          <Input
-            placeholder="Search merchants..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="h-8 w-[150px] lg:w-[250px]"
-          />
-          <Button size="sm" className="h-8 gap-1">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Add Merchant
-            </span>
-          </Button>
+    <Dialog open={isAddMerchantOpen} onOpenChange={setIsAddMerchantOpen}>
+      <Tabs defaultValue="all">
+        <div className="flex items-center">
+          <TabsList>
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="active">Active</TabsTrigger>
+            <TabsTrigger value="pending">Pending</TabsTrigger>
+            <TabsTrigger value="disabled">Disabled</TabsTrigger>
+          </TabsList>
+          <div className="ml-auto flex items-center gap-2">
+            <Input
+              placeholder="Search merchants..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-8 w-[150px] lg:w-[250px]"
+            />
+            <DialogTrigger asChild>
+              <Button size="sm" className="h-8 gap-1">
+                <PlusCircle className="h-3.5 w-3.5" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                  Add Merchant
+                </span>
+              </Button>
+            </DialogTrigger>
+          </div>
         </div>
-      </div>
-      <TabsContent value="all">
-        <Card>
-          <CardHeader>
-            <CardTitle>Merchants</CardTitle>
-            <CardDescription>
-              Manage company merchants.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>
-                      <Button variant="ghost" onClick={() => requestSort('name')} className="px-2">
-                        Merchant Name
-                        {getSortIndicator('name')}
-                      </Button>
-                    </TableHead>
-                    <TableHead>
-                       <Button variant="ghost" onClick={() => requestSort('company')} className="px-2">
-                        Company
-                        {getSortIndicator('company')}
-                      </Button>
-                    </TableHead>
-                    <TableHead>
-                       <Button variant="ghost" onClick={() => requestSort('email')} className="px-2">
-                        Email
-                        {getSortIndicator('email')}
-                      </Button>
-                    </TableHead>
-                    <TableHead>
-                       <Button variant="ghost" onClick={() => requestSort('status')} className="px-2">
-                        Status
-                        {getSortIndicator('status')}
-                      </Button>
-                    </TableHead>
-                    <TableHead>
-                      <span className="sr-only">Actions</span>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredAndSortedMerchants.length > 0 ? (
-                    filteredAndSortedMerchants.map((merchant) => (
-                      <TableRow key={merchant.id}>
-                        <TableCell className="font-medium">{merchant.name}</TableCell>
-                        <TableCell>{merchant.company}</TableCell>
-                        <TableCell className="hidden md:table-cell">{merchant.email}</TableCell>
-                        <TableCell>
-                          <Badge variant={merchant.status === 'Active' ? 'default' : merchant.status === 'Pending' ? 'secondary' : 'destructive'}>{merchant.status}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button aria-haspopup="true" size="icon" variant="ghost">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Toggle menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem>Edit</DropdownMenuItem>
-                              <DropdownMenuItem>Delete</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+        <TabsContent value="all">
+          <Card>
+            <CardHeader>
+              <CardTitle>Merchants</CardTitle>
+              <CardDescription>
+                Manage company merchants.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => requestSort('name')} className="px-2">
+                          Merchant Name
+                          {getSortIndicator('name')}
+                        </Button>
+                      </TableHead>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => requestSort('company')} className="px-2">
+                          Company
+                          {getSortIndicator('company')}
+                        </Button>
+                      </TableHead>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => requestSort('email')} className="px-2">
+                          Email
+                          {getSortIndicator('email')}
+                        </Button>
+                      </TableHead>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => requestSort('status')} className="px-2">
+                          Status
+                          {getSortIndicator('status')}
+                        </Button>
+                      </TableHead>
+                      <TableHead>
+                        <span className="sr-only">Actions</span>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredAndSortedMerchants.length > 0 ? (
+                      filteredAndSortedMerchants.map((merchant) => (
+                        <TableRow key={merchant.id}>
+                          <TableCell className="font-medium">{merchant.name}</TableCell>
+                          <TableCell>{merchant.company}</TableCell>
+                          <TableCell className="hidden md:table-cell">{merchant.email}</TableCell>
+                          <TableCell>
+                            <Badge variant={merchant.status === 'Active' ? 'default' : merchant.status === 'Pending' ? 'secondary' : 'destructive'}>{merchant.status}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button aria-haspopup="true" size="icon" variant="ghost">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                  <span className="sr-only">Toggle menu</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                                <DropdownMenuItem>Delete</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={5} className="h-24 text-center">
+                          No merchants found.
                         </TableCell>
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={5} className="h-24 text-center">
-                        No merchants found.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-      </TabsContent>
-    </Tabs>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add New Merchant</DialogTitle>
+        </DialogHeader>
+        <AddMerchantForm setOpen={setIsAddMerchantOpen} />
+      </DialogContent>
+    </Dialog>
   );
 }
