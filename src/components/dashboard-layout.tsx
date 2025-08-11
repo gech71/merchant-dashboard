@@ -37,7 +37,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
@@ -62,10 +61,6 @@ function UserProfile() {
           variant="ghost"
           className='w-full justify-start gap-2 p-2 text-left'
         >
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="https://placehold.co/40x40.png" />
-            <AvatarFallback>SA</AvatarFallback>
-          </Avatar>
           <div
             className={cn(
                 'flex flex-col text-left transition-opacity duration-200'

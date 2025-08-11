@@ -23,7 +23,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Tabs,
   TabsContent,
@@ -247,16 +246,6 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                         <TableRow key={company.id}>
                           <TableCell>
                             <div className="flex items-center gap-4">
-                              <Avatar className="h-10 w-10">
-                                <AvatarImage
-                                  src={company.logoUrl}
-                                  alt={`${company.fieldName} logo`}
-                                  data-ai-hint={company.hint}
-                                />
-                                <AvatarFallback>
-                                  {company.fieldName.charAt(0)}
-                                </AvatarFallback>
-                              </Avatar>
                               <div className="flex flex-col">
                                 <Link href={`/dashboard/companies/${company.id}`} className="font-medium hover:underline">{company.fieldName}</Link>
                               </div>
