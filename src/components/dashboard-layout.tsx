@@ -9,6 +9,7 @@ import {
   Briefcase,
   Users,
   User,
+  PanelLeft,
 } from 'lucide-react';
 
 import {
@@ -21,6 +22,8 @@ import {
   SidebarTrigger,
   SidebarGroup,
   SidebarGroupLabel,
+  SidebarFooter,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -53,10 +56,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <Briefcase className="h-5 w-5" />
               </div>
               <span className="font-semibold text-lg">MerchantView</span>
+              <div className="ml-auto">
+                <SidebarTrigger />
+              </div>
             </div>
           </SidebarHeader>
 
-          <SidebarMenu>
+          <SidebarMenu className="flex-1">
             <SidebarGroup>
               <SidebarGroupLabel>Navigation</SidebarGroupLabel>
               {menuItems.map((item) => (
@@ -75,40 +81,36 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               ))}
             </SidebarGroup>
           </SidebarMenu>
+          <SidebarSeparator />
+           <SidebarFooter>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="justify-start gap-2 w-full p-2 h-auto">
+                   <Avatar className="h-8 w-8">
+                    <AvatarImage src="https://placehold.co/32x32.png" alt="System Admin" />
+                    <AvatarFallback>SA</AvatarFallback>
+                  </Avatar>
+                  <div className="text-left">
+                    <p className="text-sm font-medium">System Admin</p>
+                    <p className="text-xs text-muted-foreground">admin@merchantview.com</p>
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="right" align="start">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>Support</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Logout</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarFooter>
         </SidebarContent>
       </Sidebar>
-      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <SidebarTrigger className="sm:hidden" />
-          <div className="ml-auto">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="overflow-hidden rounded-full"
-              >
-                <Avatar>
-                  <AvatarImage src="https://placehold.co/32x32.png" alt="System Admin" />
-                  <AvatarFallback>SA</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>System Admin</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          </div>
-        </header>
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-          {children}
-        </main>
-      </div>
+      <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-6 md:gap-8 sm:pl-16">
+        {children}
+      </main>
     </div>
   );
 }
