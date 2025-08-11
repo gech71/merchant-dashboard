@@ -53,7 +53,13 @@ const MOCK_EXISTING_MERCHANTS: Pick<Merchant, 'company' | 'role'>[] = [
 ];
 
 
-export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void }) {
+export function AddMerchantForm({ 
+  setOpen, 
+  onAddMerchant 
+}: { 
+  setOpen: (open: boolean) => void,
+  onAddMerchant: (merchant: Merchant) => void 
+}) {
   const { toast } = useToast();
   const form = useForm<MerchantFormValues>({
     resolver: zodResolver(merchantFormSchema),
@@ -76,8 +82,14 @@ export function AddMerchantForm({ setOpen }: { setOpen: (open: boolean) => void 
         return;
       }
     }
+    
+    const newMerchant: Merchant = {
+      id: new Date().toISOString(),
+      ...data,
+      status: 'Pending'
+    };
 
-    console.log({ ...data, status: 'Pending' }); 
+    onAddMerchant(newMerchant);
     toast({
       title: 'Merchant User Submitted for Approval',
       description: `${data.name} has been successfully submitted for verification.`,

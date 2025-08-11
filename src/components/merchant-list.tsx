@@ -53,7 +53,14 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
 
 
   const handleStatusChange = (merchantId: string, status: 'Active' | 'Disabled') => {
-    setMerchants(merchants.map(m => m.id === merchantId ? { ...m, status } : m));
+    setMerchants(merchants.map(m => m.id === merchantId ? { ...m, status } : m).filter(m => {
+        if (!approvalView) return true;
+        return m.status === 'Pending';
+    }));
+  };
+
+  const handleAddMerchant = (newMerchant: Merchant) => {
+    setMerchants(prev => [...prev, newMerchant]);
   };
 
   const requestSort = (key: SortableKeys) => {
@@ -266,7 +273,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
         <DialogHeader>
           <DialogTitle>Add New Merchant User</DialogTitle>
         </DialogHeader>
-        <AddMerchantForm setOpen={setIsAddMerchantOpen} />
+        <AddMerchantForm setOpen={setIsAddMerchantOpen} onAddMerchant={handleAddMerchant} />
       </DialogContent>
     </Dialog>
   );

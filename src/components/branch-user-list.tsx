@@ -54,6 +54,10 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
   const handleStatusChange = (userId: string, status: 'Active' | 'Inactive') => {
     setBranchUsers(branchUsers.map(user => user.id === userId ? { ...user, status } : user));
   };
+  
+  const handleAddUser = (newUser: BranchUser) => {
+    setBranchUsers(prev => [...prev, newUser]);
+  };
 
 
   const requestSort = (key: SortableKeys) => {
@@ -256,7 +260,7 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
         <DialogHeader>
           <DialogTitle>Add New Branch User</DialogTitle>
         </DialogHeader>
-        <AddBranchUserForm setOpen={setIsAddUserOpen} />
+        <AddBranchUserForm setOpen={setIsAddUserOpen} onAddUser={handleAddUser} />
       </DialogContent>
     </Dialog>
   );

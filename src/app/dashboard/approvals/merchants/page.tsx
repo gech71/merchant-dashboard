@@ -1,10 +1,11 @@
 
+
 import MerchantList from '@/components/merchant-list';
 import type { Merchant } from '@/types';
 
 const MOCK_MERCHANTS: Merchant[] = [
   { id: '3', name: 'Gadget Hub Admin', company: 'Quantum Corp', email: 'sales@gadgethub.com', role: 'Admin', status: 'Pending' },
-  { id: '6', name: 'Diana Prince', company: 'Synergy Systems', email: 'diana.p@example.com', role: 'Sales', status: 'Pending' },
+  { id: '8', name: 'Diana Prince', company: 'Synergy Systems', email: 'diana.p@example.com', role: 'Sales', status: 'Pending' },
 ];
 
 export default function MerchantsApprovalPage() {

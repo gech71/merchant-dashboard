@@ -45,7 +45,14 @@ export default function BranchList({ branches: initialBranches, approvalView = f
   const [isAddBranchOpen, setIsAddBranchOpen] = React.useState(false);
 
   const handleStatusChange = (branchId: string, status: 'Approved' | 'Rejected') => {
-    setBranches(branches.map(b => b.id === branchId ? { ...b, status } : b));
+    setBranches(branches.map(b => b.id === branchId ? { ...b, status } : b).filter(b => {
+        if (!approvalView) return true;
+        return b.status === 'Pending';
+    }));
+  };
+
+  const handleAddBranch = (newBranch: Branch) => {
+    setBranches(prev => [...prev, newBranch]);
   };
 
   const requestSort = (key: SortableKeys) => {
@@ -255,7 +262,7 @@ export default function BranchList({ branches: initialBranches, approvalView = f
         <DialogHeader>
           <DialogTitle>Add New Branch</DialogTitle>
         </DialogHeader>
-        <AddBranchForm setOpen={setIsAddBranchOpen} />
+        <AddBranchForm setOpen={setIsAddBranchOpen} onAddBranch={handleAddBranch} />
       </DialogContent>
     </Dialog>
   );

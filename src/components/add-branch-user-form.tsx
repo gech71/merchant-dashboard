@@ -18,6 +18,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import type { BranchUser } from '@/types';
 
 const branchUserFormSchema = z.object({
   name: z.string().min(2, 'Full name must be at least 2 characters.'),
@@ -37,7 +38,13 @@ const MOCK_BRANCHES = [
 ];
 
 
-export function AddBranchUserForm({ setOpen }: { setOpen: (open: boolean) => void }) {
+export function AddBranchUserForm({ 
+  setOpen, 
+  onAddUser 
+}: { 
+  setOpen: (open: boolean) => void,
+  onAddUser: (user: BranchUser) => void 
+}) {
   const { toast } = useToast();
   const form = useForm<BranchUserFormValues>({
     resolver: zodResolver(branchUserFormSchema),
@@ -48,7 +55,12 @@ export function AddBranchUserForm({ setOpen }: { setOpen: (open: boolean) => voi
   });
 
   function onSubmit(data: BranchUserFormValues) {
-    console.log({ ...data, status: 'Pending' }); // In a real app, you'd handle form submission here
+    const newUser: BranchUser = {
+        id: new Date().toISOString(),
+        ...data,
+        status: 'Pending'
+    }
+    onAddUser(newUser);
     toast({
       title: 'Branch User Submitted for Approval',
       description: `${data.name} has been successfully submitted and is awaiting verification.`,

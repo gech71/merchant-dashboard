@@ -52,13 +52,16 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
         ? { 
             ...c, 
             approved: isApproved, 
-            status: isApproved ? 'Active' : 'Inactive', // Or 'Rejected', 'Inactive' etc.
+            status: isApproved ? 'Active' : 'Inactive',
             approveUser: isApproved ? 'admin' : undefined 
           } 
         : c
     ).filter(c => approvalView ? c.status === 'Pending' : true));
   };
   
+  const handleAddCompany = (newCompany: Company) => {
+    setCompanies(prev => [...prev, newCompany]);
+  };
 
   const requestSort = (key: SortableKeys) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -323,7 +326,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
         <DialogHeader>
           <DialogTitle>Add New Company</DialogTitle>
         </DialogHeader>
-        <AddCompanyForm setOpen={setIsAddCompanyOpen} />
+        <AddCompanyForm setOpen={setIsAddCompanyOpen} onAddCompany={handleAddCompany}/>
       </DialogContent>
     </Dialog>
   );
