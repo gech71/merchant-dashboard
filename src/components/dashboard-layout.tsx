@@ -23,7 +23,6 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   useSidebar,
-  SidebarTrigger,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarSeparator,
@@ -69,8 +68,7 @@ function UserProfile() {
           </Avatar>
           <div
             className={cn(
-                'flex flex-col text-left transition-opacity duration-200',
-                state === 'collapsed' && 'opacity-0'
+                'flex flex-col text-left transition-opacity duration-200'
             )}
           >
             <p className="text-sm font-medium">System Admin</p>
@@ -99,7 +97,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   return (
       <div className="flex min-h-screen">
-        <Sidebar>
+        <Sidebar collapsible='none'>
           <SidebarContent className="flex flex-col justify-between">
             <div>
               <SidebarHeader className="flex items-center justify-between p-4">
@@ -111,11 +109,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   >
                     <Briefcase className="h-6 w-6" />
                   </div>
-                  <h1 className={cn("text-lg font-semibold text-primary transition-opacity duration-200", state === 'collapsed' && 'hidden')}>
+                  <h1 className={cn("text-lg font-semibold text-primary transition-opacity duration-200")}>
                     MerchantView
                   </h1>
                 </div>
-                <SidebarTrigger className={cn(state === 'collapsed' && 'absolute left-1/2 -translate-x-1/2')} />
               </SidebarHeader>
               <SidebarMenu>
                 {NAV_ITEMS.map((item) => (
@@ -123,11 +120,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     <SidebarMenuButton
                       asChild
                       isActive={pathname === item.href}
-                      className="justify-center data-[state=expanded]:justify-start"
+                      className="justify-start"
                     >
                       <Link href={item.href}>
                         <item.icon />
-                        <span className={cn(state === 'collapsed' && 'hidden')}>{item.label}</span>
+                        <span>{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -137,7 +134,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <SidebarGroup>
                 <SidebarGroupLabel className="flex items-center gap-2">
                   <CheckSquare />
-                  <span className={cn(state === 'collapsed' && 'hidden')}>Approvals</span>
+                  <span>Approvals</span>
                 </SidebarGroupLabel>
                 <SidebarMenu>
                   {APPROVAL_NAV_ITEMS.map((item) => (
@@ -145,11 +142,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     <SidebarMenuButton
                       asChild
                       isActive={pathname === item.href}
-                      className="justify-center data-[state=expanded]:justify-start"
+                      className="justify-start"
                     >
                       <Link href={item.href}>
                         <item.icon />
-                        <span className={cn(state === 'collapsed' && 'hidden')}>{item.label}</span>
+                        <span>{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
