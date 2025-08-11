@@ -26,6 +26,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import {
@@ -46,6 +47,45 @@ const NAV_ITEMS = [
   { href: '/dashboard/sales-reps', icon: Users, label: 'Sales Reps' },
 ];
 
+function UserProfile() {
+  const { state } = useSidebar();
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2 p-2"
+        >
+          <Avatar className="h-8 w-8">
+            <AvatarImage src="https://placehold.co/40x40.png" />
+            <AvatarFallback>SA</AvatarFallback>
+          </Avatar>
+          <div
+            className={cn(
+              'flex flex-col text-left transition-opacity duration-200',
+              state === 'collapsed' && 'opacity-0'
+            )}
+          >
+            <p className="text-sm font-medium">System Admin</p>
+            <p className="text-xs text-muted-foreground">
+              admin@merchantview.com
+            </p>
+          </div>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="mb-2 w-56">
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>Settings</DropdownMenuItem>
+        <DropdownMenuItem>Support</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>Logout</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
@@ -63,7 +103,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 >
                   <Briefcase className="h-6 w-6" />
                 </div>
-                <h1 className="text-lg font-semibold text-primary">
+                <h1 className="text-lg font-semibold text-primary transition-opacity duration-200 group-data-[collapsible=icon]:opacity-0">
                   MerchantView
                 </h1>
               </div>
@@ -87,30 +127,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start gap-2 p-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="https://placehold.co/40x40.png" />
-                    <AvatarFallback>SA</AvatarFallback>
-                  </Avatar>
-                  <div className="text-left">
-                    <p className="text-sm font-medium">System Admin</p>
-                    <p className="text-xs text-muted-foreground">
-                      admin@merchantview.com
-                    </p>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="mb-2 w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Logout</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <UserProfile />
           </SidebarFooter>
         </Sidebar>
 
