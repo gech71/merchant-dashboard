@@ -20,7 +20,8 @@ import { useToast } from '@/hooks/use-toast';
 
 const companyFormSchema = z.object({
   name: z.string().min(2, 'Company name must be at least 2 characters.'),
-  sales: z.coerce.number().min(0, 'Sales must be a positive number.'),
+  fieldName: z.string().min(2, 'Field name must be at least 2 characters.'),
+  accountNumber: z.string().min(4, 'Account number must be at least 4 characters.'),
 });
 
 type CompanyFormValues = z.infer<typeof companyFormSchema>;
@@ -31,7 +32,8 @@ export function AddCompanyForm({ setOpen }: { setOpen: (open: boolean) => void }
     resolver: zodResolver(companyFormSchema),
     defaultValues: {
       name: '',
-      sales: 0,
+      fieldName: '',
+      accountNumber: '',
     },
   });
 
@@ -47,7 +49,7 @@ export function AddCompanyForm({ setOpen }: { setOpen: (open: boolean) => void }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -63,18 +65,31 @@ export function AddCompanyForm({ setOpen }: { setOpen: (open: boolean) => void }
         />
         <FormField
           control={form.control}
-          name="sales"
+          name="fieldName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Sales (USD)</FormLabel>
+              <FormLabel>Field Name</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="150000" {...field} />
+                <Input placeholder="Innovate Inc." {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="flex justify-end gap-2">
+        <FormField
+          control={form.control}
+          name="accountNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Account Number</FormLabel>
+              <FormControl>
+                <Input placeholder="ACC12345" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
             <Button type="submit">Add Company</Button>
         </div>

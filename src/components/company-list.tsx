@@ -34,7 +34,7 @@ import { AddCompanyForm } from './add-company-form';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from './ui/dropdown-menu';
 
-type SortableKeys = 'name' | 'sales' | 'status';
+type SortableKeys = 'name' | 'accountNumber' | 'status' | 'approveUser';
 
 export default function CompanyList({ companies: initialCompanies, approvalView = false }: { companies: Company[], approvalView?: boolean }) {
   const [companies, setCompanies] = React.useState(initialCompanies);
@@ -42,12 +42,12 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
-  } | null>({ key: 'sales', direction: 'descending' });
+  } | null>({ key: 'name', direction: 'ascending' });
   const [isAddCompanyOpen, setIsAddCompanyOpen] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
 
   const handleStatusChange = (companyId: string, status: 'Approved' | 'Rejected') => {
-    setCompanies(companies.map(c => c.id === companyId ? { ...c, status } : c));
+    setCompanies(companies.map(c => c.id === companyId ? { ...c, status, approveUser: status === 'Approved' ? 'admin' : undefined } : c));
   };
 
   const requestSort = (key: SortableKeys) => {
@@ -79,10 +79,12 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
 
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
+        const valA = a[sortConfig.key] ?? '';
+        const valB = b[sortConfig.key] ?? '';
+        if (valA < valB) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
+        if (valA > valB) {
           return sortConfig.direction === 'ascending' ? 1 : -1;
         }
         return 0;
@@ -171,6 +173,16 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                           {getSortIndicator('name')}
                         </Button>
                       </TableHead>
+                      <TableHead>
+                        <Button
+                          variant="ghost"
+                          onClick={() => requestSort('accountNumber')}
+                          className="px-2"
+                        >
+                          Account Number
+                          {getSortIndicator('accountNumber')}
+                        </Button>
+                      </TableHead>
                        <TableHead>
                         <Button
                           variant="ghost"
@@ -181,14 +193,14 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                           {getSortIndicator('status')}
                         </Button>
                       </TableHead>
-                      <TableHead className="text-right">
+                      <TableHead>
                         <Button
                           variant="ghost"
-                          onClick={() => requestSort('sales')}
+                          onClick={() => requestSort('approveUser')}
                           className="px-2"
                         >
-                          Sales
-                          {getSortIndicator('sales')}
+                          Approved By
+                          {getSortIndicator('approveUser')}
                         </Button>
                       </TableHead>
                        <TableHead>
@@ -212,20 +224,17 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                                   {company.name.charAt(0)}
                                 </AvatarFallback>
                               </Avatar>
-                              <span className="font-medium">{company.name}</span>
+                              <div className="flex flex-col">
+                                <span className="font-medium">{company.name}</span>
+                                <span className="text-xs text-muted-foreground">{company.fieldName}</span>
+                              </div>
                             </div>
                           </TableCell>
+                          <TableCell>{company.accountNumber}</TableCell>
                           <TableCell>
                              <Badge variant={getStatusVariant(company.status)}>{company.status}</Badge>
                           </TableCell>
-                          <TableCell className="text-right font-mono">
-                            {new Intl.NumberFormat('en-US', {
-                              style: 'currency',
-                              currency: 'USD',
-                              minimumFractionDigits: 0,
-                              maximumFractionDigits: 0,
-                            }).format(company.sales)}
-                          </TableCell>
+                          <TableCell>{company.approveUser || 'N/A'}</TableCell>
                            <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -257,7 +266,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                     ) : (
                       <TableRow>
                         <TableCell
-                          colSpan={4}
+                          colSpan={5}
                           className="text-center h-24 text-muted-foreground"
                         >
                           No companies found.

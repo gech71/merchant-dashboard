@@ -1,7 +1,10 @@
+
 export type Company = {
   id: string;
   name: string;
-  sales: number;
+  accountNumber: string;
+  fieldName: string;
+  approveUser?: string;
   logoUrl: string;
   hint: string;
   status: 'Approved' | 'Pending' | 'Rejected';
