@@ -80,11 +80,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const now = new Date().toISOString();
     const newIdNumber = Math.max(...allowedCompanies.map(c => parseInt(c.ID.replace('C', ''), 10)), 0) + 1;
     const newId = `C${newIdNumber.toString().padStart(3, '0')}`;
+    const newOid = `oid_${newId}_${new Date().getTime()}`;
 
     const newCompany: allowed_companies = {
         ...company,
         ID: newId,
-        Oid: new Date().toISOString(),
+        Oid: newOid,
         APPROVED: false,
         STATUS: 'Pending',
         INSERTDATE: now,
