@@ -239,7 +239,7 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 {!approvalView && <DropdownMenuItem onClick={() => handleEdit(user)}>Edit</DropdownMenuItem>}
-                                {user.status === 'Pending' && (
+                                {approvalView && user.status === 'Pending' && (
                                   <>
                                     <DropdownMenuItem onClick={() => handleStatusChange(user.id, 'Active')}>
                                       <CheckCircle className="mr-2 h-4 w-4" />
