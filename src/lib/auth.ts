@@ -13,7 +13,8 @@ type UserPayload = {
 };
 
 export async function getCurrentUser(): Promise<UserPayload | null> {
-  const token = cookies().get('accessToken')?.value;
+  const cookieStore = cookies();
+  const token = cookieStore.get('accessToken')?.value;
 
   if (!token) {
     return null;

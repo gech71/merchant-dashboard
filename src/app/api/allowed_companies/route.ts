@@ -41,6 +41,8 @@ export async function POST(request: Request) {
         STATUS: 'Pending',
         INSERTUSER: user.name,
         UPDATEUSER: user.name,
+        OptimisticLockField: 0,
+        GCRecord: 0,
       },
     });
 
