@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings } from '@/types';
 
 // Mock Data
 const MOCK_BRANCHES: Branch[] = [
@@ -83,6 +83,11 @@ const MOCK_PAYSTREAM_TXNS: paystream_txns[] = [
     { ID: 'ps_3', MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT003', ISCOMPLETED: true, AMOUNT: 75.00, PAYERACCOUNT: 'PAYER003', INSERTDATE: '2023-07-03', UPDATEDATE: '2023-07-03', INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
+const MOCK_STREAM_PAY_SETTINGS: stream_pay_settings[] = [
+    { ID: 'sps_1', ADDRESS: 'https://streampay.api/v1', IV: 'iv_streampay_123', KEY: 'key_streampay_abc', HV: 'hv_streampay_xyz', USERNAME: 'streamuser', PASSWORD: 'StreamPayPassword1', INSERTDATE: '2023-08-01', UPDATEDATE: '2023-08-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'sps_2', ADDRESS: 'https://streampay.api/v2', IV: 'iv_streampay_456', KEY: 'key_streampay_def', HV: 'hv_streampay_uvw', USERNAME: 'streamuser2', PASSWORD: 'StreamPayPassword2', INSERTDATE: '2023-08-02', UPDATEDATE: '2023-08-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
+];
+
 
 const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
 
@@ -98,6 +103,7 @@ type DataContextType = {
   controllersConfigs: controllersconfigs[];
   coreIntegrationSettings: core_integration_settings[];
   paystreamTxns: paystream_txns[];
+  streamPaySettings: stream_pay_settings[];
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
@@ -126,6 +132,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [controllersConfigs, setControllersConfigs] = React.useState<controllersconfigs[]>(MOCK_CONTROLLERSCONFIGS);
   const [coreIntegrationSettings, setCoreIntegrationSettings] = React.useState<core_integration_settings[]>(MOCK_CORE_INTEGRATION_SETTINGS);
   const [paystreamTxns, setPaystreamTxns] = React.useState<paystream_txns[]>(MOCK_PAYSTREAM_TXNS);
+  const [streamPaySettings, setStreamPaySettings] = React.useState<stream_pay_settings[]>(MOCK_STREAM_PAY_SETTINGS);
   const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
@@ -203,6 +210,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     controllersConfigs,
     coreIntegrationSettings,
     paystreamTxns,
+    streamPaySettings,
     currentUser,
     addBranch,
     updateBranch,

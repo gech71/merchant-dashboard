@@ -62,6 +62,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/controllers-configs', icon: KeyRound, label: 'Controller Configs' },
   { href: '/dashboard/core-integration-settings', icon: Settings, label: 'Core Integration Settings' },
   { href: '/dashboard/paystream-txns', icon: Repeat, label: 'PayStream Transactions' },
+  { href: '/dashboard/stream-pay-settings', icon: Settings, label: 'StreamPay Settings' },
 ];
 
 const APPROVAL_NAV_ITEMS = [
