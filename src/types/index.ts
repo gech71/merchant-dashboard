@@ -215,4 +215,19 @@ export type ussd_push_settings = {
     UPDATEUSER: string;
 };
 
-export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | null;
+export type qr_payments = {
+    ID: string;
+    DEBITACCOUNT: string;
+    CREDITACCOUNT: string;
+    SALERPHONENUMBER: string;
+    AMOUNT: number;
+    EXPIRETIME: string;
+    QRCODE: string;
+    ISUSED: boolean;
+    INSERTDATE: string;
+    UPDATEDATE: string;
+    INSERTUSER: string;
+    UPDATEUSER: string;
+};
+
+export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | null;

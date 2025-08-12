@@ -22,7 +22,8 @@ import {
   KeyRound,
   Settings,
   Repeat,
-  Smartphone
+  Smartphone,
+  QrCode
 } from 'lucide-react';
 
 import {
@@ -65,6 +66,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/paystream-txns', icon: Repeat, label: 'PayStream Transactions' },
   { href: '/dashboard/stream-pay-settings', icon: Settings, label: 'StreamPay Settings' },
   { href: '/dashboard/ussd-push-settings', icon: Smartphone, label: 'USSD Push Settings' },
+  { href: '/dashboard/qr-payments', icon: QrCode, label: 'QR Payments' },
 ];
 
 const APPROVAL_NAV_ITEMS = [

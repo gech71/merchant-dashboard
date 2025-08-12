@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments } from '@/types';
 
 // Mock Data
 const MOCK_BRANCHES: Branch[] = [
@@ -93,6 +93,12 @@ const MOCK_USSD_PUSH_SETTINGS: ussd_push_settings[] = [
     { ID: 'ups_2', ADDRESS: 'https://another-ussd.gateway.com/push/v2', RESULTURL: 'https://api.myapp.com/ussd/callback2', USERNAME: 'ussd_user2', PASSWORD: 'UssdPassword456', INSERTDATE: '2023-09-02', UPDATEDATE: '2023-09-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
+const MOCK_QR_PAYMENTS: qr_payments[] = [
+    { ID: 'qr_1', DEBITACCOUNT: 'D001', CREDITACCOUNT: 'C001', SALERPHONENUMBER: '666-777-8888', AMOUNT: 50.00, EXPIRETIME: '2023-10-31T23:59:59Z', QRCODE: 'dummy-qr-code-1', ISUSED: false, INSERTDATE: '2023-10-01', UPDATEDATE: '2023-10-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'qr_2', DEBITACCOUNT: 'D002', CREDITACCOUNT: 'C002', SALERPHONENUMBER: '777-888-9999', AMOUNT: 150.75, EXPIRETIME: '2023-11-15T12:00:00Z', QRCODE: 'dummy-qr-code-2', ISUSED: true, INSERTDATE: '2023-10-02', UPDATEDATE: '2023-10-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'qr_3', DEBITACCOUNT: 'D003', CREDITACCOUNT: 'C001', SALERPHONENUMBER: '888-999-0000', AMOUNT: 25.00, EXPIRETIME: '2023-11-01T08:30:00Z', QRCODE: 'dummy-qr-code-3', ISUSED: false, INSERTDATE: '2023-10-03', UPDATEDATE: '2023-10-03', INSERTUSER: 'system', UPDATEUSER: 'system' },
+]
+
 const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
 
 type DataContextType = {
@@ -109,6 +115,7 @@ type DataContextType = {
   paystreamTxns: paystream_txns[];
   streamPaySettings: stream_pay_settings[];
   ussdPushSettings: ussd_push_settings[];
+  qrPayments: qr_payments[];
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
@@ -139,6 +146,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [paystreamTxns, setPaystreamTxns] = React.useState<paystream_txns[]>(MOCK_PAYSTREAM_TXNS);
   const [streamPaySettings, setStreamPaySettings] = React.useState<stream_pay_settings[]>(MOCK_STREAM_PAY_SETTINGS);
   const [ussdPushSettings, setUssdPushSettings] = React.useState<ussd_push_settings[]>(MOCK_USSD_PUSH_SETTINGS);
+  const [qrPayments, setQrPayments] = React.useState<qr_payments[]>(MOCK_QR_PAYMENTS);
   const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
@@ -218,6 +226,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     paystreamTxns,
     streamPaySettings,
     ussdPushSettings,
+    qrPayments,
     currentUser,
     addBranch,
     updateBranch,
