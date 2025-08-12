@@ -26,6 +26,7 @@ import {
   Landmark,
   ShieldCheck,
   Settings2,
+  FileText,
 } from 'lucide-react';
 
 import {
@@ -58,6 +59,7 @@ const MANAGEMENT_NAV_ITEMS = [
   { href: '/dashboard/branches', icon: Home, label: 'Branches' },
   { href: '/dashboard/branch-users', icon: UserCog, label: 'Branch Users' },
   { href: '/dashboard/merchant_users', icon: Briefcase, label: 'Merchant Users' },
+  { href: '/dashboard/account-infos', icon: FileText, label: 'Account Infos' },
 ];
 
 const TRANSACTIONS_NAV_ITEMS = [

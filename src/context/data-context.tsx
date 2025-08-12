@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos } from '@/types';
 
 // Mock Data
 const MOCK_BRANCHES: Branch[] = [
@@ -58,7 +58,7 @@ const MOCK_MERCHANT_TXNS: merchant_txns[] = [
 ]
 
 const MOCK_ARIF_REQUESTS: arif_requests[] = [
-    { NONCEID: 'nonce1', SESSIONID: 'sess1', DEBITACCOUNT: 'D001', CREDITACCOUNT: 'C001', AMOUNT: 100, MERCHANTACCOUNT: 'ACC001', SALESPHONE: '666-777-8888', REQUEST1: '{}', RESPONSE1: '{}', REQUEST2: '{}', RESPONSE2: '{}', REQUEST3: '{}', RESPONSE3: '{}', WEBHOOKRESPONSE: '{}', ERROR1: '', MESSAGE1: '', ERROR2: '', MESSAGE2: '', ERROR3: '', MESSAGE3: '', DATESEND1: '2023-06-01', DATERECIVED1: '2023-06-01', DATESEND2: '2023-06-01', DATERECIVED2: '2023-06-01', DATESEND3: '2023-06-01', DATERECIVED3: '2023-06-01', WEBHOOKRECEIVEDDATE: '2023-06-01', INSERTUSER: 'sys', UPDATEUSER: 'sys', ARIFPAYTRANSACTIONID: 'AP-TXN-1', ARIFPAYTRANSACTIONSTATUS: 'Success', T24TRANSACTIONSTATUS: 'Success' },
+    { NONCEID: 'nonce1', SESSIONID: 'sess1', DEBITACCOUNT: 'D001', CREDITACCOUNT: 'C001', AMOUNT: 100, MERCHANTACCOUNT: 'ACC001', SALESPHONE: '666-777-8888', REQUEST1: '{}', RESPONSE1: '{}', REQUEST2: '{}', RESPONSE2: '{}', REQUEST3: '{}', RESPONSE3: '{}', WEBHOOKRESPONSE: '{}', ERROR1: '', MESSAGE1: '', ERROR2: '', MESSAGE2: '', ERROR3: '', MESSAGE3: '', DATESEND1: '2023-06-01', DATERECIVED1: '2023-06-01', DATESEND2: '2023-06-01', DATERECIVED2: '2023-06-01', DATESEND3: '2023-06-01', DATERECIVED3: '2023-06-01', WEBHOOKRECEIVEDDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system', ARIFPAYTRANSACTIONID: 'AP-TXN-1', ARIFPAYTRANSACTIONSTATUS: 'Success', T24TRANSACTIONSTATUS: 'Success' },
     { NONCEID: 'nonce2', SESSIONID: 'sess2', DEBITACCOUNT: 'D002', CREDITACCOUNT: 'C002', AMOUNT: 250, MERCHANTACCOUNT: 'ACC002', SALESPHONE: '777-888-9999', REQUEST1: '{}', RESPONSE1: '{}', REQUEST2: '{}', RESPONSE2: '{"status":"failed"}', REQUEST3: '{}', RESPONSE3: '{}', WEBHOOKRESPONSE: '{}', ERROR1: '', MESSAGE1: '', ERROR2: 'T24_FAIL', MESSAGE2: 'T24 Timeout', ERROR3: '', MESSAGE3: '', DATESEND1: '2023-06-02', DATERECIVED1: '2023-06-02', DATESEND2: '2023-06-02', DATERECIVED2: '2023-06-02', DATESEND3: '', DATERECIVED3: '', WEBHOOKRECEIVEDDATE: '', INSERTUSER: 'sys', UPDATEUSER: 'sys', ARIFPAYTRANSACTIONID: 'AP-TXN-2', ARIFPAYTRANSACTIONSTATUS: 'Failed', T24TRANSACTIONSTATUS: 'Failed' },
 ]
 
@@ -99,6 +99,12 @@ const MOCK_QR_PAYMENTS: qr_payments[] = [
     { ID: 'qr_3', DEBITACCOUNT: 'D003', CREDITACCOUNT: 'C001', SALERPHONENUMBER: '888-999-0000', AMOUNT: 25.00, EXPIRETIME: '2023-11-01T08:30:00Z', QRCODE: 'dummy-qr-code-3', ISUSED: false, INSERTDATE: '2023-10-03', UPDATEDATE: '2023-10-03', INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
+const MOCK_ACCOUNT_INFOS: account_infos[] = [
+    { ID: 'ai_1', ACCOUNTNUMBER: 'ACC001', PHONENUMBER: '111-222-3333', FULLNAME: 'The Corner Cafe Admin', GENDER: 'N/A', VALUE1: null, VALUE2: null, INSERTDATE: '2023-01-15', UPDATEDATE: '2023-01-15', INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'ai_2', ACCOUNTNUMBER: 'CUST001', PHONENUMBER: '123-456-7890', FULLNAME: 'Customer A', GENDER: 'Male', VALUE1: 'VIP', VALUE2: null, INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'ai_3', ACCOUNTNUMBER: 'CUST002', PHONENUMBER: '098-765-4321', FULLNAME: 'Customer B', GENDER: 'Female', VALUE1: null, VALUE2: null, INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
+];
+
 const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
 
 type DataContextType = {
@@ -116,6 +122,7 @@ type DataContextType = {
   streamPaySettings: stream_pay_settings[];
   ussdPushSettings: ussd_push_settings[];
   qrPayments: qr_payments[];
+  accountInfos: account_infos[];
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
@@ -147,6 +154,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [streamPaySettings, setStreamPaySettings] = React.useState<stream_pay_settings[]>(MOCK_STREAM_PAY_SETTINGS);
   const [ussdPushSettings, setUssdPushSettings] = React.useState<ussd_push_settings[]>(MOCK_USSD_PUSH_SETTINGS);
   const [qrPayments, setQrPayments] = React.useState<qr_payments[]>(MOCK_QR_PAYMENTS);
+  const [accountInfos, setAccountInfos] = React.useState<account_infos[]>(MOCK_ACCOUNT_INFOS);
   const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
@@ -227,6 +235,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     streamPaySettings,
     ussdPushSettings,
     qrPayments,
+    accountInfos,
     currentUser,
     addBranch,
     updateBranch,

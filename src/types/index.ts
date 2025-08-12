@@ -230,4 +230,18 @@ export type qr_payments = {
     UPDATEUSER: string;
 };
 
-export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | null;
+export type account_infos = {
+  ID: string;
+  ACCOUNTNUMBER: string;
+  PHONENUMBER: string;
+  FULLNAME: string;
+  GENDER: string;
+  VALUE1: string | null;
+  VALUE2: string | null;
+  INSERTDATE: string;
+  UPDATEDATE: string;
+  INSERTUSER: string;
+  UPDATEUSER: string;
+};
+
+export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | null;
