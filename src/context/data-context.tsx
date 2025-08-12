@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos, promo_adds } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos, promo_adds, role_capablities } from '@/types';
 
 // Mock Data
 const MOCK_BRANCHES: Branch[] = [
@@ -111,6 +111,12 @@ const MOCK_PROMO_ADDS: promo_adds[] = [
     { ID: 'pa_3', ADDTITLE: 'Holiday Special', ADDSUBTITLE: 'Get your gifts now!', ADDADDRESS: 'https://example.com/holiday-special', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 3, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-11-10', UPDATEDATE: '2023-11-10' },
 ];
 
+const MOCK_ROLE_CAPABILITIES: role_capablities[] = [
+    { ID: 'rc_1', ROLEID: 'Admin', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'Dashboard', MENUNAME_am: 'ዳሽቦርድ', ADDRESS: '/dashboard', PARENT: 'ROOT', PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01' },
+    { ID: 'rc_2', ROLEID: 'Admin', MENUORDER: 2, SUBMENUORDER: 1, MENUNAME: 'Allowed Companies', MENUNAME_am: 'የተፈቀዱ ኩባንያዎች', ADDRESS: '/dashboard/allowed_companies', PARENT: 'Management', PARENTID: 'mg_1', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01' },
+    { ID: 'rc_3', ROLEID: 'Sales', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'My Transactions', MENUNAME_am: 'የእኔ ግብይቶች', ADDRESS: '/dashboard/merchant-txns', PARENT: 'ROOT', PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01' },
+]
+
 const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
 
 type DataContextType = {
@@ -130,6 +136,7 @@ type DataContextType = {
   qrPayments: qr_payments[];
   accountInfos: account_infos[];
   promoAdds: promo_adds[];
+  roleCapabilities: role_capablities[];
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
@@ -163,6 +170,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [qrPayments, setQrPayments] = React.useState<qr_payments[]>(MOCK_QR_PAYMENTS);
   const [accountInfos, setAccountInfos] = React.useState<account_infos[]>(MOCK_ACCOUNT_INFOS);
   const [promoAdds, setPromoAdds] = React.useState<promo_adds[]>(MOCK_PROMO_ADDS);
+  const [roleCapabilities, setRoleCapabilities] = React.useState<role_capablities[]>(MOCK_ROLE_CAPABILITIES);
   const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
@@ -245,6 +253,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     qrPayments,
     accountInfos,
     promoAdds,
+    roleCapabilities,
     currentUser,
     addBranch,
     updateBranch,

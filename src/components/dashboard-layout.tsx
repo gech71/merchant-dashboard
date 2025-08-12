@@ -28,6 +28,7 @@ import {
   Settings2,
   FileText,
   Megaphone,
+  UserCheck,
 } from 'lucide-react';
 
 import {
@@ -78,6 +79,7 @@ const SETTINGS_NAV_ITEMS = [
     { href: '/dashboard/core-integration-settings', icon: Settings, label: 'Core Integration Settings' },
     { href: '/dashboard/stream-pay-settings', icon: Settings, label: 'StreamPay Settings' },
     { href: '/dashboard/ussd-push-settings', icon: Smartphone, label: 'USSD Push Settings' },
+    { href: '/dashboard/role-capabilities', icon: UserCheck, label: 'Role Capabilities' },
 ]
 
 const APPROVAL_NAV_ITEMS = [

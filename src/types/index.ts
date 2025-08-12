@@ -1,6 +1,7 @@
 
 
 
+
 export type arif_requests = {
   NONCEID: string;
   SESSIONID: string;
@@ -258,4 +259,21 @@ export type promo_adds = {
   UPDATEDATE: string;
 };
 
-export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | null;
+export type role_capablities = {
+  ID: string;
+  ROLEID: string;
+  MENUORDER: number;
+  SUBMENUORDER: number;
+  MENUNAME: string;
+  MENUNAME_am: string;
+  ADDRESS: string;
+  PARENT: string;
+  PARENTID: string;
+  VALUE3: string | null;
+  INSERTUSERID: string;
+  UPDATEUSERID: string;
+  INSERTDATE: string;
+  UPDATEDATE: string;
+};
+
+export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | role_capablities | null;
