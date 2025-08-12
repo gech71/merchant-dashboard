@@ -26,7 +26,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useDataContext } from '@/context/data-context';
 
-type SortableKeys = 'MERCHANTACCOUNT' | 'AMOUNT' | 'STATUS' | 'T2TRANSACTIONDATE' | 'CUSTOMERNAME';
+type SortableKeys = 'MERCHANTACCOUNT' | 'AMOUNT' | 'STATUS' | 'T2TRANSACTIONDATE' | 'CUSTOMERNAME' | 'CUSTOMERACCOUNT';
 const ITEMS_PER_PAGE = 15;
 
 export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: { merchantTxns: merchant_txns[] }) {
@@ -136,6 +136,12 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
             <TableHeader>
               <TableRow>
                 <TableHead>Merchant Name</TableHead>
+                 <TableHead>
+                    <Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNT')} className="px-2">
+                        MERCHANTACCOUNT
+                        {getSortIndicator('MERCHANTACCOUNT')}
+                    </Button>
+                </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">
                     AMOUNT
@@ -155,6 +161,7 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
                         {getSortIndicator('CUSTOMERNAME')}
                     </Button>
                 </TableHead>
+                 <TableHead>CUSTOMERACCOUNT</TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('T2TRANSACTIONDATE')} className="px-2">
                     TRANSACTIONDATE
@@ -168,18 +175,20 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
                 paginatedTxns.map((txn) => (
                   <TableRow key={txn.ID}>
                     <TableCell className="font-medium">{getMerchantName(txn.MERCHANTACCOUNT)}</TableCell>
+                    <TableCell>{txn.MERCHANTACCOUNT}</TableCell>
                     <TableCell className="text-right">{txn.AMOUNT.toFixed(2)}</TableCell>
                     <TableCell>
                         <Badge variant={getStatusVariant(txn.STATUS)}>{txn.STATUS}</Badge>
                     </TableCell>
                     <TableCell>{txn.TXNID}</TableCell>
                     <TableCell>{txn.CUSTOMERNAME}</TableCell>
+                    <TableCell>{txn.CUSTOMERACCOUNT}</TableCell>
                     <TableCell>{new Date(txn.T2TRANSACTIONDATE).toLocaleString()}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
+                  <TableCell colSpan={8} className="h-24 text-center">
                     No transactions found.
                   </TableCell>
                 </TableRow>
