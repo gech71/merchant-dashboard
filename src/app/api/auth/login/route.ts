@@ -41,9 +41,16 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
+    
+    const userPayload = {
+        userId: user.ID,
+        role: user.ROLE,
+        name: user.FULLNAME,
+        email: user.PHONENUMBER, // Using phone number as email for display
+    };
 
     const accessToken = jwt.sign(
-        { userId: user.ID, role: user.ROLE, name: user.FULLNAME },
+        userPayload,
         JWT_SECRET,
         { expiresIn: JWT_EXPIRES_IN }
     );
@@ -59,6 +66,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
         isSuccess: true,
+        user: userPayload,
         errors: null,
     });
 

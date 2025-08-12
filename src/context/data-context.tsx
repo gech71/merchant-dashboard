@@ -63,8 +63,8 @@ const MOCK_ARIF_REQUESTS: arif_requests[] = [
 ]
 
 const MOCK_ARIFPAY_ENDPOINTS: arifpay_endpoints[] = [
-    { ID: 'ep_1', BANK: 'Bank of Abyssina', DISPLAYNAME: 'BoA', OTPLENGTH: 6, ORDER: 1, ENDPOINT1: 'https://api.boa.com/v1/pay', ENDPOINT2: 'https://api.boa.com/v1/confirm', ENDPOINT3: '', CANCELURL: 'https://boa.com/cancel', ERRORURL: 'https://boa.com/error', SUCCESSURL: 'https://boa.com/success', NOTIFYURL: 'https://api.myapp.com/notify/boa', ISTWOSTEP: true, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '987654321', BENEFICIARYBANK: 'BoA', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ep_2', BANK: 'Awash Bank', DISPLAYNAME: 'Awash', OTPLENGTH: 4, ORDER: 2, ENDPOINT1: 'https://api.awashbank.com/execute', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://awashbank.com/cancel', ERRORURL: 'https://awashbank.com/error', SUCCESSURL: 'https://awashbank.com/success', NOTIFYURL: 'https://api.myapp.com/notify/awash', ISTWOSTEP: false, ISOTP: false, TRANSACTIONTYPE: 'B2B', BENEFICIARYACCOUNT: '123456789', BENEFICIARYBANK: 'Awash', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: '2023-01-02', UPDATEDATE: '2023-01-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'ep_1', BANK: 'Bank of Abyssina', DISPLAYNAME: 'BoA', OTPLENGTH: 6, displayOrder: 1, ENDPOINT1: 'https://api.boa.com/v1/pay', ENDPOINT2: 'https://api.boa.com/v1/confirm', ENDPOINT3: '', CANCELURL: 'https://boa.com/cancel', ERRORURL: 'https://boa.com/error', SUCCESSURL: 'https://boa.com/success', NOTIFYURL: 'https://api.myapp.com/notify/boa', ISTWOSTEP: true, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '987654321', BENEFICIARYBANK: 'BoA', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'ep_2', BANK: 'Awash Bank', DISPLAYNAME: 'Awash', OTPLENGTH: 4, displayOrder: 2, ENDPOINT1: 'https://api.awashbank.com/execute', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://awashbank.com/cancel', ERRORURL: 'https://awashbank.com/error', SUCCESSURL: 'https://awashbank.com/success', NOTIFYURL: 'https://api.myapp.com/notify/awash', ISTWOSTEP: false, ISOTP: false, TRANSACTIONTYPE: 'B2B', BENEFICIARYACCOUNT: '123456789', BENEFICIARYBANK: 'Awash', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: '2023-01-02', UPDATEDATE: '2023-01-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
 const MOCK_CONTROLLERSCONFIGS: controllersconfigs[] = [
@@ -117,7 +117,12 @@ const MOCK_ROLE_CAPABILITIES: role_capablities[] = [
     { ID: 'rc_3', ROLEID: 'Sales', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'My Transactions', MENUNAME_am: 'የእኔ ግብይቶች', ADDRESS: '/dashboard/merchant-txns', PARENT: 'ROOT', PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01' },
 ]
 
-const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
+type CurrentUser = {
+    userId: string;
+    role: string;
+    name: string;
+    email: string;
+};
 
 type DataContextType = {
   branches: Branch[];
@@ -137,7 +142,8 @@ type DataContextType = {
   accountInfos: account_infos[];
   promoAdds: promo_adds[];
   roleCapabilities: role_capablities[];
-  currentUser: BranchUser;
+  currentUser: CurrentUser | null;
+  setCurrentUser: (user: CurrentUser | null) => void;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
   addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => void;
@@ -171,7 +177,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [accountInfos, setAccountInfos] = React.useState<account_infos[]>(MOCK_ACCOUNT_INFOS);
   const [promoAdds, setPromoAdds] = React.useState<promo_adds[]>(MOCK_PROMO_ADDS);
   const [roleCapabilities, setRoleCapabilities] = React.useState<role_capablities[]>(MOCK_ROLE_CAPABILITIES);
-  const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
+  const [currentUser, setCurrentUser] = React.useState<CurrentUser | null>(null);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
   const updateBranch = (updatedBranch: Branch) => {
@@ -192,15 +198,15 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         STATUS: 'Pending',
         INSERTDATE: now,
         UPDATEDATE: now,
-        INSERTUSER: currentUser.name,
-        UPDATEUSER: currentUser.name,
+        INSERTUSER: currentUser?.name || 'system',
+        UPDATEUSER: currentUser?.name || 'system',
         OptimisticLockField: 0,
         GCRecord: 0,
     };
     setAllowedCompanies(prev => [...prev, newCompany]);
   };
   const updateAllowedCompany = (updatedCompany: allowed_companies) => {
-    setAllowedCompanies(prev => prev.map(c => c.Oid === updatedCompany.Oid ? {...updatedCompany, UPDATEDATE: new Date().toISOString(), UPDATEUSER: currentUser.name} : c));
+    setAllowedCompanies(prev => prev.map(c => c.Oid === updatedCompany.Oid ? {...updatedCompany, UPDATEDATE: new Date().toISOString(), UPDATEUSER: currentUser?.name || 'system'} : c));
   };
   
   const updateMerchant = (updatedMerchant: Merchant_users) => {
@@ -222,7 +228,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             ...c, 
             APPROVED: isApproved, 
             STATUS: isApproved ? 'Active' : 'Inactive',
-            APPROVEUSER: isApproved ? currentUser.name : undefined 
+            APPROVEUSER: isApproved ? currentUser?.name : undefined 
           } 
         : c
     ));
@@ -255,6 +261,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     promoAdds,
     roleCapabilities,
     currentUser,
+    setCurrentUser,
     addBranch,
     updateBranch,
     addAllowedCompany,

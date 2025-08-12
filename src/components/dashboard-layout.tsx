@@ -56,6 +56,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { useDataContext } from '@/context/data-context';
+import { useToast } from '@/hooks/use-toast';
 
 const MANAGEMENT_NAV_ITEMS = [
   { href: '/dashboard/allowed_companies', icon: Building, label: 'Allowed Companies' },
@@ -88,13 +89,31 @@ const APPROVAL_NAV_ITEMS = [
 ]
 
 function UserProfile() {
-  const { currentUser } = useDataContext();
+  const { currentUser, setCurrentUser } = useDataContext();
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/login');
+    const response = await fetch('/api/auth/logout', { method: 'POST' });
+    if (response.ok) {
+        setCurrentUser(null);
+        router.push('/login');
+        toast({
+            title: 'Logged Out',
+            description: 'You have been successfully logged out.',
+        });
+    } else {
+        toast({
+            variant: 'destructive',
+            title: 'Logout Failed',
+            description: 'Could not log you out. Please try again.',
+        });
+    }
   };
+  
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <DropdownMenu>

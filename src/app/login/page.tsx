@@ -19,6 +19,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useDataContext } from '@/context/data-context';
 
 const loginFormSchema = z.object({
   phoneNumber: z.string().min(1, 'Phone number is required.'),
@@ -30,6 +31,7 @@ type LoginFormValues = z.infer<typeof loginFormSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { setCurrentUser } = useDataContext();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<LoginFormValues>({
@@ -54,6 +56,7 @@ export default function LoginPage() {
       const result = await response.json();
 
       if (response.ok && result.isSuccess) {
+        setCurrentUser(result.user);
         toast({
           title: 'Login Successful',
           description: 'Welcome back!',
@@ -96,7 +99,7 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., 123-456-7890" {...field} />
+                      <Input placeholder="e.g., 111-222-3333" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
