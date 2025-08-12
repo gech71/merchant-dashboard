@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, AllowedCompany, Merchant_users, BranchUser } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser } from '@/types';
 
 // Mock Data
 const MOCK_BRANCHES: Branch[] = [
@@ -14,7 +14,7 @@ const MOCK_BRANCHES: Branch[] = [
   { id: '5', name: 'South Branch', code: 'SB005', address: '212 Birch Ln, Anytown, USA', contact: '555-7890', status: 'Rejected' },
 ];
 
-const MOCK_ALLOWED_COMPANIES: AllowedCompany[] = [
+const MOCK_ALLOWED_COMPANIES: allowed_companies[] = [
   { Oid: '1', ID: 'C001', ACCOUNTNUMBER: 'ACC001', FIELDNAME: 'Innovate Inc.', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-01-15', UPDATEDATE: '2023-01-15', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
   { Oid: '2', ID: 'C002', ACCOUNTNUMBER: 'ACC002', FIELDNAME: 'Apex Solutions', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-02-20', UPDATEDATE: '2023-02-20', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
   { Oid: '3', ID: 'C003', ACCOUNTNUMBER: 'ACC003', FIELDNAME: 'Quantum Corp', APPROVED: false, STATUS: 'Pending', INSERTDATE: '2023-03-10', UPDATEDATE: '2023-03-10', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
@@ -45,14 +45,14 @@ const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
 
 type DataContextType = {
   branches: Branch[];
-  allowedCompanies: AllowedCompany[];
+  allowedCompanies: allowed_companies[];
   merchants: Merchant_users[];
   branchUsers: BranchUser[];
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
-  addAllowedCompany: (company: Omit<AllowedCompany, 'Oid' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => void;
-  updateAllowedCompany: (company: AllowedCompany) => void;
+  addAllowedCompany: (company: Omit<allowed_companies, 'Oid' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => void;
+  updateAllowedCompany: (company: allowed_companies) => void;
   updateMerchant: (merchant: Merchant_users) => void;
   addBranchUser: (user: BranchUser) => void;
   updateBranchUser: (user: BranchUser) => void;
@@ -66,7 +66,7 @@ const DataContext = React.createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
   const [branches, setBranches] = React.useState<Branch[]>(MOCK_BRANCHES);
-  const [allowedCompanies, setAllowedCompanies] = React.useState<AllowedCompany[]>(MOCK_ALLOWED_COMPANIES);
+  const [allowedCompanies, setAllowedCompanies] = React.useState<allowed_companies[]>(MOCK_ALLOWED_COMPANIES);
   const [merchants, setMerchants] = React.useState<Merchant_users[]>(MOCK_MERCHANT_USERS);
   const [branchUsers, setBranchUsers] = React.useState<BranchUser[]>(MOCK_BRANCH_USERS);
   const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
@@ -76,9 +76,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setBranches(prev => prev.map(b => b.id === updatedBranch.id ? updatedBranch : b));
   };
 
-  const addAllowedCompany = (company: Omit<AllowedCompany, 'Oid' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => {
+  const addAllowedCompany = (company: Omit<allowed_companies, 'Oid' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => {
     const now = new Date().toISOString();
-    const newCompany: AllowedCompany = {
+    const newCompany: allowed_companies = {
         ...company,
         Oid: new Date().toISOString(),
         APPROVED: false,
@@ -92,7 +92,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     };
     setAllowedCompanies(prev => [...prev, newCompany]);
   };
-  const updateAllowedCompany = (updatedCompany: AllowedCompany) => {
+  const updateAllowedCompany = (updatedCompany: allowed_companies) => {
     setAllowedCompanies(prev => prev.map(c => c.Oid === updatedCompany.Oid ? {...updatedCompany, UPDATEDATE: new Date().toISOString(), UPDATEUSER: currentUser.name} : c));
   };
   

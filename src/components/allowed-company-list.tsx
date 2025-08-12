@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import type { AllowedCompany, EditableItem } from '@/types';
+import type { allowed_companies, EditableItem } from '@/types';
 import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 
@@ -41,7 +41,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 type SortableKeys = 'FIELDNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'APPROVEUSER' | 'APPROVED';
 const ITEMS_PER_PAGE = 15;
 
-export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowedCompanies: AllowedCompany[], approvalView?: boolean }) {
+export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowedCompanies: allowed_companies[], approvalView?: boolean }) {
   const { updateAllowedCompanyApproval, currentUser, branches, merchants } = useDataContext();
   const [allowedCompanies, setAllowedCompanies] = React.useState(initialCompanies);
   const [searchTerm, setSearchTerm] = React.useState('');
@@ -71,7 +71,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     updateAllowedCompanyApproval(companyId, isApproved);
   };
   
-  const handleEdit = (company: AllowedCompany) => {
+  const handleEdit = (company: allowed_companies) => {
     setSelectedCompany(company);
     setIsEditCompanyOpen(true);
   };
@@ -162,7 +162,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     );
   };
   
-  const getStatusVariant = (status: AllowedCompany['STATUS']) => {
+  const getStatusVariant = (status: allowed_companies['STATUS']) => {
     switch (status) {
       case 'Active':
         return 'default';
@@ -386,7 +386,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
             </DialogHeader>
             {selectedCompany && selectedCompany.hasOwnProperty('FIELDNAME') && (
                 <EditAllowedCompanyForm
-                    allowedCompany={selectedCompany as AllowedCompany} 
+                    allowedCompany={selectedCompany as allowed_companies} 
                     setOpen={setIsEditCompanyOpen} 
                 />
             )}

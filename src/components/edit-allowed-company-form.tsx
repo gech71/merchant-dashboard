@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import type { AllowedCompany } from '@/types';
+import type { allowed_companies } from '@/types';
 import { useDataContext } from '@/context/data-context';
 
 const allowedCompanyFormSchema = z.object({
@@ -32,7 +32,7 @@ export function EditAllowedCompanyForm({
   allowedCompany,
   setOpen, 
 }: { 
-  allowedCompany: AllowedCompany,
+  allowedCompany: allowed_companies,
   setOpen: (open: boolean) => void,
 }) {
   const { toast } = useToast();
@@ -47,7 +47,7 @@ export function EditAllowedCompanyForm({
   });
 
   function onSubmit(data: AllowedCompanyFormValues) {
-    const updatedCompany: AllowedCompany = {
+    const updatedCompany: allowed_companies = {
       ...allowedCompany,
       ...data,
     };

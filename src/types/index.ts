@@ -1,6 +1,7 @@
 
 
-export type AllowedCompany = {
+
+export type allowed_companies = {
   Oid: string;
   ID: string;
   ACCOUNTNUMBER: string;
@@ -47,7 +48,7 @@ export type Merchant_users = {
   UPDATEUSERID: string;
   INSERTDATE: string;
   UPDATEDATE: string;
-  // This is needed for the relationship with AllowedCompany, not in the new list but required for functionality
+  // This is needed for the relationship with allowed_companies, not in the new list but required for functionality
   company: string; 
 };
 
@@ -60,4 +61,4 @@ export type BranchUser = {
   status: 'Active' | 'Inactive' | 'Pending';
 };
 
-export type EditableItem = AllowedCompany | Branch | Merchant_users | BranchUser | null;
+export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | null;

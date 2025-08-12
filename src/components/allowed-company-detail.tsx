@@ -2,14 +2,14 @@
 'use client';
 
 import * as React from 'react';
-import type { AllowedCompany, Merchant_users } from '@/types';
+import type { allowed_companies, Merchant_users } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import MerchantList from './merchant-list';
 
-export default function AllowedCompanyDetail({ allowedCompany, merchants }: { allowedCompany: AllowedCompany, merchants: Merchant_users[] }) {
+export default function AllowedCompanyDetail({ allowedCompany, merchants }: { allowedCompany: allowed_companies, merchants: Merchant_users[] }) {
     
-  const getStatusVariant = (status: AllowedCompany['STATUS']) => {
+  const getStatusVariant = (status: allowed_companies['STATUS']) => {
     switch (status) {
       case 'Active':
         return 'default';
