@@ -203,4 +203,16 @@ export type stream_pay_settings = {
     UPDATEUSER: string;
 };
 
-export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | null;
+export type ussd_push_settings = {
+    ID: string;
+    ADDRESS: string;
+    RESULTURL: string;
+    USERNAME: string;
+    PASSWORD: string;
+    INSERTDATE: string;
+    UPDATEDATE: string;
+    INSERTUSER: string;
+    UPDATEUSER: string;
+};
+
+export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | null;

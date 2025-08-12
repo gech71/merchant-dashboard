@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings } from '@/types';
 
 // Mock Data
 const MOCK_BRANCHES: Branch[] = [
@@ -88,6 +88,10 @@ const MOCK_STREAM_PAY_SETTINGS: stream_pay_settings[] = [
     { ID: 'sps_2', ADDRESS: 'https://streampay.api/v2', IV: 'iv_streampay_456', KEY: 'key_streampay_def', HV: 'hv_streampay_uvw', USERNAME: 'streamuser2', PASSWORD: 'StreamPayPassword2', INSERTDATE: '2023-08-02', UPDATEDATE: '2023-08-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
+const MOCK_USSD_PUSH_SETTINGS: ussd_push_settings[] = [
+    { ID: 'ups_1', ADDRESS: 'https://ussd.gateway.com/push', RESULTURL: 'https://api.myapp.com/ussd/callback', USERNAME: 'ussd_user', PASSWORD: 'UssdPassword123', INSERTDATE: '2023-09-01', UPDATEDATE: '2023-09-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'ups_2', ADDRESS: 'https://another-ussd.gateway.com/push/v2', RESULTURL: 'https://api.myapp.com/ussd/callback2', USERNAME: 'ussd_user2', PASSWORD: 'UssdPassword456', INSERTDATE: '2023-09-02', UPDATEDATE: '2023-09-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
+];
 
 const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
 
@@ -104,10 +108,11 @@ type DataContextType = {
   coreIntegrationSettings: core_integration_settings[];
   paystreamTxns: paystream_txns[];
   streamPaySettings: stream_pay_settings[];
+  ussdPushSettings: ussd_push_settings[];
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
-  addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => void;
+  addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => void;
   updateAllowedCompany: (company: allowed_companies) => void;
   updateMerchant: (merchant: Merchant_users) => void;
   addBranchUser: (user: BranchUser) => void;
@@ -133,6 +138,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [coreIntegrationSettings, setCoreIntegrationSettings] = React.useState<core_integration_settings[]>(MOCK_CORE_INTEGRATION_SETTINGS);
   const [paystreamTxns, setPaystreamTxns] = React.useState<paystream_txns[]>(MOCK_PAYSTREAM_TXNS);
   const [streamPaySettings, setStreamPaySettings] = React.useState<stream_pay_settings[]>(MOCK_STREAM_PAY_SETTINGS);
+  const [ussdPushSettings, setUssdPushSettings] = React.useState<ussd_push_settings[]>(MOCK_USSD_PUSH_SETTINGS);
   const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
@@ -140,7 +146,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setBranches(prev => prev.map(b => b.id === updatedBranch.id ? updatedBranch : b));
   };
 
-  const addAllowedCompany = (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => {
+  const addAllowedCompany = (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => {
     const now = new Date().toISOString();
     const newIdNumber = Math.max(...allowedCompanies.map(c => parseInt(c.ID.replace('C', ''), 10)), 0) + 1;
     const newId = `C${newIdNumber.toString().padStart(3, '0')}`;
@@ -211,6 +217,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     coreIntegrationSettings,
     paystreamTxns,
     streamPaySettings,
+    ussdPushSettings,
     currentUser,
     addBranch,
     updateBranch,

@@ -21,7 +21,8 @@ import {
   Link2,
   KeyRound,
   Settings,
-  Repeat
+  Repeat,
+  Smartphone
 } from 'lucide-react';
 
 import {
@@ -63,6 +64,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/core-integration-settings', icon: Settings, label: 'Core Integration Settings' },
   { href: '/dashboard/paystream-txns', icon: Repeat, label: 'PayStream Transactions' },
   { href: '/dashboard/stream-pay-settings', icon: Settings, label: 'StreamPay Settings' },
+  { href: '/dashboard/ussd-push-settings', icon: Smartphone, label: 'USSD Push Settings' },
 ];
 
 const APPROVAL_NAV_ITEMS = [
