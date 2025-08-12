@@ -1,6 +1,7 @@
 
 
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -149,11 +150,14 @@ async function main() {
     console.log(`Seeded ${MOCK_ALLOWED_COMPANIES.length} allowed companies.`);
 
     for (const m of MOCK_MERCHANT_USERS) {
-      const { ID, ...merchantData } = m;
-        await prisma.merchant_users.create({ data: {
-          ...merchantData,
-          password: 'password'
-        } });
+        const { ID, ...merchantData } = m;
+        const hashedPassword = await bcrypt.hash(m.ACCOUNTNUMBER, 10);
+        await prisma.merchant_users.create({ 
+            data: {
+                ...merchantData,
+                password: hashedPassword,
+            } 
+        });
     }
     console.log(`Seeded ${MOCK_MERCHANT_USERS.length} merchant users.`);
     
