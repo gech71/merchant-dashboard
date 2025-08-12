@@ -193,7 +193,13 @@ async function main() {
     console.log(`Seeded ${MOCK_ACCOUNT_INFOS.length} account infos.`);
 
     for (const pa of MOCK_PROMO_ADDS) {
-        await prisma.promo_adds.create({ data: pa });
+        const { ORDER, ...rest } = pa;
+        await prisma.promo_adds.create({ 
+            data: {
+                ...rest,
+                displayOrder: pa.ORDER
+            } 
+        });
     }
     console.log(`Seeded ${MOCK_PROMO_ADDS.length} promo adds.`);
 
