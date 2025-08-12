@@ -38,6 +38,7 @@ export function EditBranchForm({
 }) {
   const { toast } = useToast();
   const { updateBranch } = useDataContext();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<BranchFormValues>({
     resolver: zodResolver(branchFormSchema),
@@ -49,17 +50,24 @@ export function EditBranchForm({
     },
   });
 
-  function onSubmit(data: BranchFormValues) {
-    const updatedBranch: Branch = {
-      ...branch,
-      ...data,
-    };
-    updateBranch(updatedBranch);
-    toast({
-      title: 'Branch Updated',
-      description: `${data.name} has been successfully updated.`,
-    });
-    setOpen(false);
+  async function onSubmit(data: BranchFormValues) {
+    setIsLoading(true);
+    try {
+      await updateBranch({ ...branch, ...data });
+      toast({
+        title: 'Branch Updated',
+        description: `${data.name} has been successfully updated.`,
+      });
+      setOpen(false);
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Failed to Update Branch',
+            description: 'An error occurred while trying to update the branch.',
+        });
+    } finally {
+        setIsLoading(false);
+    }
   }
 
   return (
@@ -118,8 +126,8 @@ export function EditBranchForm({
           )}
         />
         <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit">Save Changes</Button>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isLoading}>Cancel</Button>
+            <Button type="submit" disabled={isLoading}>{isLoading ? 'Saving...' : 'Save Changes'}</Button>
         </div>
       </form>
     </Form>

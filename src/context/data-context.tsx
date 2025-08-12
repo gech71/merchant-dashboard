@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -52,8 +51,8 @@ type DataContextType = {
   roleCapabilities: role_capablities[];
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
-  addBranch: (branch: Branch) => void;
-  updateBranch: (branch: Branch) => void;
+  addBranch: (branch: Omit<Branch, 'id' | 'status'>) => Promise<void>;
+  updateBranch: (branch: Branch) => Promise<void>;
   addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => Promise<void>;
   updateAllowedCompany: (company: allowed_companies) => void;
   updateMerchant: (merchant: Merchant_users) => void;
@@ -87,9 +86,26 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const [roleCapabilities, setRoleCapabilities] = React.useState<role_capablities[]>(initialData.roleCapabilities);
   const [currentUser, setCurrentUser] = React.useState<CurrentUser | null>(null);
 
-  const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
-  const updateBranch = (updatedBranch: Branch) => {
-    setBranches(prev => prev.map(b => b.id === updatedBranch.id ? updatedBranch : b));
+  const addBranch = async (branchData: Omit<Branch, 'id' | 'status'>) => {
+    const response = await fetch('/api/branches', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(branchData),
+    });
+    if (!response.ok) throw new Error('Failed to create branch');
+    const newBranch = await response.json();
+    setBranches(prev => [...prev, newBranch]);
+  };
+
+  const updateBranch = async (updatedBranch: Branch) => {
+    const response = await fetch(`/api/branches/${updatedBranch.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedBranch)
+    });
+    if (!response.ok) throw new Error('Failed to update branch');
+    const returnedBranch = await response.json();
+    setBranches(prev => prev.map(b => b.id === returnedBranch.id ? returnedBranch : b));
   };
 
   const addAllowedCompany = async (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => {
