@@ -61,8 +61,8 @@ const MOCK_ARIF_REQUESTS = [
 ]
 
 const MOCK_ARIFPAY_ENDPOINTS = [
-    { ID: 'ep_1', BANK: 'Bank of Abyssina', DISPLAYNAME: 'BoA', OTPLENGTH: 6, ORDER: 1, ENDPOINT1: 'https://api.boa.com/v1/pay', ENDPOINT2: 'https://api.boa.com/v1/confirm', ENDPOINT3: '', CANCELURL: 'https://boa.com/cancel', ERRORURL: 'https://boa.com/error', SUCCESSURL: 'https://boa.com/success', NOTIFYURL: 'https://api.myapp.com/notify/boa', ISTWOSTEP: true, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '987654321', BENEFICIARYBANK: 'BoA', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ep_2', BANK: 'Awash Bank', DISPLAYNAME: 'Awash', OTPLENGTH: 4, ORDER: 2, ENDPOINT1: 'https://api.awashbank.com/execute', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://awashbank.com/cancel', ERRORURL: 'https://awashbank.com/error', SUCCESSURL: 'https://awashbank.com/success', NOTIFYURL: 'https://api.myapp.com/notify/awash', ISTWOSTEP: false, ISOTP: false, TRANSACTIONTYPE: 'B2B', BENEFICIARYACCOUNT: '123456789', BENEFICIARYBANK: 'Awash', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-02'), UPDATEDATE: new Date('2023-01-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'ep_1', BANK: 'Bank of Abyssina', DISPLAYNAME: 'BoA', OTPLENGTH: 6, displayOrder: 1, ENDPOINT1: 'https://api.boa.com/v1/pay', ENDPOINT2: 'https://api.boa.com/v1/confirm', ENDPOINT3: '', CANCELURL: 'https://boa.com/cancel', ERRORURL: 'https://boa.com/error', SUCCESSURL: 'https://boa.com/success', NOTIFYURL: 'https://api.myapp.com/notify/boa', ISTWOSTEP: true, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '987654321', BENEFICIARYBANK: 'BoA', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'ep_2', BANK: 'Awash Bank', DISPLAYNAME: 'Awash', OTPLENGTH: 4, displayOrder: 2, ENDPOINT1: 'https://api.awashbank.com/execute', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://awashbank.com/cancel', ERRORURL: 'https://awashbank.com/error', SUCCESSURL: 'https://awashbank.com/success', NOTIFYURL: 'https://api.myapp.com/notify/awash', ISTWOSTEP: false, ISOTP: false, TRANSACTIONTYPE: 'B2B', BENEFICIARYACCOUNT: '123456789', BENEFICIARYBANK: 'Awash', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-02'), UPDATEDATE: new Date('2023-01-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
 const MOCK_CONTROLLERSCONFIGS = [
@@ -149,7 +149,11 @@ async function main() {
     console.log(`Seeded ${MOCK_ALLOWED_COMPANIES.length} allowed companies.`);
 
     for (const m of MOCK_MERCHANT_USERS) {
-        await prisma.merchant_users.create({ data: m });
+      const { ID, ...merchantData } = m;
+        await prisma.merchant_users.create({ data: {
+          ...merchantData,
+          password: 'password'
+        } });
     }
     console.log(`Seeded ${MOCK_MERCHANT_USERS.length} merchant users.`);
     
@@ -160,12 +164,14 @@ async function main() {
     console.log(`Seeded ${MOCK_BRANCH_USERS.length} branch users.`);
 
     for (const db of MOCK_DAILY_BALANCES) {
-        await prisma.merchants_daily_balances.create({ data: db });
+      const { ID, ...rest } = db;
+        await prisma.merchants_daily_balances.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_DAILY_BALANCES.length} daily balances.`);
     
     for (const mt of MOCK_MERCHANT_TXNS) {
-        await prisma.merchant_txns.create({ data: mt });
+       const { ID, ...rest } = mt;
+        await prisma.merchant_txns.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_MERCHANT_TXNS.length} merchant txns.`);
 
@@ -175,47 +181,55 @@ async function main() {
     console.log(`Seeded ${MOCK_ARIF_REQUESTS.length} arif requests.`);
 
     for (const ae of MOCK_ARIFPAY_ENDPOINTS) {
-        await prisma.arifpay_endpoints.create({ data: ae });
+      const { ID, ...rest } = ae;
+        await prisma.arifpay_endpoints.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_ARIFPAY_ENDPOINTS.length} arifpay endpoints.`);
 
     for (const cc of MOCK_CONTROLLERSCONFIGS) {
-        await prisma.controllersconfigs.create({ data: cc });
+       const { ID, ...rest } = cc;
+        await prisma.controllersconfigs.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_CONTROLLERSCONFIGS.length} controllers configs.`);
 
     for (const cis of MOCK_CORE_INTEGRATION_SETTINGS) {
-        await prisma.core_integration_settings.create({ data: cis });
+       const { ID, ...rest } = cis;
+        await prisma.core_integration_settings.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_CORE_INTEGRATION_SETTINGS.length} core integration settings.`);
     
     for (const pt of MOCK_PAYSTREAM_TXNS) {
-        await prisma.paystream_txns.create({ data: pt });
+      const { ID, ...rest } = pt;
+        await prisma.paystream_txns.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_PAYSTREAM_TXNS.length} paystream txns.`);
 
     for (const sps of MOCK_STREAM_PAY_SETTINGS) {
-        await prisma.stream_pay_settings.create({ data: sps });
+      const { ID, ...rest } = sps;
+        await prisma.stream_pay_settings.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_STREAM_PAY_SETTINGS.length} stream pay settings.`);
 
     for (const ups of MOCK_USSD_PUSH_SETTINGS) {
-        await prisma.ussd_push_settings.create({ data: ups });
+      const { ID, ...rest } = ups;
+        await prisma.ussd_push_settings.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_USSD_PUSH_SETTINGS.length} ussd push settings.`);
     
     for (const qp of MOCK_QR_PAYMENTS) {
-        await prisma.qr_payments.create({ data: qp });
+      const { ID, ...rest } = qp;
+        await prisma.qr_payments.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_QR_PAYMENTS.length} qr payments.`);
 
     for (const ai of MOCK_ACCOUNT_INFOS) {
-        await prisma.account_infos.create({ data: ai });
+       const { ID, ...rest } = ai;
+        await prisma.account_infos.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_ACCOUNT_INFOS.length} account infos.`);
 
     for (const pa of MOCK_PROMO_ADDS) {
-        const { ORDER, ...rest } = pa;
+        const { ID, ORDER, ...rest } = pa;
         await prisma.promo_adds.create({ 
             data: {
                 ...rest,
@@ -226,7 +240,8 @@ async function main() {
     console.log(`Seeded ${MOCK_PROMO_ADDS.length} promo adds.`);
 
     for (const rc of MOCK_ROLE_CAPABILITIES) {
-        await prisma.role_capablities.create({ data: rc });
+       const { ID, ...rest } = rc;
+        await prisma.role_capablities.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_ROLE_CAPABILITIES.length} role capabilities.`);
 
