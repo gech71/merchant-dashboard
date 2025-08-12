@@ -118,7 +118,8 @@ async function main() {
     console.log(`Start seeding ...`);
 
     for (const b of MOCK_BRANCHES) {
-        await prisma.branch.create({ data: b });
+        const { id, ...branchData } = b;
+        await prisma.branch.create({ data: branchData });
     }
     console.log(`Seeded ${MOCK_BRANCHES.length} branches.`);
 
@@ -133,7 +134,8 @@ async function main() {
     console.log(`Seeded ${MOCK_MERCHANT_USERS.length} merchant users.`);
     
     for (const bu of MOCK_BRANCH_USERS) {
-        await prisma.branchUser.create({ data: bu });
+        const { id, ...userData } = bu;
+        await prisma.branchUser.create({ data: userData });
     }
     console.log(`Seeded ${MOCK_BRANCH_USERS.length} branch users.`);
 
