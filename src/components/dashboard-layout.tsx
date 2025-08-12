@@ -10,7 +10,6 @@ import {
   Home,
   Users,
   Briefcase,
-  ChevronDown,
   UserCircle,
   CheckSquare,
   UserCog,
@@ -23,7 +22,10 @@ import {
   Settings,
   Repeat,
   Smartphone,
-  QrCode
+  QrCode,
+  Landmark,
+  ShieldCheck,
+  Settings2,
 } from 'lucide-react';
 
 import {
@@ -51,23 +53,28 @@ import {
 import { cn } from '@/lib/utils';
 import { useDataContext } from '@/context/data-context';
 
-const NAV_ITEMS = [
-  { href: '/dashboard', icon: LayoutGrid, label: 'Dashboard' },
+const MANAGEMENT_NAV_ITEMS = [
   { href: '/dashboard/allowed_companies', icon: Building, label: 'Allowed Companies' },
   { href: '/dashboard/branches', icon: Home, label: 'Branches' },
   { href: '/dashboard/branch-users', icon: UserCog, label: 'Branch Users' },
   { href: '/dashboard/merchant_users', icon: Briefcase, label: 'Merchant Users' },
+];
+
+const TRANSACTIONS_NAV_ITEMS = [
   { href: '/dashboard/daily-balances', icon: DollarSign, label: 'Daily Balances' },
   { href: '/dashboard/merchant-txns', icon: Receipt, label: 'Merchant Transactions' },
   { href: '/dashboard/arif-requests', icon: Send, label: 'Arif Requests' },
-  { href: '/dashboard/arifpay-endpoints', icon: Link2, label: 'ArifPay Endpoints' },
-  { href: '/dashboard/controllers-configs', icon: KeyRound, label: 'Controller Configs' },
-  { href: '/dashboard/core-integration-settings', icon: Settings, label: 'Core Integration Settings' },
   { href: '/dashboard/paystream-txns', icon: Repeat, label: 'PayStream Transactions' },
-  { href: '/dashboard/stream-pay-settings', icon: Settings, label: 'StreamPay Settings' },
-  { href: '/dashboard/ussd-push-settings', icon: Smartphone, label: 'USSD Push Settings' },
   { href: '/dashboard/qr-payments', icon: QrCode, label: 'QR Payments' },
 ];
+
+const SETTINGS_NAV_ITEMS = [
+    { href: '/dashboard/arifpay-endpoints', icon: Link2, label: 'ArifPay Endpoints' },
+    { href: '/dashboard/controllers-configs', icon: KeyRound, label: 'Controller Configs' },
+    { href: '/dashboard/core-integration-settings', icon: Settings, label: 'Core Integration Settings' },
+    { href: '/dashboard/stream-pay-settings', icon: Settings, label: 'StreamPay Settings' },
+    { href: '/dashboard/ussd-push-settings', icon: Smartphone, label: 'USSD Push Settings' },
+]
 
 const APPROVAL_NAV_ITEMS = [
   { href: '/dashboard/approvals/allowed_companies', icon: Building, label: 'Allowed Companies' },
@@ -111,6 +118,31 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { state } = useSidebar();
 
+  const NavGroup = ({ label, icon, items }: { label: string, icon: React.ElementType, items: { href: string, icon: React.ElementType, label: string }[] }) => (
+     <SidebarGroup>
+        <SidebarGroupLabel className="flex items-center gap-2">
+            {React.createElement(icon, { className: 'h-4 w-4' })}
+            <span>{label}</span>
+        </SidebarGroupLabel>
+        <SidebarMenu>
+          {items.map((item) => (
+            <SidebarMenuItem key={item.href}>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === item.href}
+              className="justify-start text-left"
+            >
+              <Link href={item.href}>
+                <item.icon />
+                <span>{item.label}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+  )
+
   return (
       <div className="flex min-h-screen w-full">
         <Sidebar>
@@ -130,45 +162,23 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   </h1>
                 </div>
               </SidebarHeader>
-              <SidebarMenu>
-                {NAV_ITEMS.map((item) => (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === item.href}
-                      className="justify-start text-left"
-                    >
-                      <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-              <SidebarSeparator />
-              <SidebarGroup>
-                <SidebarGroupLabel className="flex items-center gap-2">
-                  <CheckSquare />
-                  <span>Approvals</span>
-                </SidebarGroupLabel>
                 <SidebarMenu>
-                  {APPROVAL_NAV_ITEMS.map((item) => (
-                    <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === item.href}
-                      className="justify-start text-left"
-                    >
-                      <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  ))}
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname === '/dashboard'} className="justify-start text-left">
+                            <Link href="/dashboard">
+                                <LayoutGrid />
+                                <span>Dashboard</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
                 </SidebarMenu>
-              </SidebarGroup>
+
+              <SidebarSeparator />
+
+              <NavGroup label="Management" icon={Landmark} items={MANAGEMENT_NAV_ITEMS} />
+              <NavGroup label="Transactions" icon={Receipt} items={TRANSACTIONS_NAV_ITEMS} />
+              <NavGroup label="System Settings" icon={Settings2} items={SETTINGS_NAV_ITEMS} />
+              <NavGroup label="Approvals" icon={ShieldCheck} items={APPROVAL_NAV_ITEMS} />
 
             </div>
             <SidebarFooter>
