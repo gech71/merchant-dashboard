@@ -27,6 +27,7 @@ import {
   ShieldCheck,
   Settings2,
   FileText,
+  Megaphone,
 } from 'lucide-react';
 
 import {
@@ -60,6 +61,7 @@ const MANAGEMENT_NAV_ITEMS = [
   { href: '/dashboard/branch-users', icon: UserCog, label: 'Branch Users' },
   { href: '/dashboard/merchant_users', icon: Briefcase, label: 'Merchant Users' },
   { href: '/dashboard/account-infos', icon: FileText, label: 'Account Infos' },
+  { href: '/dashboard/promo-adds', icon: Megaphone, label: 'Promo Ads' },
 ];
 
 const TRANSACTIONS_NAV_ITEMS = [

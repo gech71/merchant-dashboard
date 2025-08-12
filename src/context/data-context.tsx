@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos, promo_adds } from '@/types';
 
 // Mock Data
 const MOCK_BRANCHES: Branch[] = [
@@ -105,6 +105,12 @@ const MOCK_ACCOUNT_INFOS: account_infos[] = [
     { ID: 'ai_3', ACCOUNTNUMBER: 'CUST002', PHONENUMBER: '098-765-4321', FULLNAME: 'Customer B', GENDER: 'Female', VALUE1: null, VALUE2: null, INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
+const MOCK_PROMO_ADDS: promo_adds[] = [
+    { ID: 'pa_1', ADDTITLE: 'Summer Sale!', ADDSUBTITLE: 'Up to 50% off on selected items.', ADDADDRESS: 'https://example.com/summer-sale', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 1, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-11-01', UPDATEDATE: '2023-11-01' },
+    { ID: 'pa_2', ADDTITLE: 'New Arrivals', ADDSUBTITLE: 'Check out the latest fashion trends.', ADDADDRESS: 'https://example.com/new-arrivals', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 2, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-11-05', UPDATEDATE: '2023-11-05' },
+    { ID: 'pa_3', ADDTITLE: 'Holiday Special', ADDSUBTITLE: 'Get your gifts now!', ADDADDRESS: 'https://example.com/holiday-special', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 3, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-11-10', UPDATEDATE: '2023-11-10' },
+];
+
 const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
 
 type DataContextType = {
@@ -123,6 +129,7 @@ type DataContextType = {
   ussdPushSettings: ussd_push_settings[];
   qrPayments: qr_payments[];
   accountInfos: account_infos[];
+  promoAdds: promo_adds[];
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
@@ -155,6 +162,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [ussdPushSettings, setUssdPushSettings] = React.useState<ussd_push_settings[]>(MOCK_USSD_PUSH_SETTINGS);
   const [qrPayments, setQrPayments] = React.useState<qr_payments[]>(MOCK_QR_PAYMENTS);
   const [accountInfos, setAccountInfos] = React.useState<account_infos[]>(MOCK_ACCOUNT_INFOS);
+  const [promoAdds, setPromoAdds] = React.useState<promo_adds[]>(MOCK_PROMO_ADDS);
   const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
@@ -236,6 +244,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     ussdPushSettings,
     qrPayments,
     accountInfos,
+    promoAdds,
     currentUser,
     addBranch,
     updateBranch,
