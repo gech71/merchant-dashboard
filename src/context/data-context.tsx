@@ -5,124 +5,32 @@
 import * as React from 'react';
 import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos, promo_adds, role_capablities } from '@/types';
 
-// Mock Data
-const MOCK_BRANCHES: Branch[] = [
-  { id: '1', name: 'Downtown Branch', code: 'DT001', address: '123 Main St, Anytown, USA', contact: '555-1234', status: 'Approved' },
-  { id: '2', name: 'Uptown Branch', code: 'UP002', address: '456 Oak Ave, Anytown, USA', contact: '555-5678', status: 'Pending' },
-  { id: '3', name: 'Westside Branch', code: 'WS003', address: '789 Pine Rd, Anytown, USA', contact: '555-9012', status: 'Approved' },
-  { id: '4', name: 'Eastside Branch', code: 'ES004', address: '101 Maple Blvd, Anytown, USA', contact: '555-3456', status: 'Approved' },
-  { id: '5', name: 'South Branch', code: 'SB005', address: '212 Birch Ln, Anytown, USA', contact: '555-7890', status: 'Rejected' },
-];
-
-const MOCK_ALLOWED_COMPANIES: allowed_companies[] = [
-  { Oid: 'oid_C001', ID: 'C001', ACCOUNTNUMBER: 'ACC001', FIELDNAME: 'Innovate Inc.', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-01-15', UPDATEDATE: '2023-01-15', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
-  { Oid: 'oid_C002', ID: 'C002', ACCOUNTNUMBER: 'ACC002', FIELDNAME: 'Apex Solutions', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-02-20', UPDATEDATE: '2023-02-20', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
-  { Oid: 'oid_C003', ID: 'C003', ACCOUNTNUMBER: 'ACC003', FIELDNAME: 'Quantum Corp', APPROVED: false, STATUS: 'Pending', INSERTDATE: '2023-03-10', UPDATEDATE: '2023-03-10', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
-  { Oid: 'oid_C004', ID: 'C004', ACCOUNTNUMBER: 'ACC004', FIELDNAME: 'Synergy Systems', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-04-05', UPDATEDATE: '2023-04-05', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
-  { Oid: 'oid_C005', ID: 'C005', ACCOUNTNUMBER: 'ACC005', FIELDNAME: 'Pioneer Ltd.', APPROVEUSER: 'admin', APPROVED: false, STATUS: 'Inactive', INSERTDATE: '2023-05-12', UPDATEDATE: '2023-05-12', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
-];
-
-const MOCK_MERCHANT_USERS: Merchant_users[] = [
-  { ID: '1',  FULLNAME: 'The Corner Cafe Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '111-222-3333', DEVICENAME: 'Device1', ENCRYPTIONKEY: 'key1', iV: 'iv1', ISLOGGEDIN: true, authenticationkey: 'auth1', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: '2023-06-01', ISLOCKED: false, UNLOCKEDTIME: '', VALUE3: 'v3_1', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: '2023-01-15', UPDATEDATE: '2023-01-15' },
-  { ID: '2',  FULLNAME: 'QuickMart Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC002', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '222-333-4444', DEVICENAME: 'Device2', ENCRYPTIONKEY: 'key2', iV: 'iv2', ISLOGGEDIN: false, authenticationkey: 'auth2', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: '2023-06-01', ISLOCKED: false, UNLOCKEDTIME: '', VALUE3: 'v3_2', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: '2023-02-20', UPDATEDATE: '2023-02-20' },
-  { ID: '3',  FULLNAME: 'Gadget Hub Admin', ROLE: 'Admin', STATUS: 'Pending', ACCOUNTNUMBER: 'ACC003', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '333-444-5555', DEVICENAME: 'Device3', ENCRYPTIONKEY: 'key3', iV: 'iv3', ISLOGGEDIN: false, authenticationkey: 'auth3', FAILEDATTMEPTS: 2, LASTLOGINATTEMPT: '2023-05-28', ISLOCKED: true, UNLOCKEDTIME: '2023-06-01T10:00:00Z', VALUE3: 'v3_3', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: '2023-03-10', UPDATEDATE: '2023-03-10' },
-  { ID: '4',  FULLNAME: 'Style Central Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC004', ACCOUNTTYPE: 'TypeC', PHONENUMBER: '444-555-6666', DEVICENAME: 'Device4', ENCRYPTIONKEY: 'key4', iV: 'iv4', ISLOGGEDIN: true, authenticationkey: 'auth4', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: '2023-06-01', ISLOCKED: false, UNLOCKEDTIME: '', VALUE3: 'v3_4', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: '2023-04-05', UPDATEDATE: '2023-04-05' },
-  { ID: '5',  FULLNAME: 'Bookworm Haven Admin', ROLE: 'Admin', STATUS: 'Disabled', ACCOUNTNUMBER: 'ACC005', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '555-666-7777', DEVICENAME: 'Device5', ENCRYPTIONKEY: 'key5', iV: 'iv5', ISLOGGEDIN: false, authenticationkey: 'auth5', FAILEDATTMEPTS: 5, LASTLOGINATTEMPT: '2023-05-20', ISLOCKED: true, UNLOCKEDTIME: '', VALUE3: 'v3_5', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: '2023-05-12', UPDATEDATE: '2023-05-12' },
-  { ID: '6',  FULLNAME: 'Alice Johnson', ROLE: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '666-777-8888', DEVICENAME: 'Device6', ENCRYPTIONKEY: 'key6', iV: 'iv6', ISLOGGEDIN: false, authenticationkey: 'auth6', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: '2023-06-01', ISLOCKED: false, UNLOCKEDTIME: '', VALUE3: 'v3_6', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: '2023-01-15', UPDATEDATE: '2023-01-15' },
-  { ID: '7',  FULLNAME: 'Bob Williams', ROLE: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC002', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '777-888-9999', DEVICENAME: 'Device7', ENCRYPTIONKEY: 'key7', iV: 'iv7', ISLOGGEDIN: true, authenticationkey: 'auth7', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: '2023-06-01', ISLOCKED: false, UNLOCKEDTIME: '', VALUE3: 'v3_7', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: '2023-02-20', UPDATEDATE: '2023-02-20' },
-  { ID: '8',  FULLNAME: 'Diana Prince', ROLE: 'Sales', STATUS: 'Pending', ACCOUNTNUMBER: 'ACC004', ACCOUNTTYPE: 'TypeC', PHONENUMBER: '888-999-0000', DEVICENAME: 'Device8', ENCRYPTIONKEY: 'key8', iV: 'iv8', ISLOGGEDIN: false, authenticationkey: 'auth8', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: '2023-06-01', ISLOCKED: false, UNLOCKEDTIME: '', VALUE3: 'v3_8', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: '2023-04-05', UPDATEDATE: '2023-04-05' },
-];
-
-const MOCK_BRANCH_USERS: BranchUser[] = [
-  { id: '1', name: 'John Doe', email: 'john.d@branch.com', branch: 'Downtown Branch', status: 'Active' },
-  { id: '2', name: 'Jane Smith', email: 'jane.s@branch.com', branch: 'Uptown Branch', status: 'Active' },
-  { id: '3', name: 'Peter Jones', email: 'peter.j@branch.com', branch: 'Downtown Branch', status: 'Inactive' },
-  { id: '4', name: 'Mary Johnson', email: 'mary.j@branch.com', branch: 'Westside Branch', status: 'Pending' },
-  { id: '5', name: 'David Williams', email: 'david.w@branch.com', branch: 'Uptown Branch', status: 'Active' },
-];
-
-const MOCK_DAILY_BALANCES: merchants_daily_balances[] = [
-  { ID: '1', MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', DAILYBALANCE: 1500.75, DAILYTXNCOUNT: 25, BALANCEDATE: '2023-06-01', INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-  { ID: '2', MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', DAILYBALANCE: 1800.50, DAILYTXNCOUNT: 30, BALANCEDATE: '2023-06-02', INSERTDATE: '2023-06-02', UPDATEDATE: '2023-06-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
-  { ID: '3', MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', DAILYBALANCE: 3200.00, DAILYTXNCOUNT: 50, BALANCEDATE: '2023-06-01', INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-  { ID: '4', MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', DAILYBALANCE: 2950.25, DAILYTXNCOUNT: 45, BALANCEDATE: '2023-06-02', INSERTDATE: '2023-06-02', UPDATEDATE: '2023-06-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
-  { ID: '5', MERCHANTACCOUNT: 'ACC004', MERCHANTPHONE: '444-555-6666', DAILYBALANCE: 500.00, DAILYTXNCOUNT: 10, BALANCEDATE: '2023-06-01', INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-];
-
-const MOCK_MERCHANT_TXNS: merchant_txns[] = [
-    { ID: 'txn_1', MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', AMOUNT: 50.25, TXNID: 'TXN001', CUSTOMERNAME: 'Customer A', CUSTOMERACCOUNT: 'CUST001', T24USER: 't24user1', T2TRANSACTIONDATE: '2023-06-01T10:00:00Z', STATUS: 'Completed', TRANSACTIONCHANNEL: 'Mobile', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'txn_2', MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', AMOUNT: 15.00, TXNID: 'TXN002', CUSTOMERNAME: 'Customer B', CUSTOMERACCOUNT: 'CUST002', T24USER: 't24user1', T2TRANSACTIONDATE: '2023-06-01T11:30:00Z', STATUS: 'Completed', TRANSACTIONCHANNEL: 'Mobile', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'txn_3', MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', AMOUNT: 200.00, TXNID: 'TXN003', CUSTOMERNAME: 'Customer C', CUSTOMERACCOUNT: 'CUST003', T24USER: 't24user2', T2TRANSACTIONDATE: '2023-06-01T12:00:00Z', STATUS: 'Pending', TRANSACTIONCHANNEL: 'Online', TRANSACTIONSERVICE: 'Transfer', VALUE1: 'Note A', VALUE2: null, VALUE3: null, INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'txn_4', MERCHANTACCOUNT: 'ACC004', MERCHANTPHONE: '444-555-6666', AMOUNT: 75.50, TXNID: 'TXN004', CUSTOMERNAME: 'Customer D', CUSTOMERACCOUNT: 'CUST004', T24USER: 't24user3', T2TRANSACTIONDATE: '2023-06-01T14:00:00Z', STATUS: 'Failed', TRANSACTIONCHANNEL: 'POS', TRANSACTIONSERVICE: 'Purchase', VALUE1: 'Error X', VALUE2: 'Retry 1', VALUE3: null, INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'txn_5', MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', AMOUNT: 500.00, TXNID: 'TXN005', CUSTOMERNAME: 'Customer E', CUSTOMERACCOUNT: 'CUST005', T24USER: 't24user2', T2TRANSACTIONDATE: '2023-06-02T09:00:00Z', STATUS: 'Completed', TRANSACTIONCHANNEL: 'Online', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: '2023-06-02', UPDATEDATE: '2023-06-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
-]
-
-const MOCK_ARIF_REQUESTS: arif_requests[] = [
-    { NONCEID: 'nonce1', SESSIONID: 'sess1', DEBITACCOUNT: 'D001', CREDITACCOUNT: 'C001', AMOUNT: 100, MERCHANTACCOUNT: 'ACC001', SALESPHONE: '666-777-8888', REQUEST1: '{}', RESPONSE1: '{}', REQUEST2: '{}', RESPONSE2: '{}', REQUEST3: '{}', RESPONSE3: '{}', WEBHOOKRESPONSE: '{}', ERROR1: '', MESSAGE1: '', ERROR2: '', MESSAGE2: '', ERROR3: '', MESSAGE3: '', DATESEND1: '2023-06-01', DATERECIVED1: '2023-06-01', DATESEND2: '2023-06-01', DATERECIVED2: '2023-06-01', DATESEND3: '2023-06-01', DATERECIVED3: '2023-06-01', WEBHOOKRECEIVEDDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system', ARIFPAYTRANSACTIONID: 'AP-TXN-1', ARIFPAYTRANSACTIONSTATUS: 'Success', T24TRANSACTIONSTATUS: 'Success' },
-    { NONCEID: 'nonce2', SESSIONID: 'sess2', DEBITACCOUNT: 'D002', CREDITACCOUNT: 'C002', AMOUNT: 250, MERCHANTACCOUNT: 'ACC002', SALESPHONE: '777-888-9999', REQUEST1: '{}', RESPONSE1: '{}', REQUEST2: '{}', RESPONSE2: '{"status":"failed"}', REQUEST3: '{}', RESPONSE3: '{}', WEBHOOKRESPONSE: '{}', ERROR1: '', MESSAGE1: '', ERROR2: 'T24_FAIL', MESSAGE2: 'T24 Timeout', ERROR3: '', MESSAGE3: '', DATESEND1: '2023-06-02', DATERECIVED1: '2023-06-02', DATESEND2: '2023-06-02', DATERECIVED2: '2023-06-02', DATESEND3: '', DATERECIVED3: '', WEBHOOKRECEIVEDDATE: '', INSERTUSER: 'sys', UPDATEUSER: 'sys', ARIFPAYTRANSACTIONID: 'AP-TXN-2', ARIFPAYTRANSACTIONSTATUS: 'Failed', T24TRANSACTIONSTATUS: 'Failed' },
-]
-
-const MOCK_ARIFPAY_ENDPOINTS: arifpay_endpoints[] = [
-    { ID: 'ep_1', BANK: 'Bank of Abyssina', DISPLAYNAME: 'BoA', OTPLENGTH: 6, displayOrder: 1, ENDPOINT1: 'https://api.boa.com/v1/pay', ENDPOINT2: 'https://api.boa.com/v1/confirm', ENDPOINT3: '', CANCELURL: 'https://boa.com/cancel', ERRORURL: 'https://boa.com/error', SUCCESSURL: 'https://boa.com/success', NOTIFYURL: 'https://api.myapp.com/notify/boa', ISTWOSTEP: true, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '987654321', BENEFICIARYBANK: 'BoA', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ep_2', BANK: 'Awash Bank', DISPLAYNAME: 'Awash', OTPLENGTH: 4, displayOrder: 2, ENDPOINT1: 'https://api.awashbank.com/execute', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://awashbank.com/cancel', ERRORURL: 'https://awashbank.com/error', SUCCESSURL: 'https://awashbank.com/success', NOTIFYURL: 'https://api.myapp.com/notify/awash', ISTWOSTEP: false, ISOTP: false, TRANSACTIONTYPE: 'B2B', BENEFICIARYACCOUNT: '123456789', BENEFICIARYBANK: 'Awash', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: '2023-01-02', UPDATEDATE: '2023-01-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
-]
-
-const MOCK_CONTROLLERSCONFIGS: controllersconfigs[] = [
-    { ID: 'cfg_1', CONTROLLERKEY: 'CTRL_KEY_001', APIKEY: 'API_KEY_001_XYZ', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'cfg_2', CONTROLLERKEY: 'CTRL_KEY_002', APIKEY: 'API_KEY_002_ABC', INSERTDATE: '2023-02-15', UPDATEDATE: '2023-02-15', INSERTUSER: 'system', UPDATEUSER: 'system' },
-];
-
-const MOCK_CORE_INTEGRATION_SETTINGS: core_integration_settings[] = [
-    { ID: 'core_1', UNIQUEKEY: 'INTEGRATION_MAIN', ADDRESS: 'https://core.bank.com/api', USERNAME: 'coreapiuser', PASSWORD: 'SuperSecretPassword123', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'core_2', UNIQUEKEY: 'INTEGRATION_BACKUP', ADDRESS: 'https://core-backup.bank.com/api', USERNAME: 'coreapiuser_bk', PASSWORD: 'AnotherSecretPassword456', INSERTDATE: '2023-01-02', UPDATEDATE: '2023-01-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
-];
-
-const MOCK_PAYSTREAM_TXNS: paystream_txns[] = [
-    { ID: 'ps_1', MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT001', ISCOMPLETED: true, AMOUNT: 125.50, PAYERACCOUNT: 'PAYER001', INSERTDATE: '2023-07-01', UPDATEDATE: '2023-07-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ps_2', MERCHANTACCOUNTNUMBER: 'ACC002', SALERPHONENUMBER: '777-888-9999', TICKET: 'TKT002', ISCOMPLETED: false, AMOUNT: 300.00, PAYERACCOUNT: 'PAYER002', INSERTDATE: '2023-07-02', UPDATEDATE: '2023-07-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ps_3', MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT003', ISCOMPLETED: true, AMOUNT: 75.00, PAYERACCOUNT: 'PAYER003', INSERTDATE: '2023-07-03', UPDATEDATE: '2023-07-03', INSERTUSER: 'system', UPDATEUSER: 'system' },
-]
-
-const MOCK_STREAM_PAY_SETTINGS: stream_pay_settings[] = [
-    { ID: 'sps_1', ADDRESS: 'https://streampay.api/v1', IV: 'iv_streampay_123', KEY: 'key_streampay_abc', HV: 'hv_streampay_xyz', USERNAME: 'streamuser', PASSWORD: 'StreamPayPassword1', INSERTDATE: '2023-08-01', UPDATEDATE: '2023-08-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'sps_2', ADDRESS: 'https://streampay.api/v2', IV: 'iv_streampay_456', KEY: 'key_streampay_def', HV: 'hv_streampay_uvw', USERNAME: 'streamuser2', PASSWORD: 'StreamPayPassword2', INSERTDATE: '2023-08-02', UPDATEDATE: '2023-08-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
-];
-
-const MOCK_USSD_PUSH_SETTINGS: ussd_push_settings[] = [
-    { ID: 'ups_1', ADDRESS: 'https://ussd.gateway.com/push', RESULTURL: 'https://api.myapp.com/ussd/callback', USERNAME: 'ussd_user', PASSWORD: 'UssdPassword123', INSERTDATE: '2023-09-01', UPDATEDATE: '2023-09-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ups_2', ADDRESS: 'https://another-ussd.gateway.com/push/v2', RESULTURL: 'https://api.myapp.com/ussd/callback2', USERNAME: 'ussd_user2', PASSWORD: 'UssdPassword456', INSERTDATE: '2023-09-02', UPDATEDATE: '2023-09-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
-];
-
-const MOCK_QR_PAYMENTS: qr_payments[] = [
-    { ID: 'qr_1', DEBITACCOUNT: 'D001', CREDITACCOUNT: 'C001', SALERPHONENUMBER: '666-777-8888', AMOUNT: 50.00, EXPIRETIME: '2023-10-31T23:59:59Z', QRCODE: 'dummy-qr-code-1', ISUSED: false, INSERTDATE: '2023-10-01', UPDATEDATE: '2023-10-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'qr_2', DEBITACCOUNT: 'D002', CREDITACCOUNT: 'C002', SALERPHONENUMBER: '777-888-9999', AMOUNT: 150.75, EXPIRETIME: '2023-11-15T12:00:00Z', QRCODE: 'dummy-qr-code-2', ISUSED: true, INSERTDATE: '2023-10-02', UPDATEDATE: '2023-10-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'qr_3', DEBITACCOUNT: 'D003', CREDITACCOUNT: 'C001', SALERPHONENUMBER: '888-999-0000', AMOUNT: 25.00, EXPIRETIME: '2023-11-01T08:30:00Z', QRCODE: 'dummy-qr-code-3', ISUSED: false, INSERTDATE: '2023-10-03', UPDATEDATE: '2023-10-03', INSERTUSER: 'system', UPDATEUSER: 'system' },
-]
-
-const MOCK_ACCOUNT_INFOS: account_infos[] = [
-    { ID: 'ai_1', ACCOUNTNUMBER: 'ACC001', PHONENUMBER: '111-222-3333', FULLNAME: 'The Corner Cafe Admin', GENDER: 'N/A', VALUE1: null, VALUE2: null, INSERTDATE: '2023-01-15', UPDATEDATE: '2023-01-15', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ai_2', ACCOUNTNUMBER: 'CUST001', PHONENUMBER: '123-456-7890', FULLNAME: 'Customer A', GENDER: 'Male', VALUE1: 'VIP', VALUE2: null, INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ai_3', ACCOUNTNUMBER: 'CUST002', PHONENUMBER: '098-765-4321', FULLNAME: 'Customer B', GENDER: 'Female', VALUE1: null, VALUE2: null, INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
-];
-
-const MOCK_PROMO_ADDS: promo_adds[] = [
-    { ID: 'pa_1', ADDTITLE: 'Summer Sale!', ADDSUBTITLE: 'Up to 50% off on selected items.', ADDADDRESS: 'https://example.com/summer-sale', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 1, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-11-01', UPDATEDATE: '2023-11-01' },
-    { ID: 'pa_2', ADDTITLE: 'New Arrivals', ADDSUBTITLE: 'Check out the latest fashion trends.', ADDADDRESS: 'https://example.com/new-arrivals', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 2, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-11-05', UPDATEDATE: '2023-11-05' },
-    { ID: 'pa_3', ADDTITLE: 'Holiday Special', ADDSUBTITLE: 'Get your gifts now!', ADDADDRESS: 'https://example.com/holiday-special', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 3, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-11-10', UPDATEDATE: '2023-11-10' },
-];
-
-const MOCK_ROLE_CAPABILITIES: role_capablities[] = [
-    { ID: 'rc_1', ROLEID: 'Admin', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'Dashboard', MENUNAME_am: 'ዳሽቦርድ', ADDRESS: '/dashboard', PARENT: 'ROOT', PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01' },
-    { ID: 'rc_2', ROLEID: 'Admin', MENUORDER: 2, SUBMENUORDER: 1, MENUNAME: 'Allowed Companies', MENUNAME_am: 'የተፈቀዱ ኩባንያዎች', ADDRESS: '/dashboard/allowed_companies', PARENT: 'Management', PARENTID: 'mg_1', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01' },
-    { ID: 'rc_3', ROLEID: 'Sales', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'My Transactions', MENUNAME_am: 'የእኔ ግብይቶች', ADDRESS: '/dashboard/merchant-txns', PARENT: 'ROOT', PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01' },
-]
-
 type CurrentUser = {
     userId: string;
     role: string;
     name: string;
     email: string;
 };
+
+type InitialData = {
+    branches: Branch[];
+    allowedCompanies: allowed_companies[];
+    merchants: Merchant_users[];
+    branchUsers: BranchUser[];
+    dailyBalances: merchants_daily_balances[];
+    merchantTxns: merchant_txns[];
+    arifRequests: arif_requests[];
+    arifpayEndpoints: arifpay_endpoints[];
+    controllersConfigs: controllersconfigs[];
+    coreIntegrationSettings: core_integration_settings[];
+    paystreamTxns: paystream_txns[];
+    streamPaySettings: stream_pay_settings[];
+    ussdPushSettings: ussd_push_settings[];
+    qrPayments: qr_payments[];
+    accountInfos: account_infos[];
+    promoAdds: promo_adds[];
+    roleCapabilities: role_capablities[];
+}
 
 type DataContextType = {
   branches: Branch[];
@@ -159,24 +67,24 @@ type DataContextType = {
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
 
-export function DataProvider({ children }: { children: React.ReactNode }) {
-  const [branches, setBranches] = React.useState<Branch[]>(MOCK_BRANCHES);
-  const [allowedCompanies, setAllowedCompanies] = React.useState<allowed_companies[]>(MOCK_ALLOWED_COMPANIES);
-  const [merchants, setMerchants] = React.useState<Merchant_users[]>(MOCK_MERCHANT_USERS);
-  const [branchUsers, setBranchUsers] = React.useState<BranchUser[]>(MOCK_BRANCH_USERS);
-  const [dailyBalances, setDailyBalances] = React.useState<merchants_daily_balances[]>(MOCK_DAILY_BALANCES);
-  const [merchantTxns, setMerchantTxns] = React.useState<merchant_txns[]>(MOCK_MERCHANT_TXNS);
-  const [arifRequests, setArifRequests] = React.useState<arif_requests[]>(MOCK_ARIF_REQUESTS);
-  const [arifpayEndpoints, setArifpayEndpoints] = React.useState<arifpay_endpoints[]>(MOCK_ARIFPAY_ENDPOINTS);
-  const [controllersConfigs, setControllersConfigs] = React.useState<controllersconfigs[]>(MOCK_CONTROLLERSCONFIGS);
-  const [coreIntegrationSettings, setCoreIntegrationSettings] = React.useState<core_integration_settings[]>(MOCK_CORE_INTEGRATION_SETTINGS);
-  const [paystreamTxns, setPaystreamTxns] = React.useState<paystream_txns[]>(MOCK_PAYSTREAM_TXNS);
-  const [streamPaySettings, setStreamPaySettings] = React.useState<stream_pay_settings[]>(MOCK_STREAM_PAY_SETTINGS);
-  const [ussdPushSettings, setUssdPushSettings] = React.useState<ussd_push_settings[]>(MOCK_USSD_PUSH_SETTINGS);
-  const [qrPayments, setQrPayments] = React.useState<qr_payments[]>(MOCK_QR_PAYMENTS);
-  const [accountInfos, setAccountInfos] = React.useState<account_infos[]>(MOCK_ACCOUNT_INFOS);
-  const [promoAdds, setPromoAdds] = React.useState<promo_adds[]>(MOCK_PROMO_ADDS);
-  const [roleCapabilities, setRoleCapabilities] = React.useState<role_capablities[]>(MOCK_ROLE_CAPABILITIES);
+export function DataProvider({ children, initialData }: { children: React.ReactNode, initialData: InitialData }) {
+  const [branches, setBranches] = React.useState<Branch[]>(initialData.branches);
+  const [allowedCompanies, setAllowedCompanies] = React.useState<allowed_companies[]>(initialData.allowedCompanies);
+  const [merchants, setMerchants] = React.useState<Merchant_users[]>(initialData.merchants);
+  const [branchUsers, setBranchUsers] = React.useState<BranchUser[]>(initialData.branchUsers);
+  const [dailyBalances, setDailyBalances] = React.useState<merchants_daily_balances[]>(initialData.dailyBalances);
+  const [merchantTxns, setMerchantTxns] = React.useState<merchant_txns[]>(initialData.merchantTxns);
+  const [arifRequests, setArifRequests] = React.useState<arif_requests[]>(initialData.arifRequests);
+  const [arifpayEndpoints, setArifpayEndpoints] = React.useState<arifpay_endpoints[]>(initialData.arifpayEndpoints);
+  const [controllersConfigs, setControllersConfigs] = React.useState<controllersconfigs[]>(initialData.controllersConfigs);
+  const [coreIntegrationSettings, setCoreIntegrationSettings] = React.useState<core_integration_settings[]>(initialData.coreIntegrationSettings);
+  const [paystreamTxns, setPaystreamTxns] = React.useState<paystream_txns[]>(initialData.paystreamTxns);
+  const [streamPaySettings, setStreamPaySettings] = React.useState<stream_pay_settings[]>(initialData.streamPaySettings);
+  const [ussdPushSettings, setUssdPushSettings] = React.useState<ussd_push_settings[]>(initialData.ussdPushSettings);
+  const [qrPayments, setQrPayments] = React.useState<qr_payments[]>(initialData.qrPayments);
+  const [accountInfos, setAccountInfos] = React.useState<account_infos[]>(initialData.accountInfos);
+  const [promoAdds, setPromoAdds] = React.useState<promo_adds[]>(initialData.promoAdds);
+  const [roleCapabilities, setRoleCapabilities] = React.useState<role_capablities[]>(initialData.roleCapabilities);
   const [currentUser, setCurrentUser] = React.useState<CurrentUser | null>(null);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);

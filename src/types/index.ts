@@ -1,277 +1,94 @@
 
+import { Prisma } from '@prisma/client';
 
-
-
-export type arif_requests = {
-  NONCEID: string;
-  SESSIONID: string;
-  DEBITACCOUNT: string;
-  CREDITACCOUNT: string;
-  AMOUNT: number;
-  MERCHANTACCOUNT: string;
-  SALESPHONE: string;
-  REQUEST1: string;
-  RESPONSE1: string;
-  REQUEST2: string;
-  RESPONSE2: string;
-  REQUEST3: string;
-  RESPONSE3: string;
-  WEBHOOKRESPONSE: string;
-  ERROR1: string;
-  MESSAGE1: string;
-  ERROR2: string;
-  MESSAGE2: string;
-  ERROR3: string;
-  MESSAGE3: string;
-  DATESEND1: string;
-  DATERECIVED1: string;
-  DATESEND2: string;
-  DATERECIVED2: string;
-  DATESEND3: string;
-  DATERECIVED3: string;
-  WEBHOOKRECEIVEDDATE: string;
-  INSERTUSER: string;
-  UPDATEUSER: string;
-  ARIFPAYTRANSACTIONID: string;
-  ARIFPAYTRANSACTIONSTATUS: string;
-  T24TRANSACTIONSTATUS: string;
+export type arif_requests = Omit<Prisma.arif_requestsGetPayload<{}>, 'DATESEND1' | 'DATERECIVED1' | 'DATESEND2' | 'DATERECIVED2' | 'DATESEND3' | 'DATERECIVED3' | 'WEBHOOKRECEIVEDDATE'> & {
+  DATESEND1: string | null;
+  DATERECIVED1: string | null;
+  DATESEND2: string | null;
+  DATERECIVED2: string | null;
+  DATESEND3: string | null;
+  DATERECIVED3: string | null;
+  WEBHOOKRECEIVEDDATE: string | null;
 };
 
-export type allowed_companies = {
-  Oid: string;
-  ID: string;
-  ACCOUNTNUMBER: string;
-  FIELDNAME: string;
-  APPROVEUSER?: string;
-  APPROVED: boolean;
-  STATUS: 'Active' | 'Inactive' | 'Pending';
+export type allowed_companies = Omit<Prisma.allowed_companiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
   INSERTDATE: string;
   UPDATEDATE: string;
-  INSERTUSER: string;
-  UPDATEUSER: string;
-  OptimisticLockField: number;
-  GCRecord: number;
 };
 
-export type Branch = {
-  id: string;
-  name: string;
-  code: string;
-  address: string;
-  contact: string;
-  status: 'Approved' | 'Pending' | 'Rejected';
+export type Branch = Omit<Prisma.BranchGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
+  INSERTDATE: string;
+  UPDATEDATE: string;
 };
 
-export type Merchant_users = {
-  ID: string;
-  ACCOUNTNUMBER: string;
-  FULLNAME: string;
-  ACCOUNTTYPE: string;
-  PHONENUMBER: string;
-  ROLE: 'Admin' | 'Sales';
-  DEVICENAME: string;
-  ENCRYPTIONKEY: string;
-  iV: string;
-  ISLOGGEDIN: boolean;
-  authenticationkey: string;
-  STATUS: 'Active' | 'Pending' | 'Disabled';
-  FAILEDATTMEPTS: number;
+export type Merchant_users = Omit<Prisma.merchant_usersGetPayload<{}>, 'LASTLOGINATTEMPT' | 'UNLOCKEDTIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
   LASTLOGINATTEMPT: string;
-  ISLOCKED: boolean;
-  UNLOCKEDTIME: string;
-  VALUE3: string;
-  INSERTUSERID: string;
-  UPDATEUSERID: string;
+  UNLOCKEDTIME: string | null;
   INSERTDATE: string;
   UPDATEDATE: string;
 };
 
-export type merchants_daily_balances = {
-  ID: string;
-  MERCHANTACCOUNT: string;
-  MERCHANTPHONE: string;
-  DAILYBALANCE: number;
-  DAILYTXNCOUNT: number;
+export type merchants_daily_balances = Omit<Prisma.merchants_daily_balancesGetPayload<{}>, 'BALANCEDATE' | 'INSERTDATE' | 'UPDATEDATE'> & {
   BALANCEDATE: string;
   INSERTDATE: string;
   UPDATEDATE: string;
-  INSERTUSER: string;
-  UPDATEUSER: string;
 };
 
-export type merchant_txns = {
-    ID: string;
-    MERCHANTACCOUNT: string;
-    MERCHANTPHONE: string;
-    AMOUNT: number;
-    TXNID: string;
-    CUSTOMERNAME: string;
-    CUSTOMERACCOUNT: string;
-    T24USER: string;
+export type merchant_txns = Omit<Prisma.merchant_txnsGetPayload<{}>, 'T2TRANSACTIONDATE' | 'INSERTDATE' | 'UPDATEDATE'> & {
     T2TRANSACTIONDATE: string;
-    STATUS: 'Completed' | 'Pending' | 'Failed';
-    TRANSACTIONCHANNEL: string;
-    TRANSACTIONSERVICE: string;
-    VALUE1: string | null;
-    VALUE2: string | null;
-    VALUE3: string | null;
     INSERTDATE: string;
     UPDATEDATE: string;
-    INSERTUSER: string;
-    UPDATEUSER: string;
 };
 
+export type BranchUser = Prisma.BranchUserGetPayload<{}>;
 
-export type BranchUser = {
-  id: string;
-  name: string;
-  email: string;
-  branch: string;
-  status: 'Active' | 'Inactive' | 'Pending';
-};
-
-export type arifpay_endpoints = {
-  ID: string;
-  BANK: string;
-  DISPLAYNAME: string;
-  OTPLENGTH: number;
-  ORDER: number;
-  ENDPOINT1: string;
-  ENDPOINT2: string;
-  ENDPOINT3: string;
-  CANCELURL: string;
-  ERRORURL: string;
-  SUCCESSURL: string;
-  NOTIFYURL: string;
-  ISTWOSTEP: boolean;
-  ISOTP: boolean;
-  TRANSACTIONTYPE: string;
-  BENEFICIARYACCOUNT: string;
-  BENEFICIARYBANK: string;
-  IMAGEURL: string;
+export type arifpay_endpoints = Omit<Prisma.arifpay_endpointsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
   INSERTDATE: string;
   UPDATEDATE: string;
-  INSERTUSER: string;
-  UPDATEUSER: string;
 };
 
-export type controllersconfigs = {
-  ID: string;
-  CONTROLLERKEY: string;
-  APIKEY: string;
+export type controllersconfigs = Omit<Prisma.controllersconfigsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
   INSERTDATE: string;
   UPDATEDATE: string;
-  INSERTUSER: string;
-  UPDATEUSER: string;
 };
 
-export type core_integration_settings = {
-  ID: string;
-  UNIQUEKEY: string;
-  ADDRESS: string;
-  USERNAME: string;
-  PASSWORD: string;
+export type core_integration_settings = Omit<Prisma.core_integration_settingsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
   INSERTDATE: string;
   UPDATEDATE: string;
-  INSERTUSER: string;
-  UPDATEUSER: string;
 };
 
-export type paystream_txns = {
-    ID: string;
-    MERCHANTACCOUNTNUMBER: string;
-    SALERPHONENUMBER: string;
-    TICKET: string;
-    ISCOMPLETED: boolean;
-    AMOUNT: number;
-    PAYERACCOUNT: string;
+export type paystream_txns = Omit<Prisma.paystream_txnsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
     INSERTDATE: string;
     UPDATEDATE: string;
-    INSERTUSER: string;
-    UPDATEUSER: string;
 };
 
-export type stream_pay_settings = {
-    ID: string;
-    ADDRESS: string;
-    IV: string;
-    KEY: string;
-    HV: string;
-    USERNAME: string;
-    PASSWORD: string;
+export type stream_pay_settings = Omit<Prisma.stream_pay_settingsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
     INSERTDATE: string;
     UPDATEDATE: string;
-    INSERTUSER: string;
-    UPDATEUSER: string;
 };
 
-export type ussd_push_settings = {
-    ID: string;
-    ADDRESS: string;
-    RESULTURL: string;
-    USERNAME: string;
-    PASSWORD: string;
+export type ussd_push_settings = Omit<Prisma.ussd_push_settingsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
     INSERTDATE: string;
     UPDATEDATE: string;
-    INSERTUSER: string;
-    UPDATEUSER: string;
 };
 
-export type qr_payments = {
-    ID: string;
-    DEBITACCOUNT: string;
-    CREDITACCOUNT: string;
-    SALERPHONENUMBER: string;
-    AMOUNT: number;
+export type qr_payments = Omit<Prisma.qr_paymentsGetPayload<{}>, 'EXPIRETIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
     EXPIRETIME: string;
-    QRCODE: string;
-    ISUSED: boolean;
     INSERTDATE: string;
     UPDATEDATE: string;
-    INSERTUSER: string;
-    UPDATEUSER: string;
 };
 
-export type account_infos = {
-  ID: string;
-  ACCOUNTNUMBER: string;
-  PHONENUMBER: string;
-  FULLNAME: string;
-  GENDER: string;
-  VALUE1: string | null;
-  VALUE2: string | null;
-  INSERTDATE: string;
-  UPDATEDATE: string;
-  INSERTUSER: string;
-  UPDATEUSER: string;
-};
-
-export type promo_adds = {
-  ID: string;
-  ADDTITLE: string;
-  ADDSUBTITLE: string;
-  ADDADDRESS: string;
-  IMAGEADDRESS: string;
-  ORDER: number;
-  INSERTUSERID: string;
-  UPDATEUSERID: string;
+export type account_infos = Omit<Prisma.account_infosGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
   INSERTDATE: string;
   UPDATEDATE: string;
 };
 
-export type role_capablities = {
-  ID: string;
-  ROLEID: string;
-  MENUORDER: number;
-  SUBMENUORDER: number;
-  MENUNAME: string;
-  MENUNAME_am: string;
-  ADDRESS: string;
-  PARENT: string;
-  PARENTID: string;
-  VALUE3: string | null;
-  INSERTUSERID: string;
-  UPDATEUSERID: string;
+export type promo_adds = Omit<Prisma.promo_addsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
+  INSERTDATE: string;
+  UPDATEDATE: string;
+};
+
+export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
   INSERTDATE: string;
   UPDATEDATE: string;
 };

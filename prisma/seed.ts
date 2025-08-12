@@ -1,16 +1,14 @@
 
 
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../src/lib/prisma';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
-
 const MOCK_BRANCHES = [
-  { id: '1', name: 'Downtown Branch', code: 'DT001', address: '123 Main St, Anytown, USA', contact: '555-1234', status: 'Approved' },
-  { id: '2', name: 'Uptown Branch', code: 'UP002', address: '456 Oak Ave, Anytown, USA', contact: '555-5678', status: 'Pending' },
-  { id: '3', name: 'Westside Branch', code: 'WS003', address: '789 Pine Rd, Anytown, USA', contact: '555-9012', status: 'Approved' },
-  { id: '4', name: 'Eastside Branch', code: 'ES004', address: '101 Maple Blvd, Anytown, USA', contact: '555-3456', status: 'Approved' },
-  { id: '5', name: 'South Branch', code: 'SB005', address: '212 Birch Ln, Anytown, USA', contact: '555-7890', status: 'Rejected' },
+  { name: 'Downtown Branch', code: 'DT001', address: '123 Main St, Anytown, USA', contact: '555-1234', status: 'Approved' },
+  { name: 'Uptown Branch', code: 'UP002', address: '456 Oak Ave, Anytown, USA', contact: '555-5678', status: 'Pending' },
+  { name: 'Westside Branch', code: 'WS003', address: '789 Pine Rd, Anytown, USA', contact: '555-9012', status: 'Approved' },
+  { name: 'Eastside Branch', code: 'ES004', address: '101 Maple Blvd, Anytown, USA', contact: '555-3456', status: 'Approved' },
+  { name: 'South Branch', code: 'SB005', address: '212 Birch Ln, Anytown, USA', contact: '555-7890', status: 'Rejected' },
 ];
 
 const MOCK_ALLOWED_COMPANIES = [
@@ -139,8 +137,7 @@ async function main() {
     await prisma.branch.deleteMany({});
 
     for (const b of MOCK_BRANCHES) {
-        const { id, ...branchData } = b;
-        await prisma.branch.create({ data: branchData });
+        await prisma.branch.create({ data: b });
     }
     console.log(`Seeded ${MOCK_BRANCHES.length} branches.`);
 
