@@ -175,4 +175,18 @@ export type core_integration_settings = {
   UPDATEUSER: string;
 };
 
-export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | null;
+export type paystream_txns = {
+    ID: string;
+    MERCHANTACCOUNTNUMBER: string;
+    SALERPHONENUMBER: string;
+    TICKET: string;
+    ISCOMPLETED: boolean;
+    AMOUNT: number;
+    PAYERACCOUNT: string;
+    INSERTDATE: string;
+    UPDATEDATE: string;
+    INSERTUSER: string;
+    UPDATEUSER: string;
+};
+
+export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | null;

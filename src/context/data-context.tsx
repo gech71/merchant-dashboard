@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns } from '@/types';
 
 // Mock Data
 const MOCK_BRANCHES: Branch[] = [
@@ -77,6 +77,12 @@ const MOCK_CORE_INTEGRATION_SETTINGS: core_integration_settings[] = [
     { ID: 'core_2', UNIQUEKEY: 'INTEGRATION_BACKUP', ADDRESS: 'https://core-backup.bank.com/api', USERNAME: 'coreapiuser_bk', PASSWORD: 'AnotherSecretPassword456', INSERTDATE: '2023-01-02', UPDATEDATE: '2023-01-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
+const MOCK_PAYSTREAM_TXNS: paystream_txns[] = [
+    { ID: 'ps_1', MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT001', ISCOMPLETED: true, AMOUNT: 125.50, PAYERACCOUNT: 'PAYER001', INSERTDATE: '2023-07-01', UPDATEDATE: '2023-07-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'ps_2', MERCHANTACCOUNTNUMBER: 'ACC002', SALERPHONENUMBER: '777-888-9999', TICKET: 'TKT002', ISCOMPLETED: false, AMOUNT: 300.00, PAYERACCOUNT: 'PAYER002', INSERTDATE: '2023-07-02', UPDATEDATE: '2023-07-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'ps_3', MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT003', ISCOMPLETED: true, AMOUNT: 75.00, PAYERACCOUNT: 'PAYER003', INSERTDATE: '2023-07-03', UPDATEDATE: '2023-07-03', INSERTUSER: 'system', UPDATEUSER: 'system' },
+]
+
 
 const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
 
@@ -91,6 +97,7 @@ type DataContextType = {
   arifpayEndpoints: arifpay_endpoints[];
   controllersConfigs: controllersconfigs[];
   coreIntegrationSettings: core_integration_settings[];
+  paystreamTxns: paystream_txns[];
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
@@ -118,6 +125,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [arifpayEndpoints, setArifpayEndpoints] = React.useState<arifpay_endpoints[]>(MOCK_ARIFPAY_ENDPOINTS);
   const [controllersConfigs, setControllersConfigs] = React.useState<controllersconfigs[]>(MOCK_CONTROLLERSCONFIGS);
   const [coreIntegrationSettings, setCoreIntegrationSettings] = React.useState<core_integration_settings[]>(MOCK_CORE_INTEGRATION_SETTINGS);
+  const [paystreamTxns, setPaystreamTxns] = React.useState<paystream_txns[]>(MOCK_PAYSTREAM_TXNS);
   const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
@@ -194,6 +202,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     arifpayEndpoints,
     controllersConfigs,
     coreIntegrationSettings,
+    paystreamTxns,
     currentUser,
     addBranch,
     updateBranch,
