@@ -17,7 +17,8 @@ import {
   LayoutGrid,
   DollarSign,
   Receipt,
-  Send
+  Send,
+  Link2
 } from 'lucide-react';
 
 import {
@@ -54,6 +55,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/daily-balances', icon: DollarSign, label: 'Daily Balances' },
   { href: '/dashboard/merchant-txns', icon: Receipt, label: 'Merchant Transactions' },
   { href: '/dashboard/arif-requests', icon: Send, label: 'Arif Requests' },
+  { href: '/dashboard/arifpay-endpoints', icon: Link2, label: 'ArifPay Endpoints' },
 ];
 
 const APPROVAL_NAV_ITEMS = [

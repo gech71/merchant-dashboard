@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints } from '@/types';
 
 // Mock Data
 const MOCK_BRANCHES: Branch[] = [
@@ -62,6 +62,11 @@ const MOCK_ARIF_REQUESTS: arif_requests[] = [
     { NONCEID: 'nonce2', SESSIONID: 'sess2', DEBITACCOUNT: 'D002', CREDITACCOUNT: 'C002', AMOUNT: 250, MERCHANTACCOUNT: 'ACC002', SALESPHONE: '777-888-9999', REQUEST1: '{}', RESPONSE1: '{}', REQUEST2: '{}', RESPONSE2: '{"status":"failed"}', REQUEST3: '{}', RESPONSE3: '{}', WEBHOOKRESPONSE: '{}', ERROR1: '', MESSAGE1: '', ERROR2: 'T24_FAIL', MESSAGE2: 'T24 Timeout', ERROR3: '', MESSAGE3: '', DATESEND1: '2023-06-02', DATERECIVED1: '2023-06-02', DATESEND2: '2023-06-02', DATERECIVED2: '2023-06-02', DATESEND3: '', DATERECIVED3: '', WEBHOOKRECEIVEDDATE: '', INSERTUSER: 'sys', UPDATEUSER: 'sys', ARIFPAYTRANSACTIONID: 'AP-TXN-2', ARIFPAYTRANSACTIONSTATUS: 'Failed', T24TRANSACTIONSTATUS: 'Failed' },
 ]
 
+const MOCK_ARIFPAY_ENDPOINTS: arifpay_endpoints[] = [
+    { ID: 'ep_1', BANK: 'Bank of Abyssina', DISPLAYNAME: 'BoA', OTPLENGTH: 6, ORDER: 1, ENDPOINT1: 'https://api.boa.com/v1/pay', ENDPOINT2: 'https://api.boa.com/v1/confirm', ENDPOINT3: '', CANCELURL: 'https://boa.com/cancel', ERRORURL: 'https://boa.com/error', SUCCESSURL: 'https://boa.com/success', NOTIFYURL: 'https://api.myapp.com/notify/boa', ISTWOSTEP: true, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '987654321', BENEFICIARYBANK: 'BoA', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'ep_2', BANK: 'Awash Bank', DISPLAYNAME: 'Awash', OTPLENGTH: 4, ORDER: 2, ENDPOINT1: 'https://api.awashbank.com/execute', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://awashbank.com/cancel', ERRORURL: 'https://awashbank.com/error', SUCCESSURL: 'https://awashbank.com/success', NOTIFYURL: 'https://api.myapp.com/notify/awash', ISTWOSTEP: false, ISOTP: false, TRANSACTIONTYPE: 'B2B', BENEFICIARYACCOUNT: '123456789', BENEFICIARYBANK: 'Awash', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: '2023-01-02', UPDATEDATE: '2023-01-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
+]
+
 
 const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
 
@@ -73,6 +78,7 @@ type DataContextType = {
   dailyBalances: merchants_daily_balances[];
   merchantTxns: merchant_txns[];
   arifRequests: arif_requests[];
+  arifpayEndpoints: arifpay_endpoints[];
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
@@ -97,6 +103,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [dailyBalances, setDailyBalances] = React.useState<merchants_daily_balances[]>(MOCK_DAILY_BALANCES);
   const [merchantTxns, setMerchantTxns] = React.useState<merchant_txns[]>(MOCK_MERCHANT_TXNS);
   const [arifRequests, setArifRequests] = React.useState<arif_requests[]>(MOCK_ARIF_REQUESTS);
+  const [arifpayEndpoints, setArifpayEndpoints] = React.useState<arifpay_endpoints[]>(MOCK_ARIFPAY_ENDPOINTS);
   const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
@@ -170,6 +177,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     dailyBalances,
     merchantTxns,
     arifRequests,
+    arifpayEndpoints,
     currentUser,
     addBranch,
     updateBranch,

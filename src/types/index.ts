@@ -127,4 +127,29 @@ export type BranchUser = {
   status: 'Active' | 'Inactive' | 'Pending';
 };
 
+export type arifpay_endpoints = {
+  ID: string;
+  BANK: string;
+  DISPLAYNAME: string;
+  OTPLENGTH: number;
+  ORDER: number;
+  ENDPOINT1: string;
+  ENDPOINT2: string;
+  ENDPOINT3: string;
+  CANCELURL: string;
+  ERRORURL: string;
+  SUCCESSURL: string;
+  NOTIFYURL: string;
+  ISTWOSTEP: boolean;
+  ISOTP: boolean;
+  TRANSACTIONTYPE: string;
+  BENEFICIARYACCOUNT: string;
+  BENEFICIARYBANK: string;
+  IMAGEURL: string;
+  INSERTDATE: string;
+  UPDATEDATE: string;
+  INSERTUSER: string;
+  UPDATEUSER: string;
+};
+
 export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | null;
