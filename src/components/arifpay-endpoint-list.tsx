@@ -23,7 +23,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import Image from 'next/image';
 
 type SortableKeys = 'BANK' | 'DISPLAYNAME' | 'ORDER' | 'TRANSACTIONTYPE';
 const ITEMS_PER_PAGE = 15;
@@ -96,7 +95,6 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Image</TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('BANK')} className="px-2">BANK{getSortIndicator('BANK')}</Button></TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('DISPLAYNAME')} className="px-2">DISPLAYNAME{getSortIndicator('DISPLAYNAME')}</Button></TableHead>
                 <TableHead>ISTWOSTEP</TableHead>
@@ -110,9 +108,6 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
               {paginatedEndpoints.length > 0 ? (
                 paginatedEndpoints.map((endpoint) => (
                   <TableRow key={endpoint.ID}>
-                    <TableCell>
-                      <Image src={endpoint.IMAGEURL} alt={endpoint.DISPLAYNAME} width={80} height={32} className="rounded" />
-                    </TableCell>
                     <TableCell className="font-medium">{endpoint.BANK}</TableCell>
                     <TableCell>{endpoint.DISPLAYNAME}</TableCell>
                     <TableCell><Badge variant={endpoint.ISTWOSTEP ? 'default' : 'secondary'}>{endpoint.ISTWOSTEP ? 'Yes' : 'No'}</Badge></TableCell>
@@ -124,7 +119,7 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-24 text-center">No endpoints found.</TableCell>
+                  <TableCell colSpan={7} className="h-24 text-center">No endpoints found.</TableCell>
                 </TableRow>
               )}
             </TableBody>
