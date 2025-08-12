@@ -65,42 +65,37 @@ export default function DashboardPage() {
 
 
   const companiesByBranch = branches.map(branch => {
-    // Find branch users for the current branch
-    const usersInBranch = branchUsers.filter(bu => bu.branch === branch.name);
-    // Find merchants associated with those branch users (this link is assumed/indirect)
-    // A better link is to check if a company's admin user is in a branch.
-    const adminMerchants = merchants.filter(m => m.ROLE === 'Admin');
+    // This logic is complex because there's no direct branch-to-company link.
+    // We can infer a link: A company belongs to a branch if one of its 'Admin' merchants
+    // is associated with that branch. However, there's no direct merchant-to-branch link either.
+    // The closest link is branchUser.branch.
+    // For this demo, let's assume a company is in a branch if any of its merchant users
+    // has a phone number that is also a branch user's email (a weak link, but demonstrates the idea).
     
-    // Get account numbers for companies whose admin is associated with a user in this branch.
-    // This is still complex. A direct branch<->company link would be better.
-    // Let's simplify: A company is in a branch if its admin user's details are managed by a branch user in that branch.
-    // This is not directly possible with the current schema.
-    // New simplified logic: A company is in a branch if *any* of its merchants is associated with that branch.
-    // Let's assume a merchant is "in" a branch if there's a branchUser from that branch.
-    // This is still flawed. Let's make a more reasonable assumption:
-    // A company is linked to a branch if a merchant with that company's ACCOUNTNUMBER has a relationship
-    // with a branch user of that branch. The schema doesn't provide this link.
-    // So, we'll use a mocked-up but plausible logic.
-    const companyAccountNumbersInBranch = new Set<string>();
-    adminMerchants.forEach(merchant => {
-        // A direct link is missing. We will simulate a relationship for the chart.
-        // Let's assume the first 3 branches have companies for demo purposes.
-        if (branch.name === 'Downtown Branch' && ['ACC001', 'ACC003'].includes(merchant.ACCOUNTNUMBER)) {
-            companyAccountNumbersInBranch.add(merchant.ACCOUNTNUMBER);
-        }
-        if (branch.name === 'Uptown Branch' && ['ACC002'].includes(merchant.ACCOUNTNUMBER)) {
-            companyAccountNumbersInBranch.add(merchant.ACCOUNTNUMBER);
-        }
-         if (branch.name === 'Westside Branch' && ['ACC004'].includes(merchant.ACCOUNTNUMBER)) {
-            companyAccountNumbersInBranch.add(merchant.ACCOUNTNUMBER);
-        }
-    });
+    // A more robust but still indirect link:
+    // 1. Get all merchant account numbers.
+    const merchantAccountNumbers = new Set(merchants.map(m => m.ACCOUNTNUMBER));
+    // 2. Find which companies are associated with these merchants.
+    const activeCompanies = allowedCompanies.filter(c => merchantAccountNumbers.has(c.ACCOUNTNUMBER));
+    
+    // 3. To link to a branch, we use the branch users.
+    const usersInThisBranch = branchUsers.filter(bu => bu.branch === branch.name);
+    
+    // This is where the schema lacks a clear connection. We will simulate a connection for the chart.
+    // Let's assume a company is in a branch if its ACCOUNTNUMBER is one of the first few in our mock data,
+    // and we assign it to a branch for visual purposes. This part remains a simulation due to schema limitations.
+    const companyCount = allowedCompanies.filter(c => {
+        if (branch.name === 'Downtown Branch') return ['ACC001', 'ACC003'].includes(c.ACCOUNTNUMBER);
+        if (branch.name === 'Uptown Branch') return ['ACC002'].includes(c.ACCOUNTNUMBER);
+        if (branch.name === 'Westside Branch') return ['ACC004'].includes(c.ACCOUNTNUMBER);
+        return false;
+    }).length;
 
     return {
       name: branch.name,
-      companies: companyAccountNumbersInBranch.size,
+      companies: companyCount,
     };
-  });
+  }).filter(b => b.companies > 0); // Only show branches with companies for a cleaner chart.
 
   const companyStatusData = [
     { name: 'Active', value: allowedCompanies.filter(c => c.STATUS === 'Active').length },
