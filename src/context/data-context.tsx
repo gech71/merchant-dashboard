@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests } from '@/types';
 
 // Mock Data
 const MOCK_BRANCHES: Branch[] = [
@@ -57,6 +57,11 @@ const MOCK_MERCHANT_TXNS: merchant_txns[] = [
     { ID: 'txn_5', MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', AMOUNT: 500.00, TXNID: 'TXN005', CUSTOMERNAME: 'Customer E', CUSTOMERACCOUNT: 'CUST005', T24USER: 't24user2', T2TRANSACTIONDATE: '2023-06-02T09:00:00Z', STATUS: 'Completed', TRANSACTIONCHANNEL: 'Online', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: '2023-06-02', UPDATEDATE: '2023-06-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
+const MOCK_ARIF_REQUESTS: arif_requests[] = [
+    { NONCEID: 'nonce1', SESSIONID: 'sess1', DEBITACCOUNT: 'D001', CREDITACCOUNT: 'C001', AMOUNT: 100, MERCHANTACCOUNT: 'ACC001', SALESPHONE: '666-777-8888', REQUEST1: '{}', RESPONSE1: '{}', REQUEST2: '{}', RESPONSE2: '{}', REQUEST3: '{}', RESPONSE3: '{}', WEBHOOKRESPONSE: '{}', ERROR1: '', MESSAGE1: '', ERROR2: '', MESSAGE2: '', ERROR3: '', MESSAGE3: '', DATESEND1: '2023-06-01', DATERECIVED1: '2023-06-01', DATESEND2: '2023-06-01', DATERECIVED2: '2023-06-01', DATESEND3: '2023-06-01', DATERECIVED3: '2023-06-01', WEBHOOKRECEIVEDDATE: '2023-06-01', INSERTUSER: 'sys', UPDATEUSER: 'sys', ARIFPAYTRANSACTIONID: 'AP-TXN-1', ARIFPAYTRANSACTIONSTATUS: 'Success', T24TRANSACTIONSTATUS: 'Success' },
+    { NONCEID: 'nonce2', SESSIONID: 'sess2', DEBITACCOUNT: 'D002', CREDITACCOUNT: 'C002', AMOUNT: 250, MERCHANTACCOUNT: 'ACC002', SALESPHONE: '777-888-9999', REQUEST1: '{}', RESPONSE1: '{}', REQUEST2: '{}', RESPONSE2: '{"status":"failed"}', REQUEST3: '{}', RESPONSE3: '{}', WEBHOOKRESPONSE: '{}', ERROR1: '', MESSAGE1: '', ERROR2: 'T24_FAIL', MESSAGE2: 'T24 Timeout', ERROR3: '', MESSAGE3: '', DATESEND1: '2023-06-02', DATERECIVED1: '2023-06-02', DATESEND2: '2023-06-02', DATERECIVED2: '2023-06-02', DATESEND3: '', DATERECIVED3: '', WEBHOOKRECEIVEDDATE: '', INSERTUSER: 'sys', UPDATEUSER: 'sys', ARIFPAYTRANSACTIONID: 'AP-TXN-2', ARIFPAYTRANSACTIONSTATUS: 'Failed', T24TRANSACTIONSTATUS: 'Failed' },
+]
+
 
 const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
 
@@ -67,6 +72,7 @@ type DataContextType = {
   branchUsers: BranchUser[];
   dailyBalances: merchants_daily_balances[];
   merchantTxns: merchant_txns[];
+  arifRequests: arif_requests[];
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
@@ -90,6 +96,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [branchUsers, setBranchUsers] = React.useState<BranchUser[]>(MOCK_BRANCH_USERS);
   const [dailyBalances, setDailyBalances] = React.useState<merchants_daily_balances[]>(MOCK_DAILY_BALANCES);
   const [merchantTxns, setMerchantTxns] = React.useState<merchant_txns[]>(MOCK_MERCHANT_TXNS);
+  const [arifRequests, setArifRequests] = React.useState<arif_requests[]>(MOCK_ARIF_REQUESTS);
   const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
@@ -162,6 +169,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     branchUsers,
     dailyBalances,
     merchantTxns,
+    arifRequests,
     currentUser,
     addBranch,
     updateBranch,

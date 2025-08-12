@@ -1,8 +1,38 @@
 
-
-
-
-
+export type arif_requests = {
+  NONCEID: string;
+  SESSIONID: string;
+  DEBITACCOUNT: string;
+  CREDITACCOUNT: string;
+  AMOUNT: number;
+  MERCHANTACCOUNT: string;
+  SALESPHONE: string;
+  REQUEST1: string;
+  RESPONSE1: string;
+  REQUEST2: string;
+  RESPONSE2: string;
+  REQUEST3: string;
+  RESPONSE3: string;
+  WEBHOOKRESPONSE: string;
+  ERROR1: string;
+  MESSAGE1: string;
+  ERROR2: string;
+  MESSAGE2: string;
+  ERROR3: string;
+  MESSAGE3: string;
+  DATESEND1: string;
+  DATERECIVED1: string;
+  DATESEND2: string;
+  DATERECIVED2: string;
+  DATESEND3: string;
+  DATERECIVED3: string;
+  WEBHOOKRECEIVEDDATE: string;
+  INSERTUSER: string;
+  UPDATEUSER: string;
+  ARIFPAYTRANSACTIONID: string;
+  ARIFPAYTRANSACTIONSTATUS: string;
+  T24TRANSACTIONSTATUS: string;
+};
 
 export type allowed_companies = {
   Oid: string;
