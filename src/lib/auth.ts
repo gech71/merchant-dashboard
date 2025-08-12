@@ -24,6 +24,7 @@ export async function getCurrentUser(): Promise<UserPayload | null> {
     const { payload } = await jwtVerify(token, secret);
     return payload as UserPayload;
   } catch (err) {
+    console.error('Failed to verify JWT:', err);
     return null;
   }
 }
