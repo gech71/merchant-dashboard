@@ -41,12 +41,14 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EditMerchantForm } from './edit-merchant-form';
 import { useDataContext } from '@/context/data-context';
+import { useToast } from '@/hooks/use-toast';
 
 type SortableKeys = 'FULLNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'ROLE';
 const ITEMS_PER_PAGE = 15;
 
 export default function MerchantList({ merchants: initialMerchants, approvalView = false }: { merchants: Merchant_users[], approvalView?: boolean }) {
   const { merchants: contextMerchants, updateMerchantStatus, allowedCompanies } = useDataContext();
+  const { toast } = useToast();
   const [merchants, setMerchants] = React.useState(initialMerchants);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -62,8 +64,20 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     setMerchants(initialMerchants);
   }, [initialMerchants]);
   
-  const handleStatusChange = (merchantId: string, status: 'Active' | 'Disabled') => {
-    updateMerchantStatus(merchantId, status);
+  const handleStatusChange = async (merchantId: string, status: 'Active' | 'Disabled') => {
+    try {
+      await updateMerchantStatus(merchantId, status);
+      toast({
+        title: 'Merchant Status Updated',
+        description: `The merchant has been ${status === 'Active' ? 'approved' : 'rejected'}.`,
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Update Failed',
+        description: 'Could not update the merchant status.',
+      });
+    }
   };
   
   const handleEdit = (merchant: Merchant_users) => {

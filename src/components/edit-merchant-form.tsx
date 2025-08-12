@@ -37,6 +37,7 @@ export function EditMerchantForm({
 }) {
   const { toast } = useToast();
   const { merchants, updateMerchant } = useDataContext();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<MerchantFormValues>({
     resolver: zodResolver(merchantFormSchema),
@@ -45,7 +46,8 @@ export function EditMerchantForm({
     },
   });
 
-  function onSubmit(data: MerchantFormValues) {
+  async function onSubmit(data: MerchantFormValues) {
+    setIsLoading(true);
     if (data.ROLE === 'Admin') {
       const adminExists = merchants.some(
         (m) => m.ID !== merchantUser.ID && m.ACCOUNTNUMBER === merchantUser.ACCOUNTNUMBER && m.ROLE === 'Admin'
@@ -55,21 +57,27 @@ export function EditMerchantForm({
           type: 'manual',
           message: `An Admin user already exists for this account. You can't have more than one.`,
         });
+        setIsLoading(false);
         return;
       }
     }
 
-    const updatedMerchant: Merchant_users = {
-      ...merchantUser,
-      ...data,
-    };
-
-    updateMerchant(updatedMerchant);
-    toast({
-      title: 'Merchant User Updated',
-      description: `${merchantUser.FULLNAME} has been successfully updated.`,
-    });
-    setOpen(false);
+    try {
+        await updateMerchant({ ...merchantUser, ...data });
+        toast({
+            title: 'Merchant User Updated',
+            description: `${merchantUser.FULLNAME} has been successfully updated.`,
+        });
+        setOpen(false);
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Failed to Update Merchant',
+            description: 'An error occurred while trying to update the merchant.',
+        });
+    } finally {
+        setIsLoading(false);
+    }
   }
 
   return (
@@ -123,10 +131,11 @@ export function EditMerchantForm({
             type="button"
             variant="outline"
             onClick={() => setOpen(false)}
+            disabled={isLoading}
           >
             Cancel
           </Button>
-          <Button type="submit">Save Changes</Button>
+          <Button type="submit" disabled={isLoading}>{isLoading ? 'Saving...' : 'Save Changes'}</Button>
         </div>
       </form>
     </Form>

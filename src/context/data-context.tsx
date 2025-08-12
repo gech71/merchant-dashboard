@@ -51,16 +51,16 @@ type DataContextType = {
   roleCapabilities: role_capablities[];
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
-  addBranch: (branch: Omit<Branch, 'id' | 'status'>) => Promise<void>;
+  addBranch: (branch: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE'>) => Promise<void>;
   updateBranch: (branch: Branch) => Promise<void>;
   addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => Promise<void>;
   updateAllowedCompany: (company: allowed_companies) => void;
-  updateMerchant: (merchant: Merchant_users) => void;
+  updateMerchant: (merchant: Merchant_users) => Promise<void>;
   addBranchUser: (user: Omit<BranchUser, 'id' | 'status'>) => Promise<void>;
   updateBranchUser: (user: BranchUser) => Promise<void>;
   updateBranchStatus: (branchId: number, status: 'Approved' | 'Rejected') => void;
   updateAllowedCompanyApproval: (companyId: string, isApproved: boolean) => void;
-  updateMerchantStatus: (merchantId: string, status: 'Active' | 'Disabled') => void;
+  updateMerchantStatus: (merchantId: string, status: 'Active' | 'Disabled') => Promise<void>;
   updateBranchUserStatus: (userId: string, status: 'Active' | 'Inactive') => Promise<void>;
 };
 
@@ -86,7 +86,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const [roleCapabilities, setRoleCapabilities] = React.useState<role_capablities[]>(initialData.roleCapabilities);
   const [currentUser, setCurrentUser] = React.useState<CurrentUser | null>(null);
 
-  const addBranch = async (branchData: Omit<Branch, 'id' | 'status'>) => {
+  const addBranch = async (branchData: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE'>) => {
     const response = await fetch('/api/branches', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -129,8 +129,17 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setAllowedCompanies(prev => prev.map(c => c.Oid === updatedCompany.Oid ? {...updatedCompany, UPDATEDATE: new Date().toISOString(), UPDATEUSER: currentUser?.name || 'system'} : c));
   };
   
-  const updateMerchant = (updatedMerchant: Merchant_users) => {
-    setMerchants(prev => prev.map(m => m.ID === updatedMerchant.ID ? updatedMerchant : m));
+  const updateMerchant = async (updatedMerchant: Merchant_users) => {
+     const response = await fetch(`/api/merchant_users/${updatedMerchant.ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ROLE: updatedMerchant.ROLE }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update merchant user');
+    }
+    const returnedUser = await response.json();
+    setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? returnedUser : m));
   };
 
   const addBranchUser = async (userData: Omit<BranchUser, 'id' | 'status'>) => {
@@ -179,12 +188,21 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     ));
   };
 
-  const updateMerchantStatus = (merchantId: string, status: 'Active' | 'Disabled') => {
-    setMerchants(prev => prev.map(m => m.ID === merchantId ? { ...m, STATUS: status } : m));
+  const updateMerchantStatus = async (merchantId: string, status: 'Active' | 'Disabled') => {
+    const response = await fetch(`/api/merchant_users/${merchantId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ STATUS: status }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update merchant status');
+    }
+    const returnedUser = await response.json();
+    setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? returnedUser : m));
   };
   
   const updateBranchUserStatus = async (userId: string, status: 'Active' | 'Inactive') => {
-    const user = branchUsers.find(u => u.id === userId);
+    const user = branchUsers.find(u => u.id === parseInt(userId, 10));
     if (user) {
         await updateBranchUser({ ...user, status });
     }
