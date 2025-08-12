@@ -21,7 +21,7 @@ export async function PUT(
     }
     
     const updatedUser = await prisma.branchUser.update({
-      where: { id },
+      where: { id: id },
       data: {
         name,
         email,
