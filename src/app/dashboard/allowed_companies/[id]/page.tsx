@@ -14,7 +14,7 @@ export default function CompanyDetailPage() {
   const companyId = Array.isArray(id) ? id[0] : id;
 
   const company = allowedCompanies.find((c) => c.Oid === companyId);
-  const companyMerchants = merchants.filter((m) => m.company === company?.FIELDNAME);
+  const companyMerchants = merchants.filter((m) => m.ACCOUNTNUMBER === company?.ACCOUNTNUMBER);
 
   if (!company) {
     return (

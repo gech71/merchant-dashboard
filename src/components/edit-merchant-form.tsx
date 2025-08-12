@@ -48,12 +48,12 @@ export function EditMerchantForm({
   function onSubmit(data: MerchantFormValues) {
     if (data.ROLE === 'Admin') {
       const adminExists = merchants.some(
-        (m) => m.ID !== merchantUser.ID && m.company === merchantUser.company && m.ROLE === 'Admin'
+        (m) => m.ID !== merchantUser.ID && m.ACCOUNTNUMBER === merchantUser.ACCOUNTNUMBER && m.ROLE === 'Admin'
       );
       if (adminExists) {
         form.setError('ROLE', {
           type: 'manual',
-          message: `An Admin user already exists for ${merchantUser.company}. You can't have more than one.`,
+          message: `An Admin user already exists for this account. You can't have more than one.`,
         });
         return;
       }
@@ -83,9 +83,9 @@ export function EditMerchantForm({
         </FormItem>
         
         <FormItem>
-            <FormLabel>Company</FormLabel>
+            <FormLabel>ACCOUNTNUMBER</FormLabel>
             <FormControl>
-                 <Input placeholder="Company" value={merchantUser.company} disabled />
+                 <Input placeholder="ACC12345" value={merchantUser.ACCOUNTNUMBER} disabled />
             </FormControl>
         </FormItem>
 

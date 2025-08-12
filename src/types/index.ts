@@ -1,6 +1,7 @@
 
 
 
+
 export type allowed_companies = {
   Oid: string;
   ID: string;
@@ -48,8 +49,6 @@ export type Merchant_users = {
   UPDATEUSERID: string;
   INSERTDATE: string;
   UPDATEDATE: string;
-  // This is needed for the relationship with allowed_companies, not in the new list but required for functionality
-  company: string; 
 };
 
 

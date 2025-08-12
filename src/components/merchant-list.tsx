@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Merchant_users, EditableItem } from '@/types';
+import type { Merchant_users, EditableItem, allowed_companies } from '@/types';
 import { ArrowUpDown, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -42,11 +42,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { EditMerchantForm } from './edit-merchant-form';
 import { useDataContext } from '@/context/data-context';
 
-type SortableKeys = 'FULLNAME' | 'company' | 'STATUS' | 'ROLE';
+type SortableKeys = 'FULLNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'ROLE';
 const ITEMS_PER_PAGE = 15;
 
 export default function MerchantList({ merchants: initialMerchants, approvalView = false }: { merchants: Merchant_users[], approvalView?: boolean }) {
-  const { merchants: contextMerchants, updateMerchantStatus } = useDataContext();
+  const { merchants: contextMerchants, updateMerchantStatus, allowedCompanies } = useDataContext();
   const [merchants, setMerchants] = React.useState(initialMerchants);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -70,6 +70,11 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     setSelectedMerchant(merchant);
     setIsEditMerchantOpen(true);
   };
+
+  const getCompanyName = (accountNumber: string) => {
+    const company = allowedCompanies.find(c => c.ACCOUNTNUMBER === accountNumber);
+    return company ? company.FIELDNAME : 'N/A';
+  }
 
   const requestSort = (key: SortableKeys) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -103,7 +108,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
           (value) =>
             typeof value === 'string' &&
             value.toLowerCase().includes(lowercasedTerm)
-        )
+        ) || getCompanyName(merchant.ACCOUNTNUMBER).toLowerCase().includes(lowercasedTerm)
       );
     }
 
@@ -134,7 +139,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     }
 
     return sortableItems;
-  }, [merchants, contextMerchants, searchTerm, sortConfig, activeTab, approvalView]);
+  }, [merchants, contextMerchants, searchTerm, sortConfig, activeTab, approvalView, allowedCompanies]);
   
   const paginatedMerchants = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -208,10 +213,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                         </Button>
                       </TableHead>
                       <TableHead>
-                        <Button variant="ghost" onClick={() => requestSort('company')} className="px-2">
-                          Company
-                          {getSortIndicator('company')}
-                        </Button>
+                        Company
                       </TableHead>
                        <TableHead>
                         <Button variant="ghost" onClick={() => requestSort('ROLE')} className="px-2">
@@ -238,7 +240,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                       paginatedMerchants.map((merchantUser) => (
                         <TableRow key={merchantUser.ID}>
                           <TableCell className="font-medium">{merchantUser.FULLNAME}</TableCell>
-                          <TableCell>{merchantUser.company}</TableCell>
+                          <TableCell>{getCompanyName(merchantUser.ACCOUNTNUMBER)}</TableCell>
                           <TableCell>
                              <Badge variant={merchantUser.ROLE === 'Admin' ? 'default' : 'secondary'}>{merchantUser.ROLE}</Badge>
                           </TableCell>

@@ -58,7 +58,7 @@ export default function DashboardPage() {
 
   const companiesByBranch = branches.map(branch => ({
     name: branch.name,
-    companies: allowedCompanies.filter(c => merchants.some(m => m.company === c.FIELDNAME && m.ROLE === 'Admin' && branchUsers.some(bu => bu.branch === branch.name))).length,
+    companies: allowedCompanies.filter(c => merchants.some(m => m.ACCOUNTNUMBER === c.ACCOUNTNUMBER && m.ROLE === 'Admin' && branchUsers.some(bu => bu.branch === branch.name))).length,
   }));
 
   const companyStatusData = [

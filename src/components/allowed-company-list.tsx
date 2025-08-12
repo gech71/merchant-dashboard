@@ -42,8 +42,7 @@ type SortableKeys = 'FIELDNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'APPROVEUSER' | '
 const ITEMS_PER_PAGE = 15;
 
 export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowedCompanies: allowed_companies[], approvalView?: boolean }) {
-  const { updateAllowedCompanyApproval, currentUser, branches, merchants } = useDataContext();
-  const [allowedCompanies, setAllowedCompanies] = React.useState(initialCompanies);
+  const { updateAllowedCompanyApproval, currentUser, branches, merchants, branchUsers } = useDataContext();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
@@ -56,17 +55,6 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
   const [currentPage, setCurrentPage] = React.useState(1);
   const [branchFilter, setBranchFilter] = React.useState('all');
 
-  React.useEffect(() => {
-    let companies = initialCompanies;
-    if (currentUser.branch !== 'Head Office' && !approvalView) {
-        const branchCompanyNames = merchants
-            .filter(m => m.ROLE === 'Admin' && branchUsers.some(bu => bu.branch === currentUser.branch))
-            .map(m => m.company);
-        companies = initialCompanies.filter(c => branchCompanyNames.includes(c.FIELDNAME));
-    }
-    setAllowedCompanies(companies);
-  }, [initialCompanies, currentUser, merchants]);
-  
   const handleApproval = (companyId: string, isApproved: boolean) => {
     updateAllowedCompanyApproval(companyId, isApproved);
   };
@@ -88,30 +76,25 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     }
     setSortConfig({ key, direction });
   };
-  
-  const { branchUsers } = useDataContext();
 
   const filteredAndSortedCompanies = React.useMemo(() => {
     let sortableItems = [...initialCompanies];
   
     if (branchFilter !== 'all') {
-      const companyNamesInBranch = merchants
-        .filter(m => {
-            const usersInBranch = branchUsers.filter(u => u.branch === branchFilter);
-            // This is a simplification. In a real app, you'd have a direct link between merchant and branch.
-            // Here, we check if any user in the selected branch is associated with the merchant's company.
-            // This is not a perfect mapping but works for demo data.
-            const merchantsInBranch = merchants.filter(merchant => {
-              // A simplified logic, assuming a merchant is in a branch if a branch user from that branch exists for the same company.
-              // This is flawed. A better data model would link merchants to branches directly.
-              return branchUsers.some(bu => bu.branch === branchFilter && bu.name.includes(merchant.company));
-            })
-            return merchantsInBranch.map(m => m.company);
+      // Find all account numbers associated with merchants in the selected branch
+      const merchantAccountNumbersInBranch = merchants
+        .filter(merchant => {
+          // This logic is still a bit fuzzy as there's no direct link between a merchant and a branch.
+          // We are assuming a merchant is in a branch if any branch user from that branch is associated with the merchant.
+          // This is a simplification based on the available data.
+          return branchUsers.some(bu => bu.branch === branchFilter);
         })
-        .map(m => m.company);
-        
-      const uniqueCompanyNames = [...new Set(companyNamesInBranch)];
-      sortableItems = sortableItems.filter(c => uniqueCompanyNames.includes(c.FIELDNAME));
+        .map(m => m.ACCOUNTNUMBER);
+
+      const uniqueAccountNumbers = [...new Set(merchantAccountNumbersInBranch)];
+      
+      // Filter companies that have one of the account numbers
+      sortableItems = sortableItems.filter(c => uniqueAccountNumbers.includes(c.ACCOUNTNUMBER));
     }
 
 
