@@ -1,4 +1,5 @@
 
+
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -117,6 +118,25 @@ const MOCK_ROLE_CAPABILITIES = [
 async function main() {
     console.log(`Start seeding ...`);
 
+    // Deleting data
+    await prisma.role_capablities.deleteMany({});
+    await prisma.promo_adds.deleteMany({});
+    await prisma.account_infos.deleteMany({});
+    await prisma.qr_payments.deleteMany({});
+    await prisma.ussd_push_settings.deleteMany({});
+    await prisma.stream_pay_settings.deleteMany({});
+    await prisma.paystream_txns.deleteMany({});
+    await prisma.core_integration_settings.deleteMany({});
+    await prisma.controllersconfigs.deleteMany({});
+    await prisma.arifpay_endpoints.deleteMany({});
+    await prisma.arif_requests.deleteMany({});
+    await prisma.merchant_txns.deleteMany({});
+    await prisma.merchants_daily_balances.deleteMany({});
+    await prisma.branchUser.deleteMany({});
+    await prisma.merchant_users.deleteMany({});
+    await prisma.allowed_companies.deleteMany({});
+    await prisma.branch.deleteMany({});
+
     for (const b of MOCK_BRANCHES) {
         const { id, ...branchData } = b;
         await prisma.branch.create({ data: branchData });
@@ -222,3 +242,6 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
+
+    
