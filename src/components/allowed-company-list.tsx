@@ -307,7 +307,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 {!approvalView && <DropdownMenuItem onClick={() => handleEdit(company)}>Edit</DropdownMenuItem>}
-                                {company.STATUS === 'Pending' && (
+                                {approvalView && company.STATUS === 'Pending' && (
                                   <>
                                     <DropdownMenuItem onClick={() => handleApproval(company.Oid, true)}>
                                       <CheckCircle className="mr-2 h-4 w-4" />
