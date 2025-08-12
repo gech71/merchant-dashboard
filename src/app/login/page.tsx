@@ -58,10 +58,6 @@ export default function LoginPage() {
           title: 'Login Successful',
           description: 'Welcome back!',
         });
-        // In a real app, you would store the tokens securely (e.g., in httpOnly cookies)
-        // and redirect the user.
-        console.log('Access Token:', result.accessToken);
-        console.log('Refresh Token:', result.refreshToken);
         router.push('/dashboard');
       } else {
         toast({

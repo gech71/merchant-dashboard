@@ -91,8 +91,8 @@ function UserProfile() {
   const { currentUser } = useDataContext();
   const router = useRouter();
 
-  const handleLogout = () => {
-    // In a real app, you would also clear tokens from storage
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/login');
   };
 
