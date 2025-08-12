@@ -92,7 +92,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
   const { branchUsers } = useDataContext();
 
   const filteredAndSortedCompanies = React.useMemo(() => {
-    let sortableItems = [...allowedCompanies];
+    let sortableItems = [...initialCompanies];
   
     if (branchFilter !== 'all') {
       const companyNamesInBranch = merchants
@@ -101,7 +101,12 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
             // This is a simplification. In a real app, you'd have a direct link between merchant and branch.
             // Here, we check if any user in the selected branch is associated with the merchant's company.
             // This is not a perfect mapping but works for demo data.
-            return usersInBranch.length > 0; // Simplified logic
+            const merchantsInBranch = merchants.filter(merchant => {
+              // A simplified logic, assuming a merchant is in a branch if a branch user from that branch exists for the same company.
+              // This is flawed. A better data model would link merchants to branches directly.
+              return branchUsers.some(bu => bu.branch === branchFilter && bu.name.includes(merchant.company));
+            })
+            return merchantsInBranch.map(m => m.company);
         })
         .map(m => m.company);
         
@@ -143,7 +148,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     }
 
     return sortableItems;
-  }, [allowedCompanies, searchTerm, sortConfig, activeTab, approvalView, branchFilter, merchants, branchUsers]);
+  }, [initialCompanies, searchTerm, sortConfig, activeTab, approvalView, branchFilter, merchants, branchUsers]);
   
   const paginatedCompanies = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
