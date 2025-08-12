@@ -38,7 +38,8 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
   } | null>({ key: 'T2TRANSACTIONDATE', direction: 'descending' });
   const [currentPage, setCurrentPage] = React.useState(1);
 
-  const getMerchantName = (accountNumber: string) => {
+  const getMerchantName = (accountNumber: string | null) => {
+    if (!accountNumber) return 'N/A';
     const merchant = merchants.find(m => m.ACCOUNTNUMBER === accountNumber);
     return merchant ? merchant.FULLNAME : 'N/A';
   }
@@ -81,8 +82,8 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
 
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        const valA = a[sortConfig.key];
-        const valB = b[sortConfig.key];
+        const valA = a[sortConfig.key] ?? '';
+        const valB = b[sortConfig.key] ?? '';
 
         if (valA < valB) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
@@ -183,7 +184,7 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
                     <TableCell>{txn.TXNID}</TableCell>
                     <TableCell>{txn.CUSTOMERNAME}</TableCell>
                     <TableCell>{txn.CUSTOMERACCOUNT}</TableCell>
-                    <TableCell>{new Date(txn.T2TRANSACTIONDATE).toLocaleString()}</TableCell>
+                    <TableCell>{txn.T2TRANSACTIONDATE ? new Date(txn.T2TRANSACTIONDATE).toLocaleString() : 'N/A'}</TableCell>
                   </TableRow>
                 ))
               ) : (

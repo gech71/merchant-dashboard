@@ -38,12 +38,14 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
   } | null>({ key: 'INSERTDATE', direction: 'descending' });
   const [currentPage, setCurrentPage] = React.useState(1);
 
-  const getMerchantName = (accountNumber: string) => {
+  const getMerchantName = (accountNumber: string | null) => {
+    if (!accountNumber) return 'N/A';
     const company = allowedCompanies.find(c => c.ACCOUNTNUMBER === accountNumber);
     return company ? company.FIELDNAME : 'N/A';
   }
   
-  const getSalerName = (phoneNumber: string) => {
+  const getSalerName = (phoneNumber: string | null) => {
+    if (!phoneNumber) return 'N/A';
     const merchant = merchants.find(m => m.PHONENUMBER === phoneNumber);
     return merchant ? merchant.FULLNAME : 'N/A';
   }
@@ -74,8 +76,8 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
 
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        const valA = a[sortConfig.key];
-        const valB = b[sortConfig.key];
+        const valA = a[sortConfig.key] ?? '';
+        const valB = b[sortConfig.key] ?? '';
 
         if (valA < valB) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
@@ -143,7 +145,7 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
                     <TableCell><Badge variant={txn.ISCOMPLETED ? 'default' : 'secondary'}>{txn.ISCOMPLETED ? 'Yes' : 'No'}</Badge></TableCell>
                     <TableCell className="text-right">{txn.AMOUNT.toFixed(2)}</TableCell>
                     <TableCell>{txn.PAYERACCOUNT}</TableCell>
-                    <TableCell>{new Date(txn.INSERTDATE).toLocaleString()}</TableCell>
+                    <TableCell>{txn.INSERTDATE ? new Date(txn.INSERTDATE).toLocaleString() : 'N/A'}</TableCell>
                   </TableRow>
                 ))
               ) : (

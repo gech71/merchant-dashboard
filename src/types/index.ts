@@ -12,85 +12,85 @@ export type arif_requests = Omit<Prisma.arif_requestsGetPayload<{}>, 'DATESEND1'
 };
 
 export type allowed_companies = Omit<Prisma.allowed_companiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
-  INSERTDATE: string;
-  UPDATEDATE: string;
+  INSERTDATE: string | null;
+  UPDATEDATE: string | null;
 };
 
 export type Branch = Omit<Prisma.BranchGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
-  INSERTDATE: string;
-  UPDATEDATE: string;
+  INSERTDATE: string | null;
+  UPDATEDATE: string | null;
 };
 
 export type Merchant_users = Omit<Prisma.merchant_usersGetPayload<{}>, 'LASTLOGINATTEMPT' | 'UNLOCKEDTIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
-  LASTLOGINATTEMPT: string;
+  LASTLOGINATTEMPT: string | null;
   UNLOCKEDTIME: string | null;
-  INSERTDATE: string;
-  UPDATEDATE: string;
+  INSERTDATE: string | null;
+  UPDATEDATE: string | null;
 };
 
 export type merchants_daily_balances = Omit<Prisma.merchants_daily_balancesGetPayload<{}>, 'BALANCEDATE' | 'INSERTDATE' | 'UPDATEDATE'> & {
-  BALANCEDATE: string;
-  INSERTDATE: string;
-  UPDATEDATE: string;
+  BALANCEDATE: string | null;
+  INSERTDATE: string | null;
+  UPDATEDATE: string | null;
 };
 
 export type merchant_txns = Omit<Prisma.merchant_txnsGetPayload<{}>, 'T2TRANSACTIONDATE' | 'INSERTDATE' | 'UPDATEDATE'> & {
-    T2TRANSACTIONDATE: string;
-    INSERTDATE: string;
-    UPDATEDATE: string;
+    T2TRANSACTIONDATE: string | null;
+    INSERTDATE: string | null;
+    UPDATEDATE: string | null;
 };
 
 export type BranchUser = Prisma.BranchUserGetPayload<{}>;
 
 export type arifpay_endpoints = Omit<Prisma.arifpay_endpointsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
-  INSERTDATE: string;
-  UPDATEDATE: string;
+  INSERTDATE: string | null;
+  UPDATEDATE: string | null;
 };
 
 export type controllersconfigs = Omit<Prisma.controllersconfigsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
-  INSERTDATE: string;
-  UPDATEDATE: string;
+  INSERTDATE: string | null;
+  UPDATEDATE: string | null;
 };
 
 export type core_integration_settings = Omit<Prisma.core_integration_settingsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
-  INSERTDATE: string;
-  UPDATEDATE: string;
+  INSERTDATE: string | null;
+  UPDATEDATE: string | null;
 };
 
 export type paystream_txns = Omit<Prisma.paystream_txnsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
-    INSERTDATE: string;
-    UPDATEDATE: string;
+    INSERTDATE: string | null;
+    UPDATEDATE: string | null;
 };
 
 export type stream_pay_settings = Omit<Prisma.stream_pay_settingsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
-    INSERTDATE: string;
-    UPDATEDATE: string;
+    INSERTDATE: string | null;
+    UPDATEDATE: string | null;
 };
 
 export type ussd_push_settings = Omit<Prisma.ussd_push_settingsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
-    INSERTDATE: string;
-    UPDATEDATE: string;
+    INSERTDATE: string | null;
+    UPDATEDATE: string | null;
 };
 
 export type qr_payments = Omit<Prisma.qr_paymentsGetPayload<{}>, 'EXPIRETIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
-    EXPIRETIME: string;
-    INSERTDATE: string;
-    UPDATEDATE: string;
+    EXPIRETIME: string | null;
+    INSERTDATE: string | null;
+    UPDATEDATE: string | null;
 };
 
 export type account_infos = Omit<Prisma.account_infosGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
-  INSERTDATE: string;
-  UPDATEDATE: string;
+  INSERTDATE: string | null;
+  UPDATEDATE: string | null;
 };
 
 export type promo_adds = Omit<Prisma.promo_addsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
-  INSERTDATE: string;
-  UPDATEDATE: string;
+  INSERTDATE: string | null;
+  UPDATEDATE: string | null;
 };
 
 export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
-  INSERTDATE: string;
-  UPDATEDATE: string;
+  INSERTDATE: string | null;
+  UPDATEDATE: string | null;
 };
 
 export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | role_capablities | null;

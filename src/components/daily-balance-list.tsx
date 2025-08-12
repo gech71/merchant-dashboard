@@ -37,7 +37,8 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
   } | null>({ key: 'BALANCEDATE', direction: 'descending' });
   const [currentPage, setCurrentPage] = React.useState(1);
 
-  const getMerchantName = (accountNumber: string) => {
+  const getMerchantName = (accountNumber: string | null) => {
+    if (!accountNumber) return 'N/A';
     const merchant = merchants.find(m => m.ACCOUNTNUMBER === accountNumber);
     return merchant ? merchant.FULLNAME : 'N/A';
   }
@@ -60,16 +61,16 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
     if (searchTerm) {
         const lowercasedTerm = searchTerm.toLowerCase();
         sortableItems = sortableItems.filter((balance) =>
-            balance.MERCHANTACCOUNT.toLowerCase().includes(lowercasedTerm) ||
+            (balance.MERCHANTACCOUNT && balance.MERCHANTACCOUNT.toLowerCase().includes(lowercasedTerm)) ||
             getMerchantName(balance.MERCHANTACCOUNT).toLowerCase().includes(lowercasedTerm) ||
-            balance.MERCHANTPHONE.toLowerCase().includes(lowercasedTerm)
+            (balance.MERCHANTPHONE && balance.MERCHANTPHONE.toLowerCase().includes(lowercasedTerm))
       );
     }
 
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        const valA = a[sortConfig.key];
-        const valB = b[sortConfig.key];
+        const valA = a[sortConfig.key] ?? '';
+        const valB = b[sortConfig.key] ?? '';
 
         if (valA < valB) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
@@ -164,7 +165,7 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
                     <TableCell>{balance.MERCHANTPHONE}</TableCell>
                     <TableCell className="text-right">{balance.DAILYBALANCE.toFixed(2)}</TableCell>
                     <TableCell className="text-right">{balance.DAILYTXNCOUNT}</TableCell>
-                    <TableCell>{new Date(balance.BALANCEDATE).toLocaleDateString()}</TableCell>
+                    <TableCell>{balance.BALANCEDATE ? new Date(balance.BALANCEDATE).toLocaleDateString() : 'N/A'}</TableCell>
                   </TableRow>
                 ))
               ) : (

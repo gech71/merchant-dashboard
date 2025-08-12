@@ -1,3 +1,4 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -34,23 +35,23 @@ export default async function RootLayout({
   const roleCapabilities = await prisma.role_capablities.findMany();
 
   const initialData = {
-    branches: branches.map(item => ({ ...item, INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
-    allowedCompanies: allowedCompanies.map(item => ({ ...item, INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
-    merchants: merchants.map(item => ({ ...item, LASTLOGINATTEMPT: item.LASTLOGINATTEMPT.toISOString(), UNLOCKEDTIME: item.UNLOCKEDTIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
+    branches: branches.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    allowedCompanies: allowedCompanies.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    merchants: merchants.map(item => ({ ...item, LASTLOGINATTEMPT: item.LASTLOGINATTEMPT?.toISOString() ?? null, UNLOCKEDTIME: item.UNLOCKEDTIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     branchUsers,
-    dailyBalances: dailyBalances.map(item => ({ ...item, BALANCEDATE: item.BALANCEDATE.toISOString(), INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
-    merchantTxns: merchantTxns.map(item => ({ ...item, T2TRANSACTIONDATE: item.T2TRANSACTIONDATE.toISOString(), INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
+    dailyBalances: dailyBalances.map(item => ({ ...item, BALANCEDATE: item.BALANCEDATE?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    merchantTxns: merchantTxns.map(item => ({ ...item, T2TRANSACTIONDATE: item.T2TRANSACTIONDATE?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     arifRequests: arifRequests.map(item => ({...item, DATESEND1: item.DATESEND1?.toISOString() ?? null, DATERECIVED1: item.DATERECIVED1?.toISOString() ?? null, DATESEND2: item.DATESEND2?.toISOString() ?? null, DATERECIVED2: item.DATERECIVED2?.toISOString() ?? null, DATESEND3: item.DATESEND3?.toISOString() ?? null, DATERECIVED3: item.DATERECIVED3?.toISOString() ?? null, WEBHOOKRECEIVEDDATE: item.WEBHOOKRECEIVEDDATE?.toISOString() ?? null })),
-    arifpayEndpoints: arifpayEndpoints.map(item => ({ ...item, INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
-    controllersConfigs: controllersConfigs.map(item => ({ ...item, INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
-    coreIntegrationSettings: coreIntegrationSettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
-    paystreamTxns: paystreamTxns.map(item => ({ ...item, INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
-    streamPaySettings: streamPaySettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
-    ussdPushSettings: ussdPushSettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
-    qrPayments: qrPayments.map(item => ({ ...item, EXPIRETIME: item.EXPIRETIME.toISOString(), INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
-    accountInfos: accountInfos.map(item => ({ ...item, INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
-    promoAdds: promoAdds.map(item => ({ ...item, INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
-    roleCapabilities: roleCapabilities.map(item => ({ ...item, INSERTDATE: item.INSERTDATE.toISOString(), UPDATEDATE: item.UPDATEDATE.toISOString() })),
+    arifpayEndpoints: arifpayEndpoints.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    controllersConfigs: controllersConfigs.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    coreIntegrationSettings: coreIntegrationSettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    paystreamTxns: paystreamTxns.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    streamPaySettings: streamPaySettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    ussdPushSettings: ussdPushSettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    qrPayments: qrPayments.map(item => ({ ...item, EXPIRETIME: item.EXPIRETIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    accountInfos: accountInfos.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    promoAdds: promoAdds.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    roleCapabilities: roleCapabilities.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
   }
 
   return (

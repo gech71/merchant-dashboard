@@ -38,7 +38,8 @@ export default function QrPaymentList({ qrPayments: initialQrPayments }: { qrPay
   } | null>({ key: 'EXPIRETIME', direction: 'descending' });
   const [currentPage, setCurrentPage] = React.useState(1);
   
-  const getSalerName = (phoneNumber: string) => {
+  const getSalerName = (phoneNumber: string | null) => {
+    if (!phoneNumber) return 'N/A';
     const merchant = merchants.find(m => m.PHONENUMBER === phoneNumber);
     return merchant ? merchant.FULLNAME : 'N/A';
   }
@@ -68,8 +69,8 @@ export default function QrPaymentList({ qrPayments: initialQrPayments }: { qrPay
 
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        const valA = a[sortConfig.key];
-        const valB = b[sortConfig.key];
+        const valA = a[sortConfig.key] ?? '';
+        const valB = b[sortConfig.key] ?? '';
         
         if (typeof valA === 'boolean' && typeof valB === 'boolean') {
           return sortConfig.direction === 'ascending' ? (valA === valB ? 0 : valA ? -1 : 1) : (valA === valB ? 0 : valA ? 1 : -1)
@@ -143,7 +144,7 @@ export default function QrPaymentList({ qrPayments: initialQrPayments }: { qrPay
                     <TableCell className="text-right">{payment.AMOUNT.toFixed(2)}</TableCell>
                     <TableCell className="font-mono text-xs">{payment.QRCODE}</TableCell>
                     <TableCell><Badge variant={payment.ISUSED ? 'default' : 'secondary'}>{payment.ISUSED ? 'Yes' : 'No'}</Badge></TableCell>
-                    <TableCell>{new Date(payment.EXPIRETIME).toLocaleString()}</TableCell>
+                    <TableCell>{payment.EXPIRETIME ? new Date(payment.EXPIRETIME).toLocaleString() : 'N/A'}</TableCell>
                   </TableRow>
                 ))
               ) : (

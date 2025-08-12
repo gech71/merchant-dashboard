@@ -55,7 +55,8 @@ export default function ArifRequestList({ arifRequests: initialArifRequests }: {
     setSortConfig({ key, direction });
   };
 
-  const getStatusVariant = (status: string) => {
+  const getStatusVariant = (status: string | null) => {
+    if (!status) return 'outline';
     switch (status.toLowerCase()) {
       case 'success':
         return 'default';
@@ -81,8 +82,8 @@ export default function ArifRequestList({ arifRequests: initialArifRequests }: {
 
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        const valA = a[sortConfig.key];
-        const valB = b[sortConfig.key];
+        const valA = a[sortConfig.key] ?? '';
+        const valB = b[sortConfig.key] ?? '';
 
         if (valA < valB) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
@@ -192,12 +193,12 @@ export default function ArifRequestList({ arifRequests: initialArifRequests }: {
                     <TableCell className="text-right">{req.AMOUNT.toFixed(2)}</TableCell>
                     <TableCell>{req.ARIFPAYTRANSACTIONID}</TableCell>
                     <TableCell>
-                        <Badge variant={getStatusVariant(req.ARIFPAYTRANSACTIONSTATUS)}>{req.ARIFPAYTRANSACTIONSTATUS}</Badge>
+                        <Badge variant={getStatusVariant(req.ARIFPAYTRANSACTIONSTATUS)}>{req.ARIFPAYTRANSACTIONSTATUS || 'N/A'}</Badge>
                     </TableCell>
                     <TableCell>
-                        <Badge variant={getStatusVariant(req.T24TRANSACTIONSTATUS)}>{req.T24TRANSACTIONSTATUS}</Badge>
+                        <Badge variant={getStatusVariant(req.T24TRANSACTIONSTATUS)}>{req.T24TRANSACTIONSTATUS || 'N/A'}</Badge>
                     </TableCell>
-                    <TableCell>{new Date(req.DATESEND1).toLocaleString()}</TableCell>
+                    <TableCell>{req.DATESEND1 ? new Date(req.DATESEND1).toLocaleString() : 'N/A'}</TableCell>
                   </TableRow>
                 ))
               ) : (

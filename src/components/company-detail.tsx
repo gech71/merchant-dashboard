@@ -2,14 +2,14 @@
 'use client';
 
 import * as React from 'react';
-import type { AllowedCompany, Merchant } from '@/types';
+import type { allowed_companies, Merchant_users } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import MerchantList from './merchant-list';
 
-export default function AllowedCompanyDetail({ allowedCompany, merchants }: { allowedCompany: AllowedCompany, merchants: Merchant[] }) {
+export default function AllowedCompanyDetail({ allowedCompany, merchants }: { allowedCompany: allowed_companies, merchants: Merchant_users[] }) {
     
-  const getStatusVariant = (status: AllowedCompany['STATUS']) => {
+  const getStatusVariant = (status: allowed_companies['STATUS']) => {
     switch (status) {
       case 'Active':
         return 'default';
@@ -48,11 +48,11 @@ export default function AllowedCompanyDetail({ allowedCompany, merchants }: { al
             </div>
              <div>
                 <p className="text-sm font-medium text-muted-foreground">INSERTDATE</p>
-                <p>{new Date(allowedCompany.INSERTDATE).toLocaleDateString()}</p>
+                <p>{allowedCompany.INSERTDATE ? new Date(allowedCompany.INSERTDATE).toLocaleDateString() : 'N/A'}</p>
             </div>
              <div>
                 <p className="text-sm font-medium text-muted-foreground">UPDATEDATE</p>
-                <p>{new Date(allowedCompany.UPDATEDATE).toLocaleDateString()}</p>
+                <p>{allowedCompany.UPDATEDATE ? new Date(allowedCompany.UPDATEDATE).toLocaleDateString() : 'N/A'}</p>
             </div>
              <div>
                 <p className="text-sm font-medium text-muted-foreground">INSERTUSER</p>
