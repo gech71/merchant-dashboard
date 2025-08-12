@@ -59,7 +59,7 @@ type DataContextType = {
   addBranchUser: (user: Omit<BranchUser, 'id' | 'status'>) => Promise<void>;
   updateBranchUser: (user: BranchUser) => Promise<void>;
   updateBranchStatus: (branchId: number, status: 'Approved' | 'Rejected') => void;
-  updateAllowedCompanyApproval: (companyId: string, isApproved: boolean) => void;
+  updateAllowedCompanyApproval: (companyId: string, isApproved: boolean) => Promise<void>;
   updateMerchantStatus: (merchantId: string, status: 'Active' | 'Disabled') => Promise<void>;
   updateBranchUserStatus: (userId: string, status: 'Active' | 'Inactive') => Promise<void>;
 };
@@ -176,16 +176,20 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     }
   };
   
-  const updateAllowedCompanyApproval = (companyId: string, isApproved: boolean) => {
-    setAllowedCompanies(prev => prev.map(c => c.Oid === companyId 
-        ? { 
-            ...c, 
+  const updateAllowedCompanyApproval = async (companyId: string, isApproved: boolean) => {
+    const response = await fetch(`/api/allowed_companies/${companyId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
             APPROVED: isApproved, 
-            STATUS: isApproved ? 'Active' : 'Inactive',
-            APPROVEUSER: isApproved ? currentUser?.name : null
-          } 
-        : c
-    ));
+            STATUS: isApproved ? 'Active' : 'Inactive'
+        }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update company approval status');
+    }
+    const updatedCompany = await response.json();
+    setAllowedCompanies(prev => prev.map(c => c.Oid === updatedCompany.Oid ? updatedCompany : c));
   };
 
   const updateMerchantStatus = async (merchantId: string, status: 'Active' | 'Disabled') => {

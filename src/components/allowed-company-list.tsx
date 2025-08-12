@@ -37,12 +37,14 @@ import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useDataContext } from '@/context/data-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 
 type SortableKeys = 'FIELDNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'APPROVEUSER' | 'APPROVED';
 const ITEMS_PER_PAGE = 15;
 
 export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowedCompanies: allowed_companies[], approvalView?: boolean }) {
   const { updateAllowedCompanyApproval, currentUser, branches, merchants, branchUsers } = useDataContext();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
@@ -55,8 +57,20 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
   const [currentPage, setCurrentPage] = React.useState(1);
   const [branchFilter, setBranchFilter] = React.useState('all');
 
-  const handleApproval = (companyId: string, isApproved: boolean) => {
-    updateAllowedCompanyApproval(companyId, isApproved);
+  const handleApproval = async (companyId: string, isApproved: boolean) => {
+    try {
+        await updateAllowedCompanyApproval(companyId, isApproved);
+        toast({
+            title: 'Approval Status Updated',
+            description: `The company has been ${isApproved ? 'approved' : 'rejected'}.`,
+        });
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Update Failed',
+            description: 'Could not update the approval status.',
+        });
+    }
   };
   
   const handleEdit = (company: allowed_companies) => {
@@ -372,5 +386,3 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     </Dialog>
     </>
   );
-
-    
