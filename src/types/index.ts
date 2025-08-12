@@ -1,14 +1,19 @@
 
-export type Company = {
-  id: string;
-  accountNumber: string;
-  fieldName: string;
-  branch: string;
-  approveUser?: string;
-  logoUrl: string;
-  hint: string;
-  approved: boolean;
-  status: 'Active' | 'Inactive' | 'Pending';
+
+export type AllowedCompany = {
+  Oid: string;
+  ID: string;
+  ACCOUNTNUMBER: string;
+  FIELDNAME: string;
+  APPROVEUSER?: string;
+  APPROVED: boolean;
+  STATUS: 'Active' | 'Inactive' | 'Pending';
+  INSERTDATE: string;
+  UPDATEDATE: string;
+  INSERTUSER: string;
+  UPDATEUSER: string;
+  OptimisticLockField: number;
+  GCRecord: number;
 };
 
 export type Branch = {
@@ -37,4 +42,4 @@ export type BranchUser = {
   status: 'Active' | 'Inactive' | 'Pending';
 };
 
-export type EditableItem = Company | Branch | Merchant | BranchUser | null;
+export type EditableItem = AllowedCompany | Branch | Merchant | BranchUser | null;

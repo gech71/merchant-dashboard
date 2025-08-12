@@ -19,35 +19,37 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useDataContext } from '@/context/data-context';
 
-const companyFormSchema = z.object({
-  fieldName: z.string().min(2, 'Field name must be at least 2 characters.'),
-  accountNumber: z.string().min(4, 'Account number must be at least 4 characters.'),
+const allowedCompanyFormSchema = z.object({
+  ID: z.string().min(1, 'ID is required'),
+  ACCOUNTNUMBER: z.string().min(4, 'Account number must be at least 4 characters.'),
+  FIELDNAME: z.string().min(2, 'Field name must be at least 2 characters.'),
 });
 
-type CompanyFormValues = z.infer<typeof companyFormSchema>;
+type AllowedCompanyFormValues = z.infer<typeof allowedCompanyFormSchema>;
 
 
-export function AddCompanyForm({ 
+export function AddAllowedCompanyForm({ 
   setOpen, 
 }: { 
   setOpen: (open: boolean) => void,
 }) {
   const { toast } = useToast();
-  const { addCompany } = useDataContext();
+  const { addAllowedCompany } = useDataContext();
 
-  const form = useForm<CompanyFormValues>({
-    resolver: zodResolver(companyFormSchema),
+  const form = useForm<AllowedCompanyFormValues>({
+    resolver: zodResolver(allowedCompanyFormSchema),
     defaultValues: {
-      fieldName: '',
-      accountNumber: '',
+      ID: '',
+      FIELDNAME: '',
+      ACCOUNTNUMBER: '',
     },
   });
 
-  function onSubmit(data: CompanyFormValues) {
-    addCompany(data);
+  function onSubmit(data: AllowedCompanyFormValues) {
+    addAllowedCompany(data);
     toast({
       title: 'Company Submitted for Approval',
-      description: `${data.fieldName} has been sent for verification.`,
+      description: `${data.FIELDNAME} has been sent for verification.`,
     });
     setOpen(false);
   }
@@ -57,10 +59,23 @@ export function AddCompanyForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="fieldName"
+          name="ID"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Field Name</FormLabel>
+              <FormLabel>ID</FormLabel>
+              <FormControl>
+                <Input placeholder="C006" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="FIELDNAME"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>FIELDNAME</FormLabel>
               <FormControl>
                 <Input placeholder="Innovate Inc." {...field} />
               </FormControl>
@@ -70,10 +85,10 @@ export function AddCompanyForm({
         />
         <FormField
           control={form.control}
-          name="accountNumber"
+          name="ACCOUNTNUMBER"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Account Number</FormLabel>
+              <FormLabel>ACCOUNTNUMBER</FormLabel>
               <FormControl>
                 <Input placeholder="ACC12345" {...field} />
               </FormControl>

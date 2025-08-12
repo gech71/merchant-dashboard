@@ -1,9 +1,9 @@
 
 'use client';
-import CompanyList from '@/components/company-list';
+import AllowedCompanyList from '@/components/allowed-company-list';
 import { useDataContext } from '@/context/data-context';
 
 export default function CompaniesPage() {
-  const { companies } = useDataContext();
-  return <CompanyList companies={companies} />;
+  const { allowedCompanies } = useDataContext();
+  return <AllowedCompanyList allowedCompanies={allowedCompanies} />;
 }

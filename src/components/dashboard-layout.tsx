@@ -43,14 +43,14 @@ import { useDataContext } from '@/context/data-context';
 
 const NAV_ITEMS = [
   { href: '/dashboard', icon: LayoutGrid, label: 'Dashboard' },
-  { href: '/dashboard/companies', icon: Building, label: 'Companies' },
+  { href: '/dashboard/allowed_companies', icon: Building, label: 'Allowed Companies' },
   { href: '/dashboard/branches', icon: Home, label: 'Branches' },
   { href: '/dashboard/branch-users', icon: UserCog, label: 'Branch Users' },
   { href: '/dashboard/merchants', icon: Briefcase, label: 'Merchant Users' },
 ];
 
 const APPROVAL_NAV_ITEMS = [
-  { href: '/dashboard/approvals/companies', icon: Building, label: 'Companies' },
+  { href: '/dashboard/approvals/allowed_companies', icon: Building, label: 'Allowed Companies' },
 ]
 
 function UserProfile() {

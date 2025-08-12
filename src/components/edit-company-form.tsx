@@ -17,47 +17,44 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import type { Company } from '@/types';
+import type { AllowedCompany } from '@/types';
 import { useDataContext } from '@/context/data-context';
 
-const companyFormSchema = z.object({
-  fieldName: z.string().min(2, 'Field name must be at least 2 characters.'),
-  accountNumber: z.string().min(4, 'Account number must be at least 4 characters.'),
-  branch: z.string({ required_error: 'Please select a branch.' }),
+const allowedCompanyFormSchema = z.object({
+  FIELDNAME: z.string().min(2, 'Field name must be at least 2 characters.'),
+  ACCOUNTNUMBER: z.string().min(4, 'Account number must be at least 4 characters.'),
 });
 
-type CompanyFormValues = z.infer<typeof companyFormSchema>;
+type AllowedCompanyFormValues = z.infer<typeof allowedCompanyFormSchema>;
 
 
-export function EditCompanyForm({ 
-  company,
+export function EditAllowedCompanyForm({ 
+  allowedCompany,
   setOpen, 
 }: { 
-  company: Company,
+  allowedCompany: AllowedCompany,
   setOpen: (open: boolean) => void,
 }) {
   const { toast } = useToast();
-  const { branches, updateCompany, currentUser } = useDataContext();
+  const { updateAllowedCompany } = useDataContext();
 
-  const form = useForm<CompanyFormValues>({
-    resolver: zodResolver(companyFormSchema),
+  const form = useForm<AllowedCompanyFormValues>({
+    resolver: zodResolver(allowedCompanyFormSchema),
     defaultValues: {
-      fieldName: company.fieldName,
-      accountNumber: company.accountNumber,
-      branch: company.branch,
+      FIELDNAME: allowedCompany.FIELDNAME,
+      ACCOUNTNUMBER: allowedCompany.ACCOUNTNUMBER,
     },
   });
 
-  function onSubmit(data: CompanyFormValues) {
-    const updatedCompany: Company = {
-      ...company,
+  function onSubmit(data: AllowedCompanyFormValues) {
+    const updatedCompany: AllowedCompany = {
+      ...allowedCompany,
       ...data,
     };
-    updateCompany(updatedCompany);
+    updateAllowedCompany(updatedCompany);
     toast({
       title: 'Company Updated',
-      description: `${data.fieldName} has been successfully updated.`,
+      description: `${data.FIELDNAME} has been successfully updated.`,
     });
     setOpen(false);
   }
@@ -67,10 +64,10 @@ export function EditCompanyForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="fieldName"
+          name="FIELDNAME"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Field Name</FormLabel>
+              <FormLabel>FIELDNAME</FormLabel>
               <FormControl>
                 <Input placeholder="Innovate Inc." {...field} />
               </FormControl>
@@ -80,35 +77,13 @@ export function EditCompanyForm({
         />
         <FormField
           control={form.control}
-          name="accountNumber"
+          name="ACCOUNTNUMBER"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Account Number</FormLabel>
+              <FormLabel>ACCOUNTNUMBER</FormLabel>
               <FormControl>
                 <Input placeholder="ACC12345" {...field} />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="branch"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Branch</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a branch" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {branches.map(branch => (
-                     <SelectItem key={branch.id} value={branch.name}>{branch.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               <FormMessage />
             </FormItem>
           )}

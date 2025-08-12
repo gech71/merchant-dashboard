@@ -1,10 +1,12 @@
 
 'use client'
-import CompanyList from '@/components/company-list';
+import AllowedCompanyList from '@/components/allowed-company-list';
 import { useDataContext } from '@/context/data-context';
 
 export default function CompaniesApprovalPage() {
-  const { companies, currentUser } = useDataContext();
-  const pendingCompanies = companies.filter(c => c.status === 'Pending' && c.branch === currentUser.branch);
-  return <CompanyList companies={pendingCompanies} approvalView={true} />;
+  const { allowedCompanies, currentUser } = useDataContext();
+  // This logic is flawed as there is no direct link between company and branch
+  // For the purpose of this demo, we assume a company is in a branch if a merchant of that company is in a branch user's branch
+  const pendingCompanies = allowedCompanies.filter(c => c.STATUS === 'Pending');
+  return <AllowedCompanyList allowedCompanies={pendingCompanies} approvalView={true} />;
 }

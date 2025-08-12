@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Company, EditableItem } from '@/types';
+import type { AllowedCompany, EditableItem } from '@/types';
 import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 
@@ -31,24 +31,24 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AddCompanyForm } from './add-company-form';
-import { EditCompanyForm } from './edit-company-form';
+import { AddAllowedCompanyForm } from './add-allowed-company-form';
+import { EditAllowedCompanyForm } from './edit-allowed-company-form';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { useDataContext } from '@/context/data-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
-type SortableKeys = 'fieldName' | 'accountNumber' | 'branch' | 'status' | 'approveUser' | 'approved';
+type SortableKeys = 'FIELDNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'APPROVEUSER' | 'APPROVED';
 const ITEMS_PER_PAGE = 15;
 
-export default function CompanyList({ companies: initialCompanies, approvalView = false }: { companies: Company[], approvalView?: boolean }) {
-  const { updateCompanyApproval, currentUser, branches } = useDataContext();
-  const [companies, setCompanies] = React.useState(initialCompanies);
+export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowedCompanies: AllowedCompany[], approvalView?: boolean }) {
+  const { updateAllowedCompanyApproval, currentUser, branches } = useDataContext();
+  const [allowedCompanies, setAllowedCompanies] = React.useState(initialCompanies);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
-  } | null>({ key: 'fieldName', direction: 'ascending' });
+  } | null>({ key: 'FIELDNAME', direction: 'ascending' });
   const [isAddCompanyOpen, setIsAddCompanyOpen] = React.useState(false);
   const [isEditCompanyOpen, setIsEditCompanyOpen] = React.useState(false);
   const [selectedCompany, setSelectedCompany] = React.useState<EditableItem>(null);
@@ -57,14 +57,14 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
   const [branchFilter, setBranchFilter] = React.useState('all');
 
   React.useEffect(() => {
-    setCompanies(initialCompanies);
+    setAllowedCompanies(initialCompanies);
   }, [initialCompanies]);
   
   const handleApproval = (companyId: string, isApproved: boolean) => {
-    updateCompanyApproval(companyId, isApproved);
+    updateAllowedCompanyApproval(companyId, isApproved);
   };
   
-  const handleEdit = (company: Company) => {
+  const handleEdit = (company: AllowedCompany) => {
     setSelectedCompany(company);
     setIsEditCompanyOpen(true);
   };
@@ -83,26 +83,20 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
   };
 
   const filteredAndSortedCompanies = React.useMemo(() => {
-    let sortableItems = [...companies];
+    let sortableItems = [...allowedCompanies];
 
     if (approvalView) {
-      sortableItems = sortableItems.filter(c => c.status === 'Pending');
+      sortableItems = sortableItems.filter(c => c.STATUS === 'Pending');
     }
     else if (activeTab !== 'all') {
       sortableItems = sortableItems.filter(
-        (company) => company.status.toLowerCase() === activeTab
+        (company) => company.STATUS.toLowerCase() === activeTab
       );
-    }
-
-    if (branchFilter !== 'all') {
-        sortableItems = sortableItems.filter(
-          (company) => company.branch === branchFilter
-        );
     }
     
     if (searchTerm) {
       sortableItems = sortableItems.filter((company) =>
-        company.fieldName.toLowerCase().includes(searchTerm.toLowerCase())
+        company.FIELDNAME.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -124,7 +118,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
     }
 
     return sortableItems;
-  }, [companies, searchTerm, sortConfig, activeTab, approvalView, branchFilter]);
+  }, [allowedCompanies, searchTerm, sortConfig, activeTab, approvalView, branchFilter]);
   
   const paginatedCompanies = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -143,7 +137,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
     );
   };
   
-  const getStatusVariant = (status: Company['status']) => {
+  const getStatusVariant = (status: AllowedCompany['STATUS']) => {
     switch (status) {
       case 'Active':
         return 'default';
@@ -178,19 +172,6 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
               className="h-8 w-[150px] lg:w-[250px]"
             />
             {!approvalView && (
-                <Select value={branchFilter} onValueChange={setBranchFilter}>
-                    <SelectTrigger className="h-8 w-[150px] lg:w-[180px]">
-                        <SelectValue placeholder="Filter by branch" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Branches</SelectItem>
-                        {branches.map(branch => (
-                            <SelectItem key={branch.id} value={branch.name}>{branch.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            )}
-            {!approvalView && (
               <DialogTrigger asChild>
                 <Button size="sm" className="h-8 gap-1">
                   <PlusCircle className="h-3.5 w-3.5" />
@@ -205,9 +186,9 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
         <TabsContent value={approvalView ? 'pending' : activeTab}>
           <Card>
             <CardHeader>
-              <CardTitle>{approvalView ? 'Company Approvals' : 'Companies'}</CardTitle>
+              <CardTitle>{approvalView ? 'Allowed Company Approvals' : 'Allowed Companies'}</CardTitle>
               <CardDescription>
-                {approvalView ? `Review and approve pending companies for ${currentUser.branch}.` : 'A list of all companies.'}
+                {approvalView ? `Review and approve pending companies.` : 'A list of all allowed companies.'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -218,61 +199,51 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                       <TableHead>
                         <Button
                           variant="ghost"
-                          onClick={() => requestSort('fieldName')}
+                          onClick={() => requestSort('FIELDNAME')}
                           className="px-2"
                         >
-                          Company
-                          {getSortIndicator('fieldName')}
+                          FIELDNAME
+                          {getSortIndicator('FIELDNAME')}
                         </Button>
                       </TableHead>
                       <TableHead>
                         <Button
                           variant="ghost"
-                          onClick={() => requestSort('accountNumber')}
+                          onClick={() => requestSort('ACCOUNTNUMBER')}
                           className="px-2"
                         >
-                          Account Number
-                          {getSortIndicator('accountNumber')}
+                          ACCOUNTNUMBER
+                          {getSortIndicator('ACCOUNTNUMBER')}
                         </Button>
                       </TableHead>
                       <TableHead>
                         <Button
                           variant="ghost"
-                          onClick={() => requestSort('branch')}
+                          onClick={() => requestSort('APPROVED')}
                           className="px-2"
                         >
-                          Branch
-                          {getSortIndicator('branch')}
-                        </Button>
-                      </TableHead>
-                      <TableHead>
-                        <Button
-                          variant="ghost"
-                          onClick={() => requestSort('approved')}
-                          className="px-2"
-                        >
-                          Approved
-                          {getSortIndicator('approved')}
+                          APPROVED
+                          {getSortIndicator('APPROVED')}
                         </Button>
                       </TableHead>
                        <TableHead>
                         <Button
                           variant="ghost"
-                          onClick={() => requestSort('status')}
+                          onClick={() => requestSort('STATUS')}
                           className="px-2"
                         >
-                          Status
-                          {getSortIndicator('status')}
+                          STATUS
+                          {getSortIndicator('STATUS')}
                         </Button>
                       </TableHead>
                       <TableHead>
                         <Button
                           variant="ghost"
-                          onClick={() => requestSort('approveUser')}
+                          onClick={() => requestSort('APPROVEUSER')}
                           className="px-2"
                         >
-                          Approved By
-                          {getSortIndicator('approveUser')}
+                          APPROVEUSER
+                          {getSortIndicator('APPROVEUSER')}
                         </Button>
                       </TableHead>
                        <TableHead>
@@ -283,19 +254,18 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                   <TableBody>
                     {paginatedCompanies.length > 0 ? (
                       paginatedCompanies.map((company) => (
-                        <TableRow key={company.id}>
+                        <TableRow key={company.Oid}>
                           <TableCell>
-                            <Link href={`/dashboard/companies/${company.id}`} className="font-medium hover:underline">{company.fieldName}</Link>
+                            <Link href={`/dashboard/allowed_companies/${company.Oid}`} className="font-medium hover:underline">{company.FIELDNAME}</Link>
                           </TableCell>
-                          <TableCell>{company.accountNumber}</TableCell>
-                          <TableCell>{company.branch}</TableCell>
+                          <TableCell>{company.ACCOUNTNUMBER}</TableCell>
                            <TableCell>
-                             <Badge variant={company.approved ? 'default' : 'secondary'}>{company.approved ? 'Yes' : 'No'}</Badge>
+                             <Badge variant={company.APPROVED ? 'default' : 'secondary'}>{company.APPROVED ? 'Yes' : 'No'}</Badge>
                           </TableCell>
                           <TableCell>
-                             <Badge variant={getStatusVariant(company.status)}>{company.status}</Badge>
+                             <Badge variant={getStatusVariant(company.STATUS)}>{company.STATUS}</Badge>
                           </TableCell>
-                          <TableCell>{company.approveUser || 'N/A'}</TableCell>
+                          <TableCell>{company.APPROVEUSER || 'N/A'}</TableCell>
                            <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -307,13 +277,13 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 {!approvalView && <DropdownMenuItem onClick={() => handleEdit(company)}>Edit</DropdownMenuItem>}
-                                {company.status === 'Pending' && (
+                                {company.STATUS === 'Pending' && (
                                   <>
-                                    <DropdownMenuItem onClick={() => handleApproval(company.id, true)}>
+                                    <DropdownMenuItem onClick={() => handleApproval(company.Oid, true)}>
                                       <CheckCircle className="mr-2 h-4 w-4" />
                                       Approve
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleApproval(company.id, false)}>
+                                    <DropdownMenuItem onClick={() => handleApproval(company.Oid, false)}>
                                       <XCircle className="mr-2 h-4 w-4" />
                                       Reject
                                     </DropdownMenuItem>
@@ -368,7 +338,7 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
         <DialogHeader>
           <DialogTitle>Add New Company</DialogTitle>
         </DialogHeader>
-        <AddCompanyForm setOpen={setIsAddCompanyOpen} />
+        <AddAllowedCompanyForm setOpen={setIsAddCompanyOpen} />
       </DialogContent>
     </Dialog>
     <Dialog open={isEditCompanyOpen} onOpenChange={setIsEditCompanyOpen}>
@@ -376,9 +346,9 @@ export default function CompanyList({ companies: initialCompanies, approvalView 
             <DialogHeader>
                 <DialogTitle>Edit Company</DialogTitle>
             </DialogHeader>
-            {selectedCompany && selectedCompany.hasOwnProperty('fieldName') && (
-                <EditCompanyForm 
-                    company={selectedCompany as Company} 
+            {selectedCompany && selectedCompany.hasOwnProperty('FIELDNAME') && (
+                <EditAllowedCompanyForm
+                    allowedCompany={selectedCompany as AllowedCompany} 
                     setOpen={setIsEditCompanyOpen} 
                 />
             )}

@@ -43,14 +43,14 @@ const CustomPieChart = ({ title, description, data }: { title: string, descripti
 )
 
 export default function DashboardPage() {
-  const { companies, branches, merchants, branchUsers } = useDataContext();
+  const { allowedCompanies, branches, merchants, branchUsers } = useDataContext();
 
-  const totalCompanies = companies.length;
+  const totalCompanies = allowedCompanies.length;
   const totalBranches = branches.length;
   const totalMerchantUsers = merchants.length;
   const totalBranchUsers = branchUsers.length;
 
-  const pendingCompanies = companies.filter(c => c.status === 'Pending').length;
+  const pendingCompanies = allowedCompanies.filter(c => c.STATUS === 'Pending').length;
   const pendingBranches = branches.filter(b => b.status === 'Pending').length;
   const pendingMerchants = merchants.filter(m => m.status === 'Pending').length;
   const pendingBranchUsers = branchUsers.filter(u => u.status === 'Pending').length;
@@ -58,13 +58,13 @@ export default function DashboardPage() {
 
   const companiesByBranch = branches.map(branch => ({
     name: branch.name,
-    companies: companies.filter(c => c.branch === branch.name).length,
+    companies: allowedCompanies.filter(c => merchants.some(m => m.company === c.FIELDNAME && m.role === 'Admin' && branchUsers.some(bu => bu.branch === branch.name))).length,
   }));
 
   const companyStatusData = [
-    { name: 'Active', value: companies.filter(c => c.status === 'Active').length },
+    { name: 'Active', value: allowedCompanies.filter(c => c.STATUS === 'Active').length },
     { name: 'Pending', value: pendingCompanies },
-    { name: 'Inactive', value: companies.filter(c => c.status === 'Inactive').length },
+    { name: 'Inactive', value: allowedCompanies.filter(c => c.STATUS === 'Inactive').length },
   ];
   
   const branchStatusData = [

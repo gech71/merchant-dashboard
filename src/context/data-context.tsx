@@ -1,8 +1,9 @@
 
+
 'use client';
 
 import * as React from 'react';
-import type { Branch, Company, Merchant, BranchUser } from '@/types';
+import type { Branch, AllowedCompany, Merchant, BranchUser } from '@/types';
 
 // Mock Data
 const MOCK_BRANCHES: Branch[] = [
@@ -13,17 +14,12 @@ const MOCK_BRANCHES: Branch[] = [
   { id: '5', name: 'South Branch', code: 'SB005', address: '212 Birch Ln, Anytown, USA', contact: '555-7890', status: 'Rejected' },
 ];
 
-const MOCK_COMPANIES: Company[] = [
-  { id: '1', accountNumber: 'ACC001', fieldName: 'Innovate Inc.', branch: 'Downtown Branch', logoUrl: 'https://placehold.co/40x40.png', hint: 'logo tech', approved: true, status: 'Active', approveUser: 'admin' },
-  { id: '2', accountNumber: 'ACC002', fieldName: 'Apex Solutions', branch: 'Uptown Branch', logoUrl: 'https://placehold.co/40x40.png', hint: 'logo business', approved: true, status: 'Active', approveUser: 'admin' },
-  { id: '3', accountNumber: 'ACC003', fieldName: 'Quantum Corp', branch: 'Westside Branch', logoUrl: 'https://placehold.co/40x40.png', hint: 'logo modern', approved: false, status: 'Pending' },
-  { id: '4', accountNumber: 'ACC004', fieldName: 'Synergy Systems', branch: 'Downtown Branch', logoUrl: 'https://placehold.co/40x40.png', hint: 'logo design', approved: true, status: 'Active', approveUser: 'admin' },
-  { id: '5', accountNumber: 'ACC005', fieldName: 'Pioneer Ltd.', branch: 'Eastside Branch', logoUrl: 'https://placehold.co/40x40.png', hint: 'logo corporate', approved: false, status: 'Inactive' },
-  { id: '6', accountNumber: 'ACC006', fieldName: 'Zenith Ventures', branch: 'South Branch', logoUrl: 'https://placehold.co/40x40.png', hint: 'logo abstract', approved: true, status: 'Active', approveUser: 'admin' },
-  { id: '7', accountNumber: 'ACC007', fieldName: 'Starlight Co.', branch: 'Uptown Branch', logoUrl: 'https://placehold.co/40x40.png', hint: 'logo geometric', approved: false, status: 'Pending' },
-  { id: '8', accountNumber: 'ACC008', fieldName: 'Momentum', branch: 'Westside Branch', logoUrl: 'https://placehold.co/40x40.png', hint: 'logo minimal', approved: true, status: 'Active', approveUser: 'admin' },
-  { id: '9', accountNumber: 'ACC009', fieldName: 'Nexus Group', branch: 'Downtown Branch', logoUrl: 'https://placehold.co/40x40.png', hint: 'logo circle', approved: true, status: 'Inactive', approveUser: 'admin' },
-  { id: '10', accountNumber: 'ACC010', fieldName: 'Horizon Dynamics', branch: 'Eastside Branch', logoUrl: 'https://placehold.co/40x40.png', hint: 'logo arrow', approved: true, status: 'Active', approveUser: 'admin' },
+const MOCK_ALLOWED_COMPANIES: AllowedCompany[] = [
+  { Oid: '1', ID: 'C001', ACCOUNTNUMBER: 'ACC001', FIELDNAME: 'Innovate Inc.', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-01-15', UPDATEDATE: '2023-01-15', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
+  { Oid: '2', ID: 'C002', ACCOUNTNUMBER: 'ACC002', FIELDNAME: 'Apex Solutions', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-02-20', UPDATEDATE: '2023-02-20', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
+  { Oid: '3', ID: 'C003', ACCOUNTNUMBER: 'ACC003', FIELDNAME: 'Quantum Corp', APPROVED: false, STATUS: 'Pending', INSERTDATE: '2023-03-10', UPDATEDATE: '2023-03-10', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
+  { Oid: '4', ID: 'C004', ACCOUNTNUMBER: 'ACC004', FIELDNAME: 'Synergy Systems', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-04-05', UPDATEDATE: '2023-04-05', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
+  { Oid: '5', ID: 'C005', ACCOUNTNUMBER: 'ACC005', FIELDNAME: 'Pioneer Ltd.', APPROVEUSER: 'admin', APPROVED: false, STATUS: 'Inactive', INSERTDATE: '2023-05-12', UPDATEDATE: '2023-05-12', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
 ];
 
 const MOCK_MERCHANTS: Merchant[] = [
@@ -49,19 +45,19 @@ const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
 
 type DataContextType = {
   branches: Branch[];
-  companies: Company[];
+  allowedCompanies: AllowedCompany[];
   merchants: Merchant[];
   branchUsers: BranchUser[];
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
-  addCompany: (company: Omit<Company, 'branch'>) => void;
-  updateCompany: (company: Company) => void;
+  addAllowedCompany: (company: Omit<AllowedCompany, 'Oid' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => void;
+  updateAllowedCompany: (company: AllowedCompany) => void;
   updateMerchant: (merchant: Merchant) => void;
   addBranchUser: (user: BranchUser) => void;
   updateBranchUser: (user: BranchUser) => void;
   updateBranchStatus: (branchId: string, status: 'Approved' | 'Rejected') => void;
-  updateCompanyApproval: (companyId: string, isApproved: boolean) => void;
+  updateAllowedCompanyApproval: (companyId: string, isApproved: boolean) => void;
   updateMerchantStatus: (merchantId: string, status: 'Active' | 'Disabled') => void;
   updateBranchUserStatus: (userId: string, status: 'Active' | 'Inactive') => void;
 };
@@ -70,7 +66,7 @@ const DataContext = React.createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
   const [branches, setBranches] = React.useState<Branch[]>(MOCK_BRANCHES);
-  const [companies, setCompanies] = React.useState<Company[]>(MOCK_COMPANIES);
+  const [allowedCompanies, setAllowedCompanies] = React.useState<AllowedCompany[]>(MOCK_ALLOWED_COMPANIES);
   const [merchants, setMerchants] = React.useState<Merchant[]>(MOCK_MERCHANTS);
   const [branchUsers, setBranchUsers] = React.useState<BranchUser[]>(MOCK_BRANCH_USERS);
   const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
@@ -80,20 +76,24 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setBranches(prev => prev.map(b => b.id === updatedBranch.id ? updatedBranch : b));
   };
 
-  const addCompany = (company: Omit<Company, 'branch' | 'id' | 'approved' | 'status' | 'logoUrl' | 'hint' >) => {
-    const newCompany: Company = {
-        id: new Date().toISOString(),
+  const addAllowedCompany = (company: Omit<AllowedCompany, 'Oid' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => {
+    const now = new Date().toISOString();
+    const newCompany: AllowedCompany = {
         ...company,
-        branch: currentUser.branch,
-        approved: false,
-        status: 'Pending',
-        logoUrl: 'https://placehold.co/40x40.png',
-        hint: 'logo new'
+        Oid: new Date().toISOString(),
+        APPROVED: false,
+        STATUS: 'Pending',
+        INSERTDATE: now,
+        UPDATEDATE: now,
+        INSERTUSER: currentUser.name,
+        UPDATEUSER: currentUser.name,
+        OptimisticLockField: 0,
+        GCRecord: 0,
     };
-    setCompanies(prev => [...prev, newCompany]);
+    setAllowedCompanies(prev => [...prev, newCompany]);
   };
-  const updateCompany = (updatedCompany: Company) => {
-    setCompanies(prev => prev.map(c => c.id === updatedCompany.id ? updatedCompany : c));
+  const updateAllowedCompany = (updatedCompany: AllowedCompany) => {
+    setAllowedCompanies(prev => prev.map(c => c.Oid === updatedCompany.Oid ? {...updatedCompany, UPDATEDATE: new Date().toISOString(), UPDATEUSER: currentUser.name} : c));
   };
   
   const updateMerchant = (updatedMerchant: Merchant) => {
@@ -109,13 +109,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setBranches(prev => prev.map(b => b.id === branchId ? { ...b, status } : b));
   };
   
-  const updateCompanyApproval = (companyId: string, isApproved: boolean) => {
-    setCompanies(prev => prev.map(c => c.id === companyId 
+  const updateAllowedCompanyApproval = (companyId: string, isApproved: boolean) => {
+    setAllowedCompanies(prev => prev.map(c => c.Oid === companyId 
         ? { 
             ...c, 
-            approved: isApproved, 
-            status: isApproved ? 'Active' : 'Inactive',
-            approveUser: isApproved ? currentUser.name : undefined 
+            APPROVED: isApproved, 
+            STATUS: isApproved ? 'Active' : 'Inactive',
+            APPROVEUSER: isApproved ? currentUser.name : undefined 
           } 
         : c
     ));
@@ -131,19 +131,19 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   const value = {
     branches,
-    companies,
+    allowedCompanies,
     merchants,
     branchUsers,
     currentUser,
     addBranch,
     updateBranch,
-    addCompany,
-    updateCompany,
+    addAllowedCompany,
+    updateAllowedCompany,
     updateMerchant,
     addBranchUser,
     updateBranchUser,
     updateBranchStatus,
-    updateCompanyApproval,
+    updateAllowedCompanyApproval,
     updateMerchantStatus,
     updateBranchUserStatus,
   };
