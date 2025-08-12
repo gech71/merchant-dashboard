@@ -26,7 +26,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useDataContext } from '@/context/data-context';
 
-type SortableKeys = 'MERCHANTACCOUNT' | 'AMOUNT' | 'DATESEND1' | 'ARIFPAYTRANSACTIONSTATUS' | 'T24TRANSACTIONSTATUS';
+type SortableKeys = 'MERCHANTACCOUNT' | 'AMOUNT' | 'DATESEND1' | 'ARIFPAYTRANSACTIONSTATUS' | 'T24TRANSACTIONSTATUS' | 'DEBITACCOUNT' | 'CREDITACCOUNT';
 const ITEMS_PER_PAGE = 15;
 
 export default function ArifRequestList({ arifRequests: initialArifRequests }: { arifRequests: arif_requests[] }) {
@@ -142,6 +142,18 @@ export default function ArifRequestList({ arifRequests: initialArifRequests }: {
                         {getSortIndicator('MERCHANTACCOUNT')}
                     </Button>
                 </TableHead>
+                 <TableHead>
+                    <Button variant="ghost" onClick={() => requestSort('DEBITACCOUNT')} className="px-2">
+                        DEBITACCOUNT
+                        {getSortIndicator('DEBITACCOUNT')}
+                    </Button>
+                </TableHead>
+                 <TableHead>
+                    <Button variant="ghost" onClick={() => requestSort('CREDITACCOUNT')} className="px-2">
+                        CREDITACCOUNT
+                        {getSortIndicator('CREDITACCOUNT')}
+                    </Button>
+                </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">
                     AMOUNT
@@ -175,6 +187,8 @@ export default function ArifRequestList({ arifRequests: initialArifRequests }: {
                   <TableRow key={req.NONCEID}>
                     <TableCell className="font-medium">{getMerchantName(req.MERCHANTACCOUNT)}</TableCell>
                     <TableCell>{req.MERCHANTACCOUNT}</TableCell>
+                    <TableCell>{req.DEBITACCOUNT}</TableCell>
+                    <TableCell>{req.CREDITACCOUNT}</TableCell>
                     <TableCell className="text-right">{req.AMOUNT.toFixed(2)}</TableCell>
                     <TableCell>{req.ARIFPAYTRANSACTIONID}</TableCell>
                     <TableCell>
@@ -188,7 +202,7 @@ export default function ArifRequestList({ arifRequests: initialArifRequests }: {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">
+                  <TableCell colSpan={9} className="h-24 text-center">
                     No requests found.
                   </TableCell>
                 </TableRow>
