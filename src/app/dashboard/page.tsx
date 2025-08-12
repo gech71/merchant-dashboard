@@ -5,7 +5,7 @@ import * as React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useDataContext } from '@/context/data-context';
-import { Building, Home, Users, CheckSquare, Briefcase, UserCog } from 'lucide-react';
+import { Building, Home, Users, CheckSquare, Briefcase, UserCog, DollarSign, Activity } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
 const COLORS = {
@@ -15,12 +15,15 @@ const COLORS = {
   rejected: 'hsl(var(--chart-4))',
   disabled: 'hsl(var(--chart-5))',
   approved: 'hsl(var(--chart-1))',
+  completed: 'hsl(var(--chart-1))',
+  failed: 'hsl(var(--chart-4))',
 };
 
 const pieColors = [COLORS.active, COLORS.pending, COLORS.inactive, COLORS.rejected, COLORS.disabled];
+const txnPieColors = [COLORS.completed, COLORS.pending, COLORS.failed];
 
 
-const CustomPieChart = ({ title, description, data }: { title: string, description: string, data: {name: string, value: number}[] }) => (
+const CustomPieChart = ({ title, description, data, colors }: { title: string, description: string, data: {name: string, value: number}[], colors: string[] }) => (
     <Card>
         <CardHeader>
             <CardTitle>{title}</CardTitle>
@@ -32,7 +35,7 @@ const CustomPieChart = ({ title, description, data }: { title: string, descripti
                     <Tooltip content={<ChartTooltipContent nameKey="name" />} />
                     <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
                         {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
+                            <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                         ))}
                     </Pie>
                     <Legend />
@@ -43,7 +46,7 @@ const CustomPieChart = ({ title, description, data }: { title: string, descripti
 )
 
 export default function DashboardPage() {
-  const { allowedCompanies, branches, merchants, branchUsers } = useDataContext();
+  const { allowedCompanies, branches, merchants, branchUsers, merchantTxns } = useDataContext();
 
   const totalCompanies = allowedCompanies.length;
   const totalBranches = branches.length;
@@ -55,6 +58,11 @@ export default function DashboardPage() {
   const pendingMerchants = merchants.filter(m => m.STATUS === 'Pending').length;
   const pendingBranchUsers = branchUsers.filter(u => u.status === 'Pending').length;
   const totalPending = pendingCompanies + pendingBranches + pendingMerchants + pendingBranchUsers;
+
+  const successfulTxns = merchantTxns.filter(t => t.STATUS === 'Completed');
+  const totalTxnVolume = successfulTxns.reduce((acc, txn) => acc + txn.AMOUNT, 0);
+  const totalTxnCount = successfulTxns.length;
+
 
   const companiesByBranch = branches.map(branch => ({
     name: branch.name,
@@ -84,6 +92,12 @@ export default function DashboardPage() {
     { name: 'Pending', value: pendingBranchUsers },
     { name: 'Inactive', value: branchUsers.filter(u => u.status === 'Inactive').length },
   ];
+  
+  const transactionStatusData = [
+    { name: 'Completed', value: merchantTxns.filter(t => t.STATUS === 'Completed').length },
+    { name: 'Pending', value: merchantTxns.filter(t => t.STATUS === 'Pending').length },
+    { name: 'Failed', value: merchantTxns.filter(t => t.STATUS === 'Failed').length },
+  ];
 
 
   return (
@@ -92,7 +106,7 @@ export default function DashboardPage() {
           <CardTitle className="text-3xl">Dashboard</CardTitle>
           <CardDescription>A comprehensive summary of your merchant ecosystem.</CardDescription>
         </CardHeader>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Companies</CardTitle>
@@ -123,6 +137,24 @@ export default function DashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Txn Volume</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalTxnVolume.toLocaleString('en-US', {style: 'currency', currency: 'USD'})}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalTxnCount}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending Approvals</CardTitle>
             <CheckSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -135,8 +167,8 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-         <Card>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Companies per Branch</CardTitle>
             <CardDescription>Number of companies registered under each branch.</CardDescription>
@@ -156,14 +188,16 @@ export default function DashboardPage() {
             </ChartContainer>
           </CardContent>
         </Card>
-        <CustomPieChart title="Company Status" description="Distribution of all registered companies." data={companyStatusData} />
+        <CustomPieChart title="Company Status" description="Distribution of all registered companies." data={companyStatusData} colors={pieColors} />
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <CustomPieChart title="Branch Status" description="Distribution of all bank branches." data={branchStatusData} />
-        <CustomPieChart title="Merchant User Status" description="Distribution of all merchant users." data={merchantStatusData} />
-        <CustomPieChart title="Branch User Status" description="Distribution of all branch users." data={branchUserStatusData} />
+        <CustomPieChart title="Transaction Status" description="Distribution of all merchant transactions." data={transactionStatusData} colors={txnPieColors} />
+        <CustomPieChart title="Merchant User Status" description="Distribution of all merchant users." data={merchantStatusData} colors={pieColors} />
+        <CustomPieChart title="Branch User Status" description="Distribution of all branch users." data={branchUserStatusData} colors={pieColors} />
       </div>
 
     </div>
   );
 }
+
+    
