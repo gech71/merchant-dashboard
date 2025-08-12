@@ -25,14 +25,32 @@ export type Branch = {
   status: 'Approved' | 'Pending' | 'Rejected';
 };
 
-export type Merchant = {
-  id: string;
-  name: string;
-  company: string;
-  email: string;
-  role: 'Admin' | 'Sales';
-  status: 'Active' | 'Pending' | 'Disabled';
+export type Merchant_users = {
+  ID: string;
+  ACCOUNTNUMBER: string;
+  FULLNAME: string;
+  ACCOUNTTYPE: string;
+  PHONENUMBER: string;
+  ROLE: 'Admin' | 'Sales';
+  DEVICENAME: string;
+  ENCRYPTIONKEY: string;
+  iV: string;
+  ISLOGGEDIN: boolean;
+  authenticationkey: string;
+  STATUS: 'Active' | 'Pending' | 'Disabled';
+  FAILEDATTMEPTS: number;
+  LASTLOGINATTEMPT: string;
+  ISLOCKED: boolean;
+  UNLOCKEDTIME: string;
+  VALUE3: string;
+  INSERTUSERID: string;
+  UPDATEUSERID: string;
+  INSERTDATE: string;
+  UPDATEDATE: string;
+  // This is needed for the relationship with AllowedCompany, not in the new list but required for functionality
+  company: string; 
 };
+
 
 export type BranchUser = {
   id: string;
@@ -42,4 +60,4 @@ export type BranchUser = {
   status: 'Active' | 'Inactive' | 'Pending';
 };
 
-export type EditableItem = AllowedCompany | Branch | Merchant | BranchUser | null;
+export type EditableItem = AllowedCompany | Branch | Merchant_users | BranchUser | null;

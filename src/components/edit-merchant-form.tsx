@@ -18,21 +18,21 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Merchant } from '@/types';
+import { Merchant_users } from '@/types';
 import { useDataContext } from '@/context/data-context';
 
 const merchantFormSchema = z.object({
-  role: z.enum(['Admin', 'Sales'], { required_error: 'Please select a role.' }),
+  ROLE: z.enum(['Admin', 'Sales'], { required_error: 'Please select a role.' }),
 });
 
 type MerchantFormValues = z.infer<typeof merchantFormSchema>;
 
 
 export function EditMerchantForm({
-  merchant,
+  merchantUser,
   setOpen,
 }: {
-  merchant: Merchant;
+  merchantUser: Merchant_users;
   setOpen: (open: boolean) => void;
 }) {
   const { toast } = useToast();
@@ -41,33 +41,33 @@ export function EditMerchantForm({
   const form = useForm<MerchantFormValues>({
     resolver: zodResolver(merchantFormSchema),
     defaultValues: {
-      role: merchant.role,
+      ROLE: merchantUser.ROLE,
     },
   });
 
   function onSubmit(data: MerchantFormValues) {
-    if (data.role === 'Admin') {
+    if (data.ROLE === 'Admin') {
       const adminExists = merchants.some(
-        (m) => m.id !== merchant.id && m.company === merchant.company && m.role === 'Admin'
+        (m) => m.ID !== merchantUser.ID && m.company === merchantUser.company && m.ROLE === 'Admin'
       );
       if (adminExists) {
-        form.setError('role', {
+        form.setError('ROLE', {
           type: 'manual',
-          message: `An Admin user already exists for ${merchant.company}. You can't have more than one.`,
+          message: `An Admin user already exists for ${merchantUser.company}. You can't have more than one.`,
         });
         return;
       }
     }
 
-    const updatedMerchant: Merchant = {
-      ...merchant,
+    const updatedMerchant: Merchant_users = {
+      ...merchantUser,
       ...data,
     };
 
     updateMerchant(updatedMerchant);
     toast({
       title: 'Merchant User Updated',
-      description: `${merchant.name} has been successfully updated.`,
+      description: `${merchantUser.FULLNAME} has been successfully updated.`,
     });
     setOpen(false);
   }
@@ -76,25 +76,25 @@ export function EditMerchantForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormItem>
-            <FormLabel>Full Name</FormLabel>
+            <FormLabel>FULLNAME</FormLabel>
             <FormControl>
-                <Input placeholder="John Doe" value={merchant.name} disabled />
+                <Input placeholder="John Doe" value={merchantUser.FULLNAME} disabled />
             </FormControl>
         </FormItem>
         
         <FormItem>
             <FormLabel>Company</FormLabel>
             <FormControl>
-                 <Input placeholder="Company" value={merchant.company} disabled />
+                 <Input placeholder="Company" value={merchantUser.company} disabled />
             </FormControl>
         </FormItem>
 
         <FormField
           control={form.control}
-          name="role"
+          name="ROLE"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Role</FormLabel>
+              <FormLabel>ROLE</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -112,9 +112,9 @@ export function EditMerchantForm({
         />
         
         <FormItem>
-            <FormLabel>Email</FormLabel>
+            <FormLabel>PHONENUMBER</FormLabel>
             <FormControl>
-                <Input placeholder="user@company.com" value={merchant.email} disabled/>
+                <Input placeholder="user@company.com" value={merchantUser.PHONENUMBER} disabled/>
             </FormControl>
         </FormItem>
 

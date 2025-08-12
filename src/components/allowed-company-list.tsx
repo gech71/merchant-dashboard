@@ -60,7 +60,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     let companies = initialCompanies;
     if (currentUser.branch !== 'Head Office' && !approvalView) {
         const branchCompanyNames = merchants
-            .filter(m => m.role === 'Admin' && branchUsers.some(bu => bu.branch === currentUser.branch))
+            .filter(m => m.ROLE === 'Admin' && branchUsers.some(bu => bu.branch === currentUser.branch))
             .map(m => m.company);
         companies = initialCompanies.filter(c => branchCompanyNames.includes(c.FIELDNAME));
     }

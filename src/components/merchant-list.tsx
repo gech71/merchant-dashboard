@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Merchant, EditableItem } from '@/types';
+import type { Merchant_users, EditableItem } from '@/types';
 import { ArrowUpDown, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -42,17 +42,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { EditMerchantForm } from './edit-merchant-form';
 import { useDataContext } from '@/context/data-context';
 
-type SortableKeys = 'name' | 'company' | 'email' | 'status' | 'role';
+type SortableKeys = 'FULLNAME' | 'company' | 'STATUS' | 'ROLE';
 const ITEMS_PER_PAGE = 15;
 
-export default function MerchantList({ merchants: initialMerchants, approvalView = false }: { merchants: Merchant[], approvalView?: boolean }) {
+export default function MerchantList({ merchants: initialMerchants, approvalView = false }: { merchants: Merchant_users[], approvalView?: boolean }) {
   const { merchants: contextMerchants, updateMerchantStatus } = useDataContext();
   const [merchants, setMerchants] = React.useState(initialMerchants);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
-  } | null>({ key: 'name', direction: 'ascending' });
+  } | null>({ key: 'FULLNAME', direction: 'ascending' });
   const [isEditMerchantOpen, setIsEditMerchantOpen] = React.useState(false);
   const [selectedMerchant, setSelectedMerchant] = React.useState<EditableItem>(null);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
@@ -66,7 +66,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     updateMerchantStatus(merchantId, status);
   };
   
-  const handleEdit = (merchant: Merchant) => {
+  const handleEdit = (merchant: Merchant_users) => {
     setSelectedMerchant(merchant);
     setIsEditMerchantOpen(true);
   };
@@ -88,11 +88,11 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     let sortableItems = [...sourceData];
 
     if (approvalView) {
-      sortableItems = sortableItems.filter(m => m.status === 'Pending');
+      sortableItems = sortableItems.filter(m => m.STATUS === 'Pending');
     }
     else if (activeTab !== 'all') {
       sortableItems = sortableItems.filter(
-        (merchant) => merchant.status.toLowerCase() === activeTab
+        (merchant) => merchant.STATUS.toLowerCase() === activeTab
       );
     }
 
@@ -110,13 +110,16 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
         // Always put Admin first
-        if (a.role === 'Admin' && b.role !== 'Admin') return -1;
-        if (a.role !== 'Admin' && b.role === 'Admin') return 1;
+        if (a.ROLE === 'Admin' && b.ROLE !== 'Admin') return -1;
+        if (a.ROLE !== 'Admin' && b.ROLE === 'Admin') return 1;
+        
+        const valA = a[sortConfig.key] ?? '';
+        const valB = b[sortConfig.key] ?? '';
 
-        if (a[sortConfig.key] < b[sortConfig.key]) {
+        if (valA < valB) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
+        if (valA > valB) {
           return sortConfig.direction === 'ascending' ? 1 : -1;
         }
         return 0;
@@ -124,8 +127,8 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     } else {
         // Default sort: Admin first
         sortableItems.sort((a, b) => {
-            if (a.role === 'Admin' && b.role !== 'Admin') return -1;
-            if (a.role !== 'Admin' && b.role === 'Admin') return 1;
+            if (a.ROLE === 'Admin' && b.ROLE !== 'Admin') return -1;
+            if (a.ROLE !== 'Admin' && b.ROLE === 'Admin') return 1;
             return 0;
         });
     }
@@ -150,7 +153,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     );
   };
   
-  const getStatusVariant = (status: Merchant['status']) => {
+  const getStatusVariant = (status: Merchant_users['STATUS']) => {
     switch (status) {
       case 'Active':
         return 'default';
@@ -199,9 +202,9 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                   <TableHeader>
                     <TableRow>
                       <TableHead>
-                        <Button variant="ghost" onClick={() => requestSort('name')} className="px-2">
+                        <Button variant="ghost" onClick={() => requestSort('FULLNAME')} className="px-2">
                           User Name
-                          {getSortIndicator('name')}
+                          {getSortIndicator('FULLNAME')}
                         </Button>
                       </TableHead>
                       <TableHead>
@@ -211,21 +214,18 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                         </Button>
                       </TableHead>
                        <TableHead>
-                        <Button variant="ghost" onClick={() => requestSort('role')} className="px-2">
+                        <Button variant="ghost" onClick={() => requestSort('ROLE')} className="px-2">
                           Role
-                          {getSortIndicator('role')}
+                          {getSortIndicator('ROLE')}
                         </Button>
                       </TableHead>
                       <TableHead>
-                        <Button variant="ghost" onClick={() => requestSort('email')} className="px-2">
-                          Email
-                          {getSortIndicator('email')}
-                        </Button>
+                        PHONENUMBER
                       </TableHead>
                       <TableHead>
-                        <Button variant="ghost" onClick={() => requestSort('status')} className="px-2">
+                        <Button variant="ghost" onClick={() => requestSort('STATUS')} className="px-2">
                           Status
-                          {getSortIndicator('status')}
+                          {getSortIndicator('STATUS')}
                         </Button>
                       </TableHead>
                       <TableHead>
@@ -235,16 +235,16 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                   </TableHeader>
                   <TableBody>
                     {paginatedMerchants.length > 0 ? (
-                      paginatedMerchants.map((merchant) => (
-                        <TableRow key={merchant.id}>
-                          <TableCell className="font-medium">{merchant.name}</TableCell>
-                          <TableCell>{merchant.company}</TableCell>
+                      paginatedMerchants.map((merchantUser) => (
+                        <TableRow key={merchantUser.ID}>
+                          <TableCell className="font-medium">{merchantUser.FULLNAME}</TableCell>
+                          <TableCell>{merchantUser.company}</TableCell>
                           <TableCell>
-                             <Badge variant={merchant.role === 'Admin' ? 'default' : 'secondary'}>{merchant.role}</Badge>
+                             <Badge variant={merchantUser.ROLE === 'Admin' ? 'default' : 'secondary'}>{merchantUser.ROLE}</Badge>
                           </TableCell>
-                          <TableCell className="hidden md:table-cell">{merchant.email}</TableCell>
+                          <TableCell className="hidden md:table-cell">{merchantUser.PHONENUMBER}</TableCell>
                           <TableCell>
-                            <Badge variant={getStatusVariant(merchant.status)}>{merchant.status}</Badge>
+                            <Badge variant={getStatusVariant(merchantUser.STATUS)}>{merchantUser.STATUS}</Badge>
                           </TableCell>
                           <TableCell>
                             <DropdownMenu>
@@ -256,14 +256,14 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                {!approvalView && <DropdownMenuItem onClick={() => handleEdit(merchant)}>Edit</DropdownMenuItem>}
-                                {approvalView && merchant.status === 'Pending' && (
+                                {!approvalView && <DropdownMenuItem onClick={() => handleEdit(merchantUser)}>Edit</DropdownMenuItem>}
+                                {approvalView && merchantUser.STATUS === 'Pending' && (
                                   <>
-                                    <DropdownMenuItem onClick={() => handleStatusChange(merchant.id, 'Active')}>
+                                    <DropdownMenuItem onClick={() => handleStatusChange(merchantUser.ID, 'Active')}>
                                       <CheckCircle className="mr-2 h-4 w-4" />
                                       Approve
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleStatusChange(merchant.id, 'Disabled')}>
+                                    <DropdownMenuItem onClick={() => handleStatusChange(merchantUser.ID, 'Disabled')}>
                                       <XCircle className="mr-2 h-4 w-4" />
                                       Reject
                                     </DropdownMenuItem>
@@ -316,9 +316,9 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
             <DialogHeader>
                 <DialogTitle>Edit Merchant User</DialogTitle>
             </DialogHeader>
-            {selectedMerchant && selectedMerchant.hasOwnProperty('role') && (
+            {selectedMerchant && selectedMerchant.hasOwnProperty('ROLE') && (
                 <EditMerchantForm
-                    merchant={selectedMerchant as Merchant}
+                    merchantUser={selectedMerchant as Merchant_users}
                     setOpen={setIsEditMerchantOpen}
                 />
             )}

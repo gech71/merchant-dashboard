@@ -52,13 +52,13 @@ export default function DashboardPage() {
 
   const pendingCompanies = allowedCompanies.filter(c => c.STATUS === 'Pending').length;
   const pendingBranches = branches.filter(b => b.status === 'Pending').length;
-  const pendingMerchants = merchants.filter(m => m.status === 'Pending').length;
+  const pendingMerchants = merchants.filter(m => m.STATUS === 'Pending').length;
   const pendingBranchUsers = branchUsers.filter(u => u.status === 'Pending').length;
   const totalPending = pendingCompanies + pendingBranches + pendingMerchants + pendingBranchUsers;
 
   const companiesByBranch = branches.map(branch => ({
     name: branch.name,
-    companies: allowedCompanies.filter(c => merchants.some(m => m.company === c.FIELDNAME && m.role === 'Admin' && branchUsers.some(bu => bu.branch === branch.name))).length,
+    companies: allowedCompanies.filter(c => merchants.some(m => m.company === c.FIELDNAME && m.ROLE === 'Admin' && branchUsers.some(bu => bu.branch === branch.name))).length,
   }));
 
   const companyStatusData = [
@@ -74,9 +74,9 @@ export default function DashboardPage() {
   ];
   
   const merchantStatusData = [
-    { name: 'Active', value: merchants.filter(m => m.status === 'Active').length },
+    { name: 'Active', value: merchants.filter(m => m.STATUS === 'Active').length },
     { name: 'Pending', value: pendingMerchants },
-    { name: 'Disabled', value: merchants.filter(m => m.status === 'Disabled').length },
+    { name: 'Disabled', value: merchants.filter(m => m.STATUS === 'Disabled').length },
   ];
 
   const branchUserStatusData = [
