@@ -9,7 +9,11 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = params.id;
+    const id = parseInt(params.id, 10);
+    if (isNaN(id)) {
+        return NextResponse.json({ message: 'Invalid user ID' }, { status: 400 });
+    }
+
     const body = await request.json();
     const { name, email, branch, status } = body;
 
