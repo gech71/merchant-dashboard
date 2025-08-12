@@ -34,6 +34,7 @@ export function AddAllowedCompanyForm({
 }) {
   const { toast } = useToast();
   const { addAllowedCompany } = useDataContext();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<AllowedCompanyFormValues>({
     resolver: zodResolver(allowedCompanyFormSchema),
@@ -43,13 +44,24 @@ export function AddAllowedCompanyForm({
     },
   });
 
-  function onSubmit(data: AllowedCompanyFormValues) {
-    addAllowedCompany(data);
-    toast({
-      title: 'Company Submitted for Approval',
-      description: `${data.FIELDNAME} has been sent for verification.`,
-    });
-    setOpen(false);
+  async function onSubmit(data: AllowedCompanyFormValues) {
+    setIsLoading(true);
+    try {
+        await addAllowedCompany(data);
+        toast({
+          title: 'Company Submitted for Approval',
+          description: `${data.FIELDNAME} has been sent for verification.`,
+        });
+        setOpen(false);
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Failed to Add Company',
+            description: 'An error occurred while trying to add the company.',
+        });
+    } finally {
+        setIsLoading(false);
+    }
   }
 
   return (
@@ -82,8 +94,8 @@ export function AddAllowedCompanyForm({
           )}
         />
         <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit">Add Company</Button>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isLoading}>Cancel</Button>
+            <Button type="submit" disabled={isLoading}>{isLoading ? 'Adding...' : 'Add Company'}</Button>
         </div>
       </form>
     </Form>

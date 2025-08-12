@@ -54,7 +54,7 @@ type DataContextType = {
   setCurrentUser: (user: CurrentUser | null) => void;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
-  addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => void;
+  addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => Promise<void>;
   updateAllowedCompany: (company: allowed_companies) => void;
   updateMerchant: (merchant: Merchant_users) => void;
   addBranchUser: (user: BranchUser) => void;
@@ -92,28 +92,23 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setBranches(prev => prev.map(b => b.id === updatedBranch.id ? updatedBranch : b));
   };
 
-  const addAllowedCompany = (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => {
-    const now = new Date().toISOString();
-    const newIdNumber = Math.max(...allowedCompanies.map(c => parseInt(c.ID.replace('C', ''), 10)), 0) + 1;
-    const newId = `C${newIdNumber.toString().padStart(3, '0')}`;
-    const newOid = `oid_${newId}`;
+  const addAllowedCompany = async (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => {
+    const response = await fetch('/api/allowed_companies', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(company),
+    });
 
-    const newCompany: allowed_companies = {
-        ...company,
-        ID: newId,
-        Oid: newOid,
-        APPROVEUSER: null,
-        APPROVED: false,
-        STATUS: 'Pending',
-        INSERTDATE: now,
-        UPDATEDATE: now,
-        INSERTUSER: currentUser?.name || 'system',
-        UPDATEUSER: currentUser?.name || 'system',
-        OptimisticLockField: 0,
-        GCRecord: 0,
-    };
+    if (!response.ok) {
+        throw new Error('Failed to add company');
+    }
+
+    const newCompany = await response.json();
     setAllowedCompanies(prev => [...prev, newCompany]);
   };
+
   const updateAllowedCompany = (updatedCompany: allowed_companies) => {
     setAllowedCompanies(prev => prev.map(c => c.Oid === updatedCompany.Oid ? {...updatedCompany, UPDATEDATE: new Date().toISOString(), UPDATEUSER: currentUser?.name || 'system'} : c));
   };
@@ -194,5 +189,3 @@ export function useDataContext() {
   }
   return context;
 }
-
-    
