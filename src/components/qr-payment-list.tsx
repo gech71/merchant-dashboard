@@ -26,7 +26,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useDataContext } from '@/context/data-context';
 
-type SortableKeys = 'DEBITACCOUNT' | 'CREDITACCOUNT' | 'SALERPHONENUMBER' | 'AMOUNT' | 'EXPIRETIME' | 'ISUSED' | 'INSERTDATE';
+type SortableKeys = 'DEBITACCOUNT' | 'CREDITACCOUNT' | 'SALERPHONENUMBER' | 'AMOUNT' | 'EXPIRETIME' | 'ISUSED';
 const ITEMS_PER_PAGE = 15;
 
 export default function QrPaymentList({ qrPayments: initialQrPayments }: { qrPayments: qr_payments[] }) {
@@ -35,7 +35,7 @@ export default function QrPaymentList({ qrPayments: initialQrPayments }: { qrPay
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
-  } | null>({ key: 'INSERTDATE', direction: 'descending' });
+  } | null>({ key: 'EXPIRETIME', direction: 'descending' });
   const [currentPage, setCurrentPage] = React.useState(1);
   
   const getSalerName = (phoneNumber: string) => {

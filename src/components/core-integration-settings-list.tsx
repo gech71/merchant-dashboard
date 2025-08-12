@@ -24,7 +24,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-type SortableKeys = 'UNIQUEKEY' | 'ADDRESS' | 'USERNAME' | 'INSERTDATE' | 'UPDATEDATE';
+type SortableKeys = 'UNIQUEKEY' | 'ADDRESS' | 'USERNAME';
 const ITEMS_PER_PAGE = 15;
 
 export default function CoreIntegrationSettingsList({ coreIntegrationSettings: initialSettings }: { coreIntegrationSettings: core_integration_settings[] }) {
@@ -32,7 +32,7 @@ export default function CoreIntegrationSettingsList({ coreIntegrationSettings: i
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
-  } | null>({ key: 'INSERTDATE', direction: 'descending' });
+  } | null>({ key: 'UNIQUEKEY', direction: 'ascending' });
   const [currentPage, setCurrentPage] = React.useState(1);
 
   const requestSort = (key: SortableKeys) => {
@@ -99,10 +99,6 @@ export default function CoreIntegrationSettingsList({ coreIntegrationSettings: i
                 <TableHead><Button variant="ghost" onClick={() => requestSort('ADDRESS')} className="px-2">ADDRESS{getSortIndicator('ADDRESS')}</Button></TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('USERNAME')} className="px-2">USERNAME{getSortIndicator('USERNAME')}</Button></TableHead>
                 <TableHead>PASSWORD</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('INSERTDATE')} className="px-2">INSERTDATE{getSortIndicator('INSERTDATE')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('UPDATEDATE')} className="px-2">UPDATEDATE{getSortIndicator('UPDATEDATE')}</Button></TableHead>
-                <TableHead>INSERTUSER</TableHead>
-                <TableHead>UPDATEUSER</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -113,15 +109,11 @@ export default function CoreIntegrationSettingsList({ coreIntegrationSettings: i
                     <TableCell>{setting.ADDRESS}</TableCell>
                     <TableCell>{setting.USERNAME}</TableCell>
                     <TableCell>{'●'.repeat(setting.PASSWORD.length)}</TableCell>
-                    <TableCell>{new Date(setting.INSERTDATE).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(setting.UPDATEDATE).toLocaleDateString()}</TableCell>
-                    <TableCell>{setting.INSERTUSER}</TableCell>
-                    <TableCell>{setting.UPDATEUSER}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-24 text-center">No settings found.</TableCell>
+                  <TableCell colSpan={4} className="h-24 text-center">No settings found.</TableCell>
                 </TableRow>
               )}
             </TableBody>

@@ -24,7 +24,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-type SortableKeys = 'ADDRESS' | 'USERNAME' | 'INSERTDATE' | 'UPDATEDATE';
+type SortableKeys = 'ADDRESS' | 'USERNAME';
 const ITEMS_PER_PAGE = 15;
 
 export default function UssdPushSettingsList({ ussdPushSettings: initialSettings }: { ussdPushSettings: ussd_push_settings[] }) {
@@ -32,7 +32,7 @@ export default function UssdPushSettingsList({ ussdPushSettings: initialSettings
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
-  } | null>({ key: 'INSERTDATE', direction: 'descending' });
+  } | null>({ key: 'ADDRESS', direction: 'ascending' });
   const [currentPage, setCurrentPage] = React.useState(1);
 
   const requestSort = (key: SortableKeys) => {
@@ -99,8 +99,6 @@ export default function UssdPushSettingsList({ ussdPushSettings: initialSettings
                 <TableHead>RESULTURL</TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('USERNAME')} className="px-2">USERNAME{getSortIndicator('USERNAME')}</Button></TableHead>
                 <TableHead>PASSWORD</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('INSERTDATE')} className="px-2">INSERTDATE{getSortIndicator('INSERTDATE')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('UPDATEDATE')} className="px-2">UPDATEDATE{getSortIndicator('UPDATEDATE')}</Button></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -111,13 +109,11 @@ export default function UssdPushSettingsList({ ussdPushSettings: initialSettings
                     <TableCell>{setting.RESULTURL}</TableCell>
                     <TableCell>{setting.USERNAME}</TableCell>
                     <TableCell>{'●'.repeat(setting.PASSWORD.length)}</TableCell>
-                    <TableCell>{new Date(setting.INSERTDATE).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(setting.UPDATEDATE).toLocaleDateString()}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">No settings found.</TableCell>
+                  <TableCell colSpan={4} className="h-24 text-center">No settings found.</TableCell>
                 </TableRow>
               )}
             </TableBody>

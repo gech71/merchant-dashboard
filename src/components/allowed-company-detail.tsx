@@ -50,22 +50,6 @@ export default function AllowedCompanyDetail({ allowedCompany, merchants }: { al
                 <p className="text-sm font-medium text-muted-foreground">APPROVEUSER</p>
                 <p>{allowedCompany.APPROVEUSER || 'N/A'}</p>
             </div>
-             <div>
-                <p className="text-sm font-medium text-muted-foreground">INSERTDATE</p>
-                <p>{new Date(allowedCompany.INSERTDATE).toLocaleDateString()}</p>
-            </div>
-             <div>
-                <p className="text-sm font-medium text-muted-foreground">UPDATEDATE</p>
-                <p>{new Date(allowedCompany.UPDATEDATE).toLocaleDateString()}</p>
-            </div>
-             <div>
-                <p className="text-sm font-medium text-muted-foreground">INSERTUSER</p>
-                <p>{allowedCompany.INSERTUSER}</p>
-            </div>
-            <div>
-                <p className="text-sm font-medium text-muted-foreground">UPDATEUSER</p>
-                <p>{allowedCompany.UPDATEUSER}</p>
-            </div>
             <div>
                 <p className="text-sm font-medium text-muted-foreground">OptimisticLockField</p>
                 <p>{allowedCompany.OptimisticLockField}</p>

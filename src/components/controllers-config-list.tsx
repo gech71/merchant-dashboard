@@ -24,7 +24,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-type SortableKeys = 'CONTROLLERKEY' | 'APIKEY' | 'INSERTDATE' | 'UPDATEDATE';
+type SortableKeys = 'CONTROLLERKEY' | 'APIKEY';
 const ITEMS_PER_PAGE = 15;
 
 export default function ControllersConfigList({ controllersConfigs: initialControllersConfigs }: { controllersConfigs: controllersconfigs[] }) {
@@ -32,7 +32,7 @@ export default function ControllersConfigList({ controllersConfigs: initialContr
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
-  } | null>({ key: 'INSERTDATE', direction: 'descending' });
+  } | null>({ key: 'CONTROLLERKEY', direction: 'ascending' });
   const [currentPage, setCurrentPage] = React.useState(1);
 
   const requestSort = (key: SortableKeys) => {
@@ -97,10 +97,6 @@ export default function ControllersConfigList({ controllersConfigs: initialContr
               <TableRow>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('CONTROLLERKEY')} className="px-2">CONTROLLERKEY{getSortIndicator('CONTROLLERKEY')}</Button></TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('APIKEY')} className="px-2">APIKEY{getSortIndicator('APIKEY')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('INSERTDATE')} className="px-2">INSERTDATE{getSortIndicator('INSERTDATE')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('UPDATEDATE')} className="px-2">UPDATEDATE{getSortIndicator('UPDATEDATE')}</Button></TableHead>
-                <TableHead>INSERTUSER</TableHead>
-                <TableHead>UPDATEUSER</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -109,15 +105,11 @@ export default function ControllersConfigList({ controllersConfigs: initialContr
                   <TableRow key={config.ID}>
                     <TableCell className="font-medium">{config.CONTROLLERKEY}</TableCell>
                     <TableCell>{config.APIKEY}</TableCell>
-                    <TableCell>{new Date(config.INSERTDATE).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(config.UPDATEDATE).toLocaleDateString()}</TableCell>
-                    <TableCell>{config.INSERTUSER}</TableCell>
-                    <TableCell>{config.UPDATEUSER}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">No configurations found.</TableCell>
+                  <TableCell colSpan={2} className="h-24 text-center">No configurations found.</TableCell>
                 </TableRow>
               )}
             </TableBody>
