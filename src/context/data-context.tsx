@@ -102,6 +102,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         ...company,
         ID: newId,
         Oid: newOid,
+        APPROVEUSER: null,
         APPROVED: false,
         STATUS: 'Pending',
         INSERTDATE: now,
@@ -136,7 +137,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
             ...c, 
             APPROVED: isApproved, 
             STATUS: isApproved ? 'Active' : 'Inactive',
-            APPROVEUSER: isApproved ? currentUser?.name : undefined 
+            APPROVEUSER: isApproved ? currentUser?.name : null
           } 
         : c
     ));
@@ -193,3 +194,5 @@ export function useDataContext() {
   }
   return context;
 }
+
+    

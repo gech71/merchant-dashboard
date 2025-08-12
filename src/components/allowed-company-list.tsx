@@ -41,7 +41,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 type SortableKeys = 'FIELDNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'APPROVEUSER' | 'APPROVED';
 const ITEMS_PER_PAGE = 15;
 
-export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowedCompanies: allowed_companies[], approvalView?: boolean }) {
+export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowed_companies[], approvalView?: boolean }) {
   const { updateAllowedCompanyApproval, currentUser, branches, merchants, branchUsers } = useDataContext();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -81,20 +81,9 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     let sortableItems = [...initialCompanies];
   
     if (branchFilter !== 'all') {
-      // Find all account numbers associated with merchants in the selected branch
-      const merchantAccountNumbersInBranch = merchants
-        .filter(merchant => {
-          // This logic is still a bit fuzzy as there's no direct link between a merchant and a branch.
-          // We are assuming a merchant is in a branch if any branch user from that branch is associated with the merchant.
-          // This is a simplification based on the available data.
-          return branchUsers.some(bu => bu.branch === branchFilter);
-        })
-        .map(m => m.ACCOUNTNUMBER);
-
-      const uniqueAccountNumbers = [...new Set(merchantAccountNumbersInBranch)];
-      
-      // Filter companies that have one of the account numbers
-      sortableItems = sortableItems.filter(c => uniqueAccountNumbers.includes(c.ACCOUNTNUMBER));
+      const usersInBranch = branchUsers.filter(bu => bu.branch === branchFilter);
+      const accountsInBranch = new Set(merchants.filter(m => usersInBranch.some(u => u.email === m.PHONENUMBER)).map(m => m.ACCOUNTNUMBER));
+      sortableItems = sortableItems.filter(c => accountsInBranch.has(c.ACCOUNTNUMBER));
     }
 
 
@@ -108,8 +97,9 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     }
     
     if (searchTerm) {
+      const lowercasedTerm = searchTerm.toLowerCase();
       sortableItems = sortableItems.filter((company) =>
-        company.FIELDNAME.toLowerCase().includes(searchTerm.toLowerCase())
+        Object.values(company).some(val => String(val).toLowerCase().includes(lowercasedTerm))
       );
     }
 
@@ -382,4 +372,5 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     </Dialog>
     </>
   );
-}
+
+    
