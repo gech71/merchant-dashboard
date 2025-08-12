@@ -130,7 +130,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenuButton
               asChild
               isActive={pathname === item.href}
-              className="justify-start text-left"
+              className="justify-start text-left pl-6"
             >
               <Link href={item.href}>
                 <item.icon />
