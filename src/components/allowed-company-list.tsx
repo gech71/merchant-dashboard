@@ -31,12 +31,12 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AddAllowedCompanyForm } from './add-allowed-company-form';
-import { EditAllowedCompanyForm } from './edit-allowed-company-form';
+import { AddAllowedCompanyForm } from '@/components/add-allowed-company-form';
+import { EditAllowedCompanyForm } from '@/components/edit-allowed-company-form';
 import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useDataContext } from '@/context/data-context';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type SortableKeys = 'FIELDNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'APPROVEUSER' | 'APPROVED';
 const ITEMS_PER_PAGE = 15;
