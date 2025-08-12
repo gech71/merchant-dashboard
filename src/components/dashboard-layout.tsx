@@ -19,7 +19,8 @@ import {
   Receipt,
   Send,
   Link2,
-  KeyRound
+  KeyRound,
+  Settings
 } from 'lucide-react';
 
 import {
@@ -58,6 +59,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/arif-requests', icon: Send, label: 'Arif Requests' },
   { href: '/dashboard/arifpay-endpoints', icon: Link2, label: 'ArifPay Endpoints' },
   { href: '/dashboard/controllers-configs', icon: KeyRound, label: 'Controller Configs' },
+  { href: '/dashboard/core-integration-settings', icon: Settings, label: 'Core Integration Settings' },
 ];
 
 const APPROVAL_NAV_ITEMS = [

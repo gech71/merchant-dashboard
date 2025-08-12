@@ -163,4 +163,16 @@ export type controllersconfigs = {
   UPDATEUSER: string;
 };
 
-export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | null;
+export type core_integration_settings = {
+  ID: string;
+  UNIQUEKEY: string;
+  ADDRESS: string;
+  USERNAME: string;
+  PASSWORD: string;
+  INSERTDATE: string;
+  UPDATEDATE: string;
+  INSERTUSER: string;
+  UPDATEUSER: string;
+};
+
+export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | null;

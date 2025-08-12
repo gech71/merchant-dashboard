@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings } from '@/types';
 
 // Mock Data
 const MOCK_BRANCHES: Branch[] = [
@@ -72,6 +72,11 @@ const MOCK_CONTROLLERSCONFIGS: controllersconfigs[] = [
     { ID: 'cfg_2', CONTROLLERKEY: 'CTRL_KEY_002', APIKEY: 'API_KEY_002_ABC', INSERTDATE: '2023-02-15', UPDATEDATE: '2023-02-15', INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
+const MOCK_CORE_INTEGRATION_SETTINGS: core_integration_settings[] = [
+    { ID: 'core_1', UNIQUEKEY: 'INTEGRATION_MAIN', ADDRESS: 'https://core.bank.com/api', USERNAME: 'coreapiuser', PASSWORD: 'SuperSecretPassword123', INSERTDATE: '2023-01-01', UPDATEDATE: '2023-01-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'core_2', UNIQUEKEY: 'INTEGRATION_BACKUP', ADDRESS: 'https://core-backup.bank.com/api', USERNAME: 'coreapiuser_bk', PASSWORD: 'AnotherSecretPassword456', INSERTDATE: '2023-01-02', UPDATEDATE: '2023-01-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
+];
+
 
 const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
 
@@ -85,6 +90,7 @@ type DataContextType = {
   arifRequests: arif_requests[];
   arifpayEndpoints: arifpay_endpoints[];
   controllersConfigs: controllersconfigs[];
+  coreIntegrationSettings: core_integration_settings[];
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
@@ -111,6 +117,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [arifRequests, setArifRequests] = React.useState<arif_requests[]>(MOCK_ARIF_REQUESTS);
   const [arifpayEndpoints, setArifpayEndpoints] = React.useState<arifpay_endpoints[]>(MOCK_ARIFPAY_ENDPOINTS);
   const [controllersConfigs, setControllersConfigs] = React.useState<controllersconfigs[]>(MOCK_CONTROLLERSCONFIGS);
+  const [coreIntegrationSettings, setCoreIntegrationSettings] = React.useState<core_integration_settings[]>(MOCK_CORE_INTEGRATION_SETTINGS);
   const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
@@ -186,6 +193,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     arifRequests,
     arifpayEndpoints,
     controllersConfigs,
+    coreIntegrationSettings,
     currentUser,
     addBranch,
     updateBranch,
