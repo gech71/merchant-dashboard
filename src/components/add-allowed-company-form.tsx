@@ -20,7 +20,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useDataContext } from '@/context/data-context';
 
 const allowedCompanyFormSchema = z.object({
-  ID: z.string().min(1, 'ID is required'),
   ACCOUNTNUMBER: z.string().min(4, 'Account number must be at least 4 characters.'),
   FIELDNAME: z.string().min(2, 'Field name must be at least 2 characters.'),
 });
@@ -39,7 +38,6 @@ export function AddAllowedCompanyForm({
   const form = useForm<AllowedCompanyFormValues>({
     resolver: zodResolver(allowedCompanyFormSchema),
     defaultValues: {
-      ID: '',
       FIELDNAME: '',
       ACCOUNTNUMBER: '',
     },
@@ -57,19 +55,6 @@ export function AddAllowedCompanyForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="ID"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>ID</FormLabel>
-              <FormControl>
-                <Input placeholder="C006" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <FormField
           control={form.control}
           name="FIELDNAME"

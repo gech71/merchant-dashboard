@@ -51,7 +51,7 @@ type DataContextType = {
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
-  addAllowedCompany: (company: Omit<allowed_companies, 'Oid' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => void;
+  addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => void;
   updateAllowedCompany: (company: allowed_companies) => void;
   updateMerchant: (merchant: Merchant_users) => void;
   addBranchUser: (user: BranchUser) => void;
@@ -76,10 +76,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setBranches(prev => prev.map(b => b.id === updatedBranch.id ? updatedBranch : b));
   };
 
-  const addAllowedCompany = (company: Omit<allowed_companies, 'Oid' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => {
+  const addAllowedCompany = (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => {
     const now = new Date().toISOString();
+    const newIdNumber = Math.max(...allowedCompanies.map(c => parseInt(c.ID.replace('C', ''), 10)), 0) + 1;
+    const newId = `C${newIdNumber.toString().padStart(3, '0')}`;
+
     const newCompany: allowed_companies = {
         ...company,
+        ID: newId,
         Oid: new Date().toISOString(),
         APPROVED: false,
         STATUS: 'Pending',
