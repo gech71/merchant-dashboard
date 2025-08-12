@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Building,
   Home,
@@ -29,6 +29,7 @@ import {
   FileText,
   Megaphone,
   UserCheck,
+  LogOut,
 } from 'lucide-react';
 
 import {
@@ -88,6 +89,13 @@ const APPROVAL_NAV_ITEMS = [
 
 function UserProfile() {
   const { currentUser } = useDataContext();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // In a real app, you would also clear tokens from storage
+    router.push('/login');
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -110,10 +118,16 @@ function UserProfile() {
       <DropdownMenuContent className="mb-2 w-56">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Settings</DropdownMenuItem>
+        <DropdownMenuItem>
+            <Settings className="mr-2 h-4 w-4" />
+            Settings
+        </DropdownMenuItem>
         <DropdownMenuItem>Support</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Logout</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
