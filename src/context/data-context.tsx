@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -61,7 +62,7 @@ type DataContextType = {
   updateBranchStatus: (branchId: number, status: 'Approved' | 'Rejected') => void;
   updateAllowedCompanyApproval: (companyId: string, isApproved: boolean) => Promise<void>;
   updateMerchantStatus: (merchantId: string, status: 'Active' | 'Disabled') => Promise<void>;
-  updateBranchUserStatus: (userId: string, status: 'Active' | 'Inactive') => Promise<void>;
+  updateBranchUserStatus: (userId: number, status: 'Active' | 'Inactive') => Promise<void>;
 };
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
@@ -205,8 +206,8 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? returnedUser : m));
   };
   
-  const updateBranchUserStatus = async (userId: string, status: 'Active' | 'Inactive') => {
-    const user = branchUsers.find(u => u.id === parseInt(userId, 10));
+  const updateBranchUserStatus = async (userId: number, status: 'Active' | 'Inactive') => {
+    const user = branchUsers.find(u => u.id === userId);
     if (user) {
         await updateBranchUser({ ...user, status });
     }

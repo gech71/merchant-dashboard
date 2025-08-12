@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -41,12 +42,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AddBranchUserForm } from './add-branch-user-form';
 import { EditBranchUserForm } from './edit-branch-user-form';
 import { useDataContext } from '@/context/data-context';
+import { useToast } from '@/hooks/use-toast';
 
 type SortableKeys = 'name' | 'email' | 'branch' | 'status';
 const ITEMS_PER_PAGE = 15;
 
 export default function BranchUserList({ branchUsers: initialBranchUsers, approvalView = false }: { branchUsers: BranchUser[], approvalView?: boolean }) {
   const { branchUsers, updateBranchUserStatus } = useDataContext();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
@@ -58,8 +61,20 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
   const [currentPage, setCurrentPage] = React.useState(1);
 
-  const handleStatusChange = (userId: string, status: 'Active' | 'Inactive') => {
-    updateBranchUserStatus(userId, status);
+  const handleStatusChange = async (userId: number, status: 'Active' | 'Inactive') => {
+    try {
+      await updateBranchUserStatus(userId, status);
+      toast({
+          title: 'User Status Updated',
+          description: `The user has been ${status === 'Active' ? 'approved' : 'rejected'}.`,
+      });
+    } catch (error) {
+       toast({
+            variant: 'destructive',
+            title: 'Update Failed',
+            description: 'Could not update the user status.',
+        });
+    }
   };
   
   const handleEdit = (user: BranchUser) => {
@@ -82,7 +97,9 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
   const filteredAndSortedUsers = React.useMemo(() => {
     let sortableItems = [...branchUsers];
 
-    if (activeTab !== 'all') {
+    if (approvalView) {
+      sortableItems = sortableItems.filter(u => u.status === 'Pending');
+    } else if (activeTab !== 'all') {
       sortableItems = sortableItems.filter(
         (user) => user.status.toLowerCase() === activeTab
       );
@@ -112,7 +129,7 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
     }
 
     return sortableItems;
-  }, [branchUsers, searchTerm, sortConfig, activeTab]);
+  }, [branchUsers, searchTerm, sortConfig, activeTab, approvalView]);
 
   const paginatedUsers = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;

@@ -86,6 +86,7 @@ const SETTINGS_NAV_ITEMS = [
 
 const APPROVAL_NAV_ITEMS = [
   { href: '/dashboard/approvals/allowed_companies', icon: Building, label: 'Allowed Companies' },
+  { href: '/dashboard/approvals/branch_users', icon: UserCog, label: 'Branch Users' },
 ]
 
 function UserProfile() {
