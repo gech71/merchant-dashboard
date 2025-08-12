@@ -29,11 +29,15 @@ export default function AllowedCompanyDetail({ allowedCompany, merchants }: { al
           <div className="flex items-center gap-4">
             <div>
               <CardTitle className="text-3xl">{allowedCompany.FIELDNAME}</CardTitle>
-              <CardDescription>ACCOUNTNUMBER: {allowedCompany.ACCOUNTNUMBER}</CardDescription>
+              <CardDescription>ID: {allowedCompany.ID} | ACCOUNTNUMBER: {allowedCompany.ACCOUNTNUMBER}</CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <CardContent className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <p className="text-sm font-medium text-muted-foreground">Oid</p>
+                <p>{allowedCompany.Oid}</p>
+            </div>
            <div>
                 <p className="text-sm font-medium text-muted-foreground">STATUS</p>
                 <Badge variant={getStatusVariant(allowedCompany.STATUS)}>{allowedCompany.STATUS}</Badge>
@@ -61,6 +65,14 @@ export default function AllowedCompanyDetail({ allowedCompany, merchants }: { al
             <div>
                 <p className="text-sm font-medium text-muted-foreground">UPDATEUSER</p>
                 <p>{allowedCompany.UPDATEUSER}</p>
+            </div>
+            <div>
+                <p className="text-sm font-medium text-muted-foreground">OptimisticLockField</p>
+                <p>{allowedCompany.OptimisticLockField}</p>
+            </div>
+            <div>
+                <p className="text-sm font-medium text-muted-foreground">GCRecord</p>
+                <p>{allowedCompany.GCRecord}</p>
             </div>
         </CardContent>
       </Card>
