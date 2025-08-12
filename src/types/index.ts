@@ -1,4 +1,5 @@
 
+
 export type arif_requests = {
   NONCEID: string;
   SESSIONID: string;
@@ -152,4 +153,14 @@ export type arifpay_endpoints = {
   UPDATEUSER: string;
 };
 
-export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | null;
+export type controllersconfigs = {
+  ID: string;
+  CONTROLLERKEY: string;
+  APIKEY: string;
+  INSERTDATE: string;
+  UPDATEDATE: string;
+  INSERTUSER: string;
+  UPDATEUSER: string;
+};
+
+export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | null;

@@ -18,7 +18,8 @@ import {
   DollarSign,
   Receipt,
   Send,
-  Link2
+  Link2,
+  KeyRound
 } from 'lucide-react';
 
 import {
@@ -56,6 +57,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/merchant-txns', icon: Receipt, label: 'Merchant Transactions' },
   { href: '/dashboard/arif-requests', icon: Send, label: 'Arif Requests' },
   { href: '/dashboard/arifpay-endpoints', icon: Link2, label: 'ArifPay Endpoints' },
+  { href: '/dashboard/controllers-configs', icon: KeyRound, label: 'Controller Configs' },
 ];
 
 const APPROVAL_NAV_ITEMS = [
