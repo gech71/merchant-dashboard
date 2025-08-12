@@ -15,7 +15,8 @@ import {
   CheckSquare,
   UserCog,
   LayoutGrid,
-  DollarSign
+  DollarSign,
+  Receipt
 } from 'lucide-react';
 
 import {
@@ -50,6 +51,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/branch-users', icon: UserCog, label: 'Branch Users' },
   { href: '/dashboard/merchant_users', icon: Briefcase, label: 'Merchant Users' },
   { href: '/dashboard/daily-balances', icon: DollarSign, label: 'Daily Balances' },
+  { href: '/dashboard/merchant-txns', icon: Receipt, label: 'Merchant Transactions' },
 ];
 
 const APPROVAL_NAV_ITEMS = [

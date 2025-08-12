@@ -3,6 +3,7 @@
 
 
 
+
 export type allowed_companies = {
   Oid: string;
   ID: string;
@@ -63,6 +64,28 @@ export type merchants_daily_balances = {
   UPDATEDATE: string;
   INSERTUSER: string;
   UPDATEUSER: string;
+};
+
+export type merchant_txns = {
+    ID: string;
+    MERCHANTACCOUNT: string;
+    MERCHANTPHONE: string;
+    AMOUNT: number;
+    TXNID: string;
+    CUSTOMERNAME: string;
+    CUSTOMERACCOUNT: string;
+    T24USER: string;
+    T2TRANSACTIONDATE: string;
+    STATUS: 'Completed' | 'Pending' | 'Failed';
+    TRANSACTIONCHANNEL: string;
+    TRANSACTIONSERVICE: string;
+    VALUE1: string | null;
+    VALUE2: string | null;
+    VALUE3: string | null;
+    INSERTDATE: string;
+    UPDATEDATE: string;
+    INSERTUSER: string;
+    UPDATEUSER: string;
 };
 
 
