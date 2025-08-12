@@ -1,44 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model arif_requests {
+  NONCEID                  String    @id
+  SESSIONID                String
+  DEBITACCOUNT             String
+  CREDITACCOUNT            String
+  AMOUNT                   Float
+  MERCHANTACCOUNT          String
+  SALESPHONE               String
+  REQUEST1                 String?
+  RESPONSE1                String?
+  REQUEST2                 String?
+  RESPONSE2                String?
+  REQUEST3                 String?
+  RESPONSE3                String?
+  WEBHOOKRESPONSE          String?
+  ERROR1                   String?
+  MESSAGE1                 String?
+  ERROR2                   String?
+  MESSAGE2                 String?
+  ERROR3                   String?
+  MESSAGE3                 String?
+  DATESEND1                DateTime?
+  DATERECIVED1             DateTime?
+  DATESEND2                DateTime?
+  DATERECIVED2             DateTime?
+  DATESEND3                DateTime?
+  DATERECIVED3             DateTime?
+  WEBHOOKRECEIVEDDATE      DateTime?
+  INSERTUSER               String
+  UPDATEUSER               String
+  ARIFPAYTRANSACTIONID     String
+  ARIFPAYTRANSACTIONSTATUS String
+  T24TRANSACTIONSTATUS     String
+
+  allowed_company allowed_companies? @relation(fields: [MERCHANTACCOUNT], references: [ACCOUNTNUMBER])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model allowed_companies {
-  Oid                 String   @id @unique
-  ID                  String   @unique
-  ACCOUNTNUMBER       String   @unique
+  Oid                 String          @id @unique
+  ID                  String          @unique
+  ACCOUNTNUMBER       String          @unique
   FIELDNAME           String
   APPROVEUSER         String?
   APPROVED            Boolean
-  STATUS              String
-  INSERTDATE          DateTime @default(now())
-  UPDATEDATE          DateTime @updatedAt
+  STATUS              String // 'Active' | 'Inactive' | 'Pending'
+  INSERTDATE          DateTime        @default(now())
+  UPDATEDATE          DateTime        @updatedAt
   INSERTUSER          String
   UPDATEUSER          String
   OptimisticLockField Int
   GCRecord            Int
-  
   merchants           Merchant_users[]
-  daily_balances      merchants_daily_balances[]
-  merchant_txns       merchant_txns[]
   arif_requests       arif_requests[]
-  paystream_txns      paystream_txns[]
-  account_infos       account_infos[]
 }
 
 model Branch {
-  id      String @id @default(cuid())
+  id      String       @id @default(cuid())
   name    String
-  code    String @unique
+  code    String       @unique
   address String
   contact String
-  status  String
-  
+  status  String // 'Approved' | 'Pending' | 'Rejected'
   users   BranchUser[]
 }
 
@@ -48,26 +84,24 @@ model Merchant_users {
   FULLNAME          String
   ACCOUNTTYPE       String
   PHONENUMBER       String   @unique
-  ROLE              String
-  DEVICENAME        String
-  ENCRYPTIONKEY     String
-  iV                String
+  ROLE              String // 'Admin' | 'Sales'
+  DEVICENAME        String?
+  ENCRYPTIONKEY     String?
+  iV                String?
   ISLOGGEDIN        Boolean
-  authenticationkey String
-  STATUS            String
+  authenticationkey String?
+  STATUS            String // 'Active' | 'Pending' | 'Disabled'
   FAILEDATTMEPTS    Int
-  LASTLOGINATTEMPT  DateTime
+  LASTLOGINATTEMPT  DateTime?
   ISLOCKED          Boolean
-  UNLOCKEDTIME      DateTime?
+  UNLOCKEDTIME      String?
   VALUE3            String?
   INSERTUSERID      String
   UPDATEUSERID      String
   INSERTDATE        DateTime @default(now())
   UPDATEDATE        DateTime @updatedAt
-  
-  allowed_company   allowed_companies @relation(fields: [ACCOUNTNUMBER], references: [ACCOUNTNUMBER])
-  paystream_txns    paystream_txns[]
-  qr_payments       qr_payments[]
+
+  company allowed_companies @relation(fields: [ACCOUNTNUMBER], references: [ACCOUNTNUMBER])
 }
 
 model merchants_daily_balances {
@@ -81,8 +115,6 @@ model merchants_daily_balances {
   UPDATEDATE      DateTime @updatedAt
   INSERTUSER      String
   UPDATEUSER      String
-  
-  allowed_company allowed_companies @relation(fields: [MERCHANTACCOUNT], references: [ACCOUNTNUMBER])
 }
 
 model merchant_txns {
@@ -95,7 +127,7 @@ model merchant_txns {
   CUSTOMERACCOUNT    String
   T24USER            String
   T2TRANSACTIONDATE  DateTime
-  STATUS             String
+  STATUS             String // 'Completed' | 'Pending' | 'Failed'
   TRANSACTIONCHANNEL String
   TRANSACTIONSERVICE String
   VALUE1             String?
@@ -105,55 +137,15 @@ model merchant_txns {
   UPDATEDATE         DateTime @updatedAt
   INSERTUSER         String
   UPDATEUSER         String
-
-  allowed_company    allowed_companies @relation(fields: [MERCHANTACCOUNT], references: [ACCOUNTNUMBER])
 }
 
 model BranchUser {
-  id      String @id @default(cuid())
+  id      String  @id @default(cuid())
   name    String
-  email   String @unique
-  branchId String
-  status  String
-  
-  branch  Branch @relation(fields: [branchId], references: [id])
-}
-
-model arif_requests {
-  NONCEID                  String   @id @unique
-  SESSIONID                String
-  DEBITACCOUNT             String
-  CREDITACCOUNT            String
-  AMOUNT                   Float
-  MERCHANTACCOUNT          String
-  SALESPHONE               String
-  REQUEST1                 String
-  RESPONSE1                String
-  REQUEST2                 String
-  RESPONSE2                String
-  REQUEST3                 String
-  RESPONSE3                String
-  WEBHOOKRESPONSE          String
-  ERROR1                   String
-  MESSAGE1                 String
-  ERROR2                   String
-  MESSAGE2                 String
-  ERROR3                   String
-  MESSAGE3                 String
-  DATESEND1                DateTime
-  DATERECIVED1             DateTime
-  DATESEND2                DateTime
-  DATERECIVED2             DateTime
-  DATESEND3                DateTime?
-  DATERECIVED3             DateTime?
-  WEBHOOKRECEIVEDDATE      DateTime?
-  INSERTUSER               String
-  UPDATEUSER               String
-  ARIFPAYTRANSACTIONID     String   @unique
-  ARIFPAYTRANSACTIONSTATUS String
-  T24TRANSACTIONSTATUS     String
-
-  allowed_company          allowed_companies @relation(fields: [MERCHANTACCOUNT], references: [ACCOUNTNUMBER])
+  email   String  @unique
+  branch  String
+  status  String // 'Active' | 'Inactive' | 'Pending'
+  branch_relation Branch @relation(fields: [branch], references: [name])
 }
 
 model arifpay_endpoints {
@@ -192,15 +184,15 @@ model controllersconfigs {
 }
 
 model core_integration_settings {
-  ID          String   @id @default(cuid())
-  UNIQUEKEY   String   @unique
-  ADDRESS     String
-  USERNAME    String
-  PASSWORD    String
-  INSERTDATE  DateTime @default(now())
-  UPDATEDATE  DateTime @updatedAt
-  INSERTUSER  String
-  UPDATEUSER  String
+  ID         String   @id @default(cuid())
+  UNIQUEKEY  String   @unique
+  ADDRESS    String
+  USERNAME   String
+  PASSWORD   String
+  INSERTDATE DateTime @default(now())
+  UPDATEDATE DateTime @updatedAt
+  INSERTUSER String
+  UPDATEUSER String
 }
 
 model paystream_txns {
@@ -215,9 +207,6 @@ model paystream_txns {
   UPDATEDATE            DateTime @updatedAt
   INSERTUSER            String
   UPDATEUSER            String
-
-  allowed_company       allowed_companies @relation(fields: [MERCHANTACCOUNTNUMBER], references: [ACCOUNTNUMBER])
-  saler                 Merchant_users @relation(fields: [SALERPHONENUMBER], references: [PHONENUMBER])
 }
 
 model stream_pay_settings {
@@ -235,15 +224,15 @@ model stream_pay_settings {
 }
 
 model ussd_push_settings {
-  ID          String   @id @default(cuid())
-  ADDRESS     String
-  RESULTURL   String
-  USERNAME    String
-  PASSWORD    String
-  INSERTDATE  DateTime @default(now())
-  UPDATEDATE  DateTime @updatedAt
-  INSERTUSER  String
-  UPDATEUSER  String
+  ID         String   @id @default(cuid())
+  ADDRESS    String
+  RESULTURL  String
+  USERNAME   String
+  PASSWORD   String
+  INSERTDATE DateTime @default(now())
+  UPDATEDATE DateTime @updatedAt
+  INSERTUSER String
+  UPDATEUSER String
 }
 
 model qr_payments {
@@ -259,13 +248,11 @@ model qr_payments {
   UPDATEDATE       DateTime @updatedAt
   INSERTUSER       String
   UPDATEUSER       String
-
-  saler            Merchant_users @relation(fields: [SALERPHONENUMBER], references: [PHONENUMBER])
 }
 
 model account_infos {
   ID            String   @id @default(cuid())
-  ACCOUNTNUMBER String
+  ACCOUNTNUMBER String   @unique
   PHONENUMBER   String
   FULLNAME      String
   GENDER        String
@@ -275,8 +262,6 @@ model account_infos {
   UPDATEDATE    DateTime @updatedAt
   INSERTUSER    String
   UPDATEUSER    String
-
-  allowed_company allowed_companies @relation(fields: [ACCOUNTNUMBER], references: [ACCOUNTNUMBER])
 }
 
 model promo_adds {
@@ -293,18 +278,18 @@ model promo_adds {
 }
 
 model role_capablities {
-    ID          String @id @default(cuid())
-    ROLEID      String
-    MENUORDER   Int
+    ID           String   @id @default(cuid())
+    ROLEID       String
+    MENUORDER    Int
     SUBMENUORDER Int
-    MENUNAME    String
-    MENUNAME_am String
-    ADDRESS     String
-    PARENT      String
-    PARENTID    String
-    VALUE3      String?
+    MENUNAME     String
+    MENUNAME_am  String
+    ADDRESS      String
+    PARENT       String
+    PARENTID     String
+    VALUE3       String?
     INSERTUSERID String
     UPDATEUSERID String
-    INSERTDATE  DateTime @default(now())
-    UPDATEDATE  DateTime @updatedAt
+    INSERTDATE   DateTime @default(now())
+    UPDATEDATE   DateTime @updatedAt
 }
