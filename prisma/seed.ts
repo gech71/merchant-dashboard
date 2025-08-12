@@ -1,5 +1,4 @@
 
-
 import { prisma } from '../src/lib/prisma';
 import bcrypt from 'bcryptjs';
 
@@ -258,6 +257,3 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-
-
-    

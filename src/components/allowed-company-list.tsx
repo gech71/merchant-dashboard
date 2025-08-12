@@ -41,7 +41,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 type SortableKeys = 'FIELDNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'APPROVEUSER' | 'APPROVED';
 const ITEMS_PER_PAGE = 15;
 
-export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowed_companies[], approvalView?: boolean }) {
+export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowedCompanies: allowed_companies[], approvalView?: boolean }) {
   const { updateAllowedCompanyApproval, currentUser, branches, merchants, branchUsers } = useDataContext();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
