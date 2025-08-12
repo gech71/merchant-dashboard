@@ -56,12 +56,12 @@ type DataContextType = {
   addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => Promise<void>;
   updateAllowedCompany: (company: allowed_companies) => void;
   updateMerchant: (merchant: Merchant_users) => void;
-  addBranchUser: (user: BranchUser) => void;
-  updateBranchUser: (user: BranchUser) => void;
-  updateBranchStatus: (branchId: string, status: 'Approved' | 'Rejected') => void;
+  addBranchUser: (user: Omit<BranchUser, 'id' | 'status'>) => Promise<void>;
+  updateBranchUser: (user: BranchUser) => Promise<void>;
+  updateBranchStatus: (branchId: number, status: 'Approved' | 'Rejected') => void;
   updateAllowedCompanyApproval: (companyId: string, isApproved: boolean) => void;
   updateMerchantStatus: (merchantId: string, status: 'Active' | 'Disabled') => void;
-  updateBranchUserStatus: (userId: string, status: 'Active' | 'Inactive') => void;
+  updateBranchUserStatus: (userId: string, status: 'Active' | 'Inactive') => Promise<void>;
 };
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
@@ -133,13 +133,38 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setMerchants(prev => prev.map(m => m.ID === updatedMerchant.ID ? updatedMerchant : m));
   };
 
-  const addBranchUser = (user: BranchUser) => setBranchUsers(prev => [...prev, user]);
-  const updateBranchUser = (updatedUser: BranchUser) => {
-    setBranchUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+  const addBranchUser = async (userData: Omit<BranchUser, 'id' | 'status'>) => {
+    const response = await fetch('/api/branch-users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create branch user');
+    }
+    const newUser = await response.json();
+    setBranchUsers(prev => [...prev, newUser]);
   };
 
-  const updateBranchStatus = (branchId: string, status: 'Approved' | 'Rejected') => {
-    setBranches(prev => prev.map(b => b.id === branchId ? { ...b, status } : b));
+  const updateBranchUser = async (updatedUser: BranchUser) => {
+    const response = await fetch(`/api/branch-users/${updatedUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedUser),
+    });
+     if (!response.ok) {
+        throw new Error('Failed to update branch user');
+    }
+    const returnedUser = await response.json();
+    setBranchUsers(prev => prev.map(u => u.id === returnedUser.id ? returnedUser : u));
+  };
+
+  const updateBranchStatus = (branchId: number, status: 'Approved' | 'Rejected') => {
+    const branch = branches.find(b => b.id === branchId);
+    if (branch) {
+      updateBranch({ ...branch, status });
+    }
   };
   
   const updateAllowedCompanyApproval = (companyId: string, isApproved: boolean) => {
@@ -158,8 +183,11 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setMerchants(prev => prev.map(m => m.ID === merchantId ? { ...m, STATUS: status } : m));
   };
   
-  const updateBranchUserStatus = (userId: string, status: 'Active' | 'Inactive') => {
-    setBranchUsers(prev => prev.map(user => user.id === userId ? { ...user, status } : user));
+  const updateBranchUserStatus = async (userId: string, status: 'Active' | 'Inactive') => {
+    const user = branchUsers.find(u => u.id === userId);
+    if (user) {
+        await updateBranchUser({ ...user, status });
+    }
   };
 
   const value = {

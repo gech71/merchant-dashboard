@@ -38,6 +38,8 @@ export function EditBranchUserForm({
 }) {
   const { toast } = useToast();
   const { branches, updateBranchUser } = useDataContext();
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const form = useForm<BranchUserFormValues>({
     resolver: zodResolver(branchUserFormSchema),
     defaultValues: {
@@ -47,17 +49,24 @@ export function EditBranchUserForm({
     },
   });
 
-  function onSubmit(data: BranchUserFormValues) {
-    const updatedUser: BranchUser = {
-      ...user,
-      ...data,
-    };
-    updateBranchUser(updatedUser);
-    toast({
-      title: 'Branch User Updated',
-      description: `${data.name} has been successfully updated.`,
-    });
-    setOpen(false);
+  async function onSubmit(data: BranchUserFormValues) {
+    setIsLoading(true);
+    try {
+        await updateBranchUser({ ...user, ...data });
+        toast({
+            title: 'Branch User Updated',
+            description: `${data.name} has been successfully updated.`,
+        });
+        setOpen(false);
+    } catch (error) {
+         toast({
+            variant: 'destructive',
+            title: 'Failed to Update Branch User',
+            description: 'An error occurred while trying to update the user.',
+        });
+    } finally {
+        setIsLoading(false);
+    }
   }
 
   return (
@@ -118,10 +127,11 @@ export function EditBranchUserForm({
             type="button"
             variant="outline"
             onClick={() => setOpen(false)}
+            disabled={isLoading}
           >
             Cancel
           </Button>
-          <Button type="submit">Save Changes</Button>
+          <Button type="submit" disabled={isLoading}>{isLoading ? 'Saving...' : 'Save Changes'}</Button>
         </div>
       </form>
     </Form>

@@ -18,7 +18,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import type { BranchUser } from '@/types';
 import { useDataContext } from '@/context/data-context';
 
 const branchUserFormSchema = z.object({
@@ -36,6 +35,8 @@ export function AddBranchUserForm({
 }) {
   const { toast } = useToast();
   const { branches, addBranchUser } = useDataContext();
+  const [isLoading, setIsLoading] = React.useState(false);
+  
   const form = useForm<BranchUserFormValues>({
     resolver: zodResolver(branchUserFormSchema),
     defaultValues: {
@@ -44,18 +45,24 @@ export function AddBranchUserForm({
     },
   });
 
-  function onSubmit(data: BranchUserFormValues) {
-    const newUser: BranchUser = {
-        id: new Date().toISOString(),
-        ...data,
-        status: 'Pending'
+  async function onSubmit(data: BranchUserFormValues) {
+    setIsLoading(true);
+    try {
+      await addBranchUser(data);
+      toast({
+        title: 'Branch User Submitted for Approval',
+        description: `${data.name} has been successfully submitted and is awaiting verification.`,
+      });
+      setOpen(false);
+    } catch (error: any) {
+        toast({
+            variant: 'destructive',
+            title: 'Failed to Add Branch User',
+            description: error.message || 'An error occurred while trying to add the user.',
+        });
+    } finally {
+        setIsLoading(false);
     }
-    addBranchUser(newUser);
-    toast({
-      title: 'Branch User Submitted for Approval',
-      description: `${data.name} has been successfully submitted and is awaiting verification.`,
-    });
-    setOpen(false);
   }
 
   return (
@@ -110,8 +117,8 @@ export function AddBranchUserForm({
           )}
         />
         <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit">Add User</Button>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isLoading}>Cancel</Button>
+            <Button type="submit" disabled={isLoading}>{isLoading ? 'Adding...' : 'Add User'}</Button>
         </div>
       </form>
     </Form>

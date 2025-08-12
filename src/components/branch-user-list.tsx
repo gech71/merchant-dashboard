@@ -46,8 +46,7 @@ type SortableKeys = 'name' | 'email' | 'branch' | 'status';
 const ITEMS_PER_PAGE = 15;
 
 export default function BranchUserList({ branchUsers: initialBranchUsers, approvalView = false }: { branchUsers: BranchUser[], approvalView?: boolean }) {
-  const { updateBranchUserStatus } = useDataContext();
-  const [branchUsers, setBranchUsers] = React.useState(initialBranchUsers);
+  const { branchUsers, updateBranchUserStatus } = useDataContext();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
@@ -58,10 +57,6 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
   const [selectedUser, setSelectedUser] = React.useState<EditableItem>(null);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
   const [currentPage, setCurrentPage] = React.useState(1);
-  
-  React.useEffect(() => {
-    setBranchUsers(initialBranchUsers);
-  }, [initialBranchUsers]);
 
   const handleStatusChange = (userId: string, status: 'Active' | 'Inactive') => {
     updateBranchUserStatus(userId, status);
