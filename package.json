@@ -11,7 +11,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "seed": "ts-node --compiler-options '{\\\"module\\\":\\\"commonjs\\\"}' prisma/seed.ts"
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.14.1",
