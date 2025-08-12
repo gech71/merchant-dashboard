@@ -2,6 +2,7 @@
 
 
 
+
 export type allowed_companies = {
   Oid: string;
   ID: string;
@@ -49,6 +50,19 @@ export type Merchant_users = {
   UPDATEUSERID: string;
   INSERTDATE: string;
   UPDATEDATE: string;
+};
+
+export type merchants_daily_balances = {
+  ID: string;
+  MERCHANTACCOUNT: string;
+  MERCHANTPHONE: string;
+  DAILYBALANCE: number;
+  DAILYTXNCOUNT: number;
+  BALANCEDATE: string;
+  INSERTDATE: string;
+  UPDATEDATE: string;
+  INSERTUSER: string;
+  UPDATEUSER: string;
 };
 
 

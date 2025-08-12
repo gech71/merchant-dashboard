@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -13,7 +14,8 @@ import {
   UserCircle,
   CheckSquare,
   UserCog,
-  LayoutGrid
+  LayoutGrid,
+  DollarSign
 } from 'lucide-react';
 
 import {
@@ -47,6 +49,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/branches', icon: Home, label: 'Branches' },
   { href: '/dashboard/branch-users', icon: UserCog, label: 'Branch Users' },
   { href: '/dashboard/merchant_users', icon: Briefcase, label: 'Merchant Users' },
+  { href: '/dashboard/daily-balances', icon: DollarSign, label: 'Daily Balances' },
 ];
 
 const APPROVAL_NAV_ITEMS = [

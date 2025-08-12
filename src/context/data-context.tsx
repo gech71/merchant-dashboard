@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances } from '@/types';
 
 // Mock Data
 const MOCK_BRANCHES: Branch[] = [
@@ -15,11 +15,11 @@ const MOCK_BRANCHES: Branch[] = [
 ];
 
 const MOCK_ALLOWED_COMPANIES: allowed_companies[] = [
-  { Oid: 'oid_C001_1', ID: 'C001', ACCOUNTNUMBER: 'ACC001', FIELDNAME: 'Innovate Inc.', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-01-15', UPDATEDATE: '2023-01-15', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
-  { Oid: 'oid_C002_1', ID: 'C002', ACCOUNTNUMBER: 'ACC002', FIELDNAME: 'Apex Solutions', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-02-20', UPDATEDATE: '2023-02-20', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
-  { Oid: 'oid_C003_1', ID: 'C003', ACCOUNTNUMBER: 'ACC003', FIELDNAME: 'Quantum Corp', APPROVED: false, STATUS: 'Pending', INSERTDATE: '2023-03-10', UPDATEDATE: '2023-03-10', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
-  { Oid: 'oid_C004_1', ID: 'C004', ACCOUNTNUMBER: 'ACC004', FIELDNAME: 'Synergy Systems', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-04-05', UPDATEDATE: '2023-04-05', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
-  { Oid: 'oid_C005_1', ID: 'C005', ACCOUNTNUMBER: 'ACC005', FIELDNAME: 'Pioneer Ltd.', APPROVEUSER: 'admin', APPROVED: false, STATUS: 'Inactive', INSERTDATE: '2023-05-12', UPDATEDATE: '2023-05-12', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
+  { Oid: 'oid_C001', ID: 'C001', ACCOUNTNUMBER: 'ACC001', FIELDNAME: 'Innovate Inc.', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-01-15', UPDATEDATE: '2023-01-15', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
+  { Oid: 'oid_C002', ID: 'C002', ACCOUNTNUMBER: 'ACC002', FIELDNAME: 'Apex Solutions', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-02-20', UPDATEDATE: '2023-02-20', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
+  { Oid: 'oid_C003', ID: 'C003', ACCOUNTNUMBER: 'ACC003', FIELDNAME: 'Quantum Corp', APPROVED: false, STATUS: 'Pending', INSERTDATE: '2023-03-10', UPDATEDATE: '2023-03-10', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
+  { Oid: 'oid_C004', ID: 'C004', ACCOUNTNUMBER: 'ACC004', FIELDNAME: 'Synergy Systems', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: '2023-04-05', UPDATEDATE: '2023-04-05', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
+  { Oid: 'oid_C005', ID: 'C005', ACCOUNTNUMBER: 'ACC005', FIELDNAME: 'Pioneer Ltd.', APPROVEUSER: 'admin', APPROVED: false, STATUS: 'Inactive', INSERTDATE: '2023-05-12', UPDATEDATE: '2023-05-12', INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0 },
 ];
 
 const MOCK_MERCHANT_USERS: Merchant_users[] = [
@@ -41,6 +41,15 @@ const MOCK_BRANCH_USERS: BranchUser[] = [
   { id: '5', name: 'David Williams', email: 'david.w@branch.com', branch: 'Uptown Branch', status: 'Active' },
 ];
 
+const MOCK_DAILY_BALANCES: merchants_daily_balances[] = [
+  { ID: '1', MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', DAILYBALANCE: 1500.75, DAILYTXNCOUNT: 25, BALANCEDATE: '2023-06-01', INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
+  { ID: '2', MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', DAILYBALANCE: 1800.50, DAILYTXNCOUNT: 30, BALANCEDATE: '2023-06-02', INSERTDATE: '2023-06-02', UPDATEDATE: '2023-06-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
+  { ID: '3', MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', DAILYBALANCE: 3200.00, DAILYTXNCOUNT: 50, BALANCEDATE: '2023-06-01', INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
+  { ID: '4', MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', DAILYBALANCE: 2950.25, DAILYTXNCOUNT: 45, BALANCEDATE: '2023-06-02', INSERTDATE: '2023-06-02', UPDATEDATE: '2023-06-02', INSERTUSER: 'system', UPDATEUSER: 'system' },
+  { ID: '5', MERCHANTACCOUNT: 'ACC004', MERCHANTPHONE: '444-555-6666', DAILYBALANCE: 500.00, DAILYTXNCOUNT: 10, BALANCEDATE: '2023-06-01', INSERTDATE: '2023-06-01', UPDATEDATE: '2023-06-01', INSERTUSER: 'system', UPDATEUSER: 'system' },
+];
+
+
 const MOCK_CURRENT_USER: BranchUser = MOCK_BRANCH_USERS[0];
 
 type DataContextType = {
@@ -48,6 +57,7 @@ type DataContextType = {
   allowedCompanies: allowed_companies[];
   merchants: Merchant_users[];
   branchUsers: BranchUser[];
+  dailyBalances: merchants_daily_balances[];
   currentUser: BranchUser;
   addBranch: (branch: Branch) => void;
   updateBranch: (branch: Branch) => void;
@@ -69,6 +79,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [allowedCompanies, setAllowedCompanies] = React.useState<allowed_companies[]>(MOCK_ALLOWED_COMPANIES);
   const [merchants, setMerchants] = React.useState<Merchant_users[]>(MOCK_MERCHANT_USERS);
   const [branchUsers, setBranchUsers] = React.useState<BranchUser[]>(MOCK_BRANCH_USERS);
+  const [dailyBalances, setDailyBalances] = React.useState<merchants_daily_balances[]>(MOCK_DAILY_BALANCES);
   const [currentUser, setCurrentUser] = React.useState<BranchUser>(MOCK_CURRENT_USER);
 
   const addBranch = (branch: Branch) => setBranches(prev => [...prev, branch]);
@@ -80,7 +91,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const now = new Date().toISOString();
     const newIdNumber = Math.max(...allowedCompanies.map(c => parseInt(c.ID.replace('C', ''), 10)), 0) + 1;
     const newId = `C${newIdNumber.toString().padStart(3, '0')}`;
-    const newOid = `oid_${newId}_${new Date().getTime()}`;
+    const newOid = `oid_${newId}`;
 
     const newCompany: allowed_companies = {
         ...company,
@@ -139,6 +150,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     allowedCompanies,
     merchants,
     branchUsers,
+    dailyBalances,
     currentUser,
     addBranch,
     updateBranch,
