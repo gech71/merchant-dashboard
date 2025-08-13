@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ShieldAlert } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardLayout({
   children,
@@ -14,21 +15,29 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const { currentUser } = useDataContext();
+  const router = useRouter();
   const pathname = usePathname();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
+    if (currentUser === null) {
+      router.push('/login');
+      return;
+    }
+    
     if (currentUser) {
         const authorized = currentUser.permissions?.includes(pathname) ?? false;
         setIsAuthorized(authorized);
     }
-  }, [currentUser, pathname]);
+  }, [currentUser, pathname, router]);
 
   if (isAuthorized === null) {
     return (
-        <div className="flex min-h-screen items-center justify-center">
-            <p>Loading...</p>
-        </div>
+        <Layout>
+            <div className="flex min-h-screen items-center justify-center">
+                <p>Loading...</p>
+            </div>
+        </Layout>
     );
   }
 

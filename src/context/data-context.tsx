@@ -3,6 +3,9 @@
 
 import * as React from 'react';
 import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos, promo_adds, role_capablities, Role } from '@/types';
+import { jwtVerify } from 'jose';
+
+const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET || 'your-super-secret-jwt-key';
 
 type CurrentUser = {
     userId: string;
@@ -76,8 +79,32 @@ type DataContextType = {
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
 
+async function decodeToken(token: string): Promise<CurrentUser | null> {
+    try {
+        const secret = new TextEncoder().encode(JWT_SECRET);
+        const { payload } = await jwtVerify(token, secret);
+        return payload as CurrentUser;
+    } catch (error) {
+        console.error("Failed to decode token:", error);
+        return null;
+    }
+}
+
 export function DataProvider({ children, initialData }: { children: React.ReactNode, initialData: InitialData }) {
   const [currentUser, setCurrentUser] = React.useState<CurrentUser | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const initializeUser = async () => {
+        const token = document.cookie.split('; ').find(row => row.startsWith('accessToken='))?.split('=')[1];
+        if (token) {
+            const user = await decodeToken(token);
+            setCurrentUser(user);
+        }
+        setLoading(false);
+    };
+    initializeUser();
+  }, []);
 
   const isSystemAdmin = currentUser?.role === 'System Admin';
   const isBranchUser = currentUser?.userType === 'branch';
@@ -376,6 +403,14 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     updateUserRole,
   };
 
+  if (loading) {
+    return (
+        <div className="flex min-h-screen items-center justify-center">
+            <p>Loading...</p>
+        </div>
+    );
+  }
+
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 }
 
@@ -386,5 +421,3 @@ export function useDataContext() {
   }
   return context;
 }
-
-    
