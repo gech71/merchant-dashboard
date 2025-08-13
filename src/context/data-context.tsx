@@ -279,7 +279,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
             APPROVED: isApproved, 
-            STATUS: isApproved // Automatically set to active on approval
+            STATUS: isApproved // On rejection, STATUS also becomes false
         }),
     });
     if (!response.ok) {

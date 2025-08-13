@@ -1,3 +1,4 @@
+
 'use server';
 
 import { prisma } from '@/lib/prisma';
@@ -7,7 +8,7 @@ import { cookies } from 'next/headers';
 
 export async function PUT(
   request: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: { id: string } }
 ) {
   try {
     const cookieStore = await cookies();
@@ -18,7 +19,7 @@ export async function PUT(
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
     
-    const { id } = await context.params;
+    const { id } = context.params;
 
     const body = await request.json();
     const { APPROVED, STATUS } = body;
