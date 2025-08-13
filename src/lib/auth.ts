@@ -80,7 +80,8 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
 }
 
 export async function getMe() {
-    const token = cookies().get('accessToken')?.value;
+    const cookieStore = await cookies();
+    const token = cookieStore.get('accessToken')?.value;
     const user = await getCurrentUser(token);
     if (!user) {
         return new NextResponse(JSON.stringify({ message: "Not authenticated" }), { status: 401 });
