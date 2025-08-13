@@ -4,13 +4,15 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getCurrentUser();
+    const token = cookies().get('accessToken')?.value;
+    const user = await getCurrentUser(token);
     if (!user) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }

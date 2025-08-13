@@ -1,4 +1,6 @@
 
+'use server';
+
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
 import { prisma } from '@/lib/prisma';
@@ -18,10 +20,7 @@ type UserPayload = {
     permissions: string[];
 };
 
-export async function getCurrentUser(): Promise<UserPayload | null> {
-  const cookieStore = cookies();
-  const token = cookieStore.get('accessToken')?.value;
-
+export async function getCurrentUser(token: string | undefined): Promise<UserPayload | null> {
   if (!token) {
     return null;
   }
@@ -81,7 +80,8 @@ export async function getCurrentUser(): Promise<UserPayload | null> {
 }
 
 export async function getMe() {
-    const user = await getCurrentUser();
+    const token = cookies().get('accessToken')?.value;
+    const user = await getCurrentUser(token);
     if (!user) {
         return new NextResponse(JSON.stringify({ message: "Not authenticated" }), { status: 401 });
     }
