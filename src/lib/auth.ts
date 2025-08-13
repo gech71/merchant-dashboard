@@ -2,6 +2,7 @@
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
 import { prisma } from '@/lib/prisma';
+import { NextResponse } from 'next/server';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key';
 const secret = new TextEncoder().encode(JWT_SECRET);
@@ -77,4 +78,12 @@ export async function getCurrentUser(): Promise<UserPayload | null> {
     console.error('Failed to verify JWT:', err);
     return null;
   }
+}
+
+export async function getMe() {
+    const user = await getCurrentUser();
+    if (!user) {
+        return new NextResponse(JSON.stringify({ message: "Not authenticated" }), { status: 401 });
+    }
+    return new NextResponse(JSON.stringify(user));
 }

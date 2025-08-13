@@ -3,9 +3,6 @@
 
 import * as React from 'react';
 import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos, promo_adds, role_capablities, Role } from '@/types';
-import { jwtVerify } from 'jose';
-
-const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET || 'your-super-secret-jwt-key';
 
 type CurrentUser = {
     userId: string;
@@ -65,7 +62,7 @@ type DataContextType = {
   addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord' | 'branch'>) => Promise<void>;
   updateAllowedCompany: (company: allowed_companies) => void;
   updateMerchant: (merchant: Merchant_users) => Promise<void>;
-  addBranchUser: (user: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'role'>) => Promise<void>;
+  addBranchUser: (user: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'role' | 'password'>) => Promise<void>;
   updateBranchUser: (user: BranchUser) => Promise<void>;
   updateBranchStatus: (branchId: number, status: 'Approved' | 'Rejected') => void;
   updateAllowedCompanyApproval: (companyId: string, isApproved: boolean) => Promise<void>;
@@ -79,32 +76,29 @@ type DataContextType = {
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
 
-async function decodeToken(token: string): Promise<CurrentUser | null> {
-    try {
-        const secret = new TextEncoder().encode(JWT_SECRET);
-        const { payload } = await jwtVerify(token, secret);
-        return payload as CurrentUser;
-    } catch (error) {
-        console.error("Failed to decode token:", error);
-        return null;
-    }
-}
-
 export function DataProvider({ children, initialData }: { children: React.ReactNode, initialData: InitialData }) {
   const [currentUser, setCurrentUser] = React.useState<CurrentUser | null>(null);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    const initializeUser = async () => {
-        const token = document.cookie.split('; ').find(row => row.startsWith('accessToken='))?.split('=')[1];
-        if (token) {
-            const user = await decodeToken(token);
-            setCurrentUser(user);
+    const fetchUser = async () => {
+        try {
+            const response = await fetch('/api/auth/me');
+            if (response.ok) {
+                const user = await response.json();
+                setCurrentUser(user);
+            } else {
+                setCurrentUser(null);
+            }
+        } catch (error) {
+            console.error('Failed to fetch user', error);
+            setCurrentUser(null);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
-    initializeUser();
-  }, []);
+    fetchUser();
+}, []);
 
   const isSystemAdmin = currentUser?.role === 'System Admin';
   const isBranchUser = currentUser?.userType === 'branch';
@@ -244,7 +238,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     if (index !== -1) initialData.merchants[index] = returnedUser;
   };
 
-  const addBranchUser = async (userData: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'role'>) => {
+  const addBranchUser = async (userData: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'role' | 'password'>) => {
     const response = await fetch('/api/branch-users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -421,3 +415,5 @@ export function useDataContext() {
   }
   return context;
 }
+
+    
