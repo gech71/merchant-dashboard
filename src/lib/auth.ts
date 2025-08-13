@@ -13,6 +13,7 @@ type UserPayload = {
     name: string;
     email: string;
     accountNumber: string | null;
+    branch: string | null;
     permissions: string[];
 };
 
@@ -56,6 +57,7 @@ export async function getCurrentUser(): Promise<UserPayload | null> {
             name: user.FULLNAME,
             email: user.PHONENUMBER,
             accountNumber: user.ACCOUNTNUMBER,
+            branch: null, // Merchant users are not directly in a branch
             permissions: permissions,
         };
     } else { // userType === 'branch'
@@ -65,7 +67,8 @@ export async function getCurrentUser(): Promise<UserPayload | null> {
             role: user.role.name,
             name: user.name,
             email: user.email,
-            accountNumber: null, // System admins are not tied to a company
+            accountNumber: null, 
+            branch: user.branch,
             permissions: permissions,
         };
     }

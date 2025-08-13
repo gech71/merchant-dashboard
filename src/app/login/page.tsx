@@ -93,7 +93,7 @@ export default function LoginPage() {
                 </CardDescription>
                  <TabsList className="grid w-full grid-cols-2 mt-4">
                     <TabsTrigger value="merchant">Merchant User</TabsTrigger>
-                    <TabsTrigger value="branch">System Admin</TabsTrigger>
+                    <TabsTrigger value="branch">Branch/System User</TabsTrigger>
                 </TabsList>
             </CardHeader>
             <CardContent>
@@ -143,3 +143,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    

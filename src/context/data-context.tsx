@@ -11,6 +11,7 @@ type CurrentUser = {
     name: string;
     email: string;
     accountNumber: string | null;
+    branch: string | null;
     permissions: string[];
 };
 
@@ -58,7 +59,7 @@ type DataContextType = {
   setCurrentUser: (user: CurrentUser | null) => void;
   addBranch: (branch: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE'>) => Promise<void>;
   updateBranch: (branch: Branch) => Promise<void>;
-  addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => Promise<void>;
+  addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord' | 'branch'>) => Promise<void>;
   updateAllowedCompany: (company: allowed_companies) => void;
   updateMerchant: (merchant: Merchant_users) => Promise<void>;
   addBranchUser: (user: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'role'>) => Promise<void>;
@@ -78,15 +79,20 @@ const DataContext = React.createContext<DataContextType | undefined>(undefined);
 export function DataProvider({ children, initialData }: { children: React.ReactNode, initialData: InitialData }) {
   const [currentUser, setCurrentUser] = React.useState<CurrentUser | null>(null);
 
-  const isSystemAdmin = currentUser?.userType === 'branch';
+  const isSystemAdmin = currentUser?.role === 'System Admin';
+  const isBranchUser = currentUser?.userType === 'branch';
   const userAccountNumber = currentUser?.accountNumber;
 
   const branches = React.useMemo(() => isSystemAdmin ? initialData.branches : [], [isSystemAdmin, initialData.branches]);
+  
   const allowedCompanies = React.useMemo(() => {
     if (isSystemAdmin) return initialData.allowedCompanies;
+    if (currentUser?.userType === 'branch') {
+        return initialData.allowedCompanies.filter(c => c.branch === currentUser.branch);
+    }
     if (userAccountNumber) return initialData.allowedCompanies.filter(c => c.ACCOUNTNUMBER === userAccountNumber);
     return [];
-  }, [isSystemAdmin, userAccountNumber, initialData.allowedCompanies]);
+  }, [isSystemAdmin, userAccountNumber, currentUser, initialData.allowedCompanies]);
 
   const merchants = React.useMemo(() => {
     if (isSystemAdmin) return initialData.merchants;
@@ -175,7 +181,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     if (index !== -1) initialData.branches[index] = returnedBranch;
   };
 
-  const addAllowedCompany = async (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => {
+  const addAllowedCompany = async (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord' | 'branch'>) => {
     const response = await fetch('/api/allowed_companies', {
         method: 'POST',
         headers: {
@@ -380,3 +386,5 @@ export function useDataContext() {
   }
   return context;
 }
+
+    

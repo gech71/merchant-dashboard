@@ -40,6 +40,7 @@ export async function POST(request: Request) {
                 name: user.FULLNAME,
                 email: user.PHONENUMBER,
                 accountNumber: user.ACCOUNTNUMBER,
+                branch: null,
                 permissions,
             };
         }
@@ -58,7 +59,8 @@ export async function POST(request: Request) {
                 role: user.role?.name || 'No Role',
                 name: user.name,
                 email: user.email,
-                accountNumber: null, // Branch users are not tied to a single company
+                accountNumber: null,
+                branch: user.branch,
                 permissions,
             };
         }

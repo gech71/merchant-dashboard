@@ -29,6 +29,9 @@ export async function POST(request: Request) {
     const newIdNumber = Math.max(...companies.map(c => parseInt(c.ID.replace('C', ''), 10)), 0) + 1;
     const newId = `C${newIdNumber.toString().padStart(3, '0')}`;
     const newOid = `oid_${newId}`;
+    
+    // If the user is a branch user, associate the company with their branch
+    const branch = user.userType === 'branch' ? user.branch : null;
 
     const newCompany = await prisma.allowed_companies.create({
       data: {
@@ -43,6 +46,7 @@ export async function POST(request: Request) {
         UPDATEUSER: user.name,
         OptimisticLockField: 0,
         GCRecord: 0,
+        branch: branch,
       },
     });
 
