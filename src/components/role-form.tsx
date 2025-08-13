@@ -140,39 +140,41 @@ export function RoleForm({ setOpen, role }: { setOpen: (open: boolean) => void, 
                                 <FormLabel>Permissions</FormLabel>
                                 <FormDescription>Select the pages this role will have access to.</FormDescription>
                             </div>
-                            <Accordion type="multiple" className="w-full" defaultValue={Object.keys(PAGE_GROUPS)}>
-                                {Object.entries(PAGE_GROUPS).map(([groupName, pages]) => (
-                                <AccordionItem value={groupName} key={groupName}>
-                                    <AccordionTrigger>{groupName}</AccordionTrigger>
-                                    <AccordionContent>
-                                        <div className="space-y-4 ml-2 pl-4 border-l">
-                                            {pages.map((item) => (
-                                                <FormField
-                                                    key={item.id}
-                                                    control={form.control}
-                                                    name="permissions.pages"
-                                                    render={({ field }) => (
-                                                        <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
-                                                            <FormControl>
-                                                                <Checkbox
-                                                                    checked={field.value?.includes(item.id)}
-                                                                    onCheckedChange={(checked) => (
-                                                                        checked
-                                                                            ? field.onChange([...field.value, item.id])
-                                                                            : field.onChange(field.value?.filter(value => value !== item.id))
-                                                                    )}
-                                                                />
-                                                            </FormControl>
-                                                            <FormLabel className="font-normal">{item.label}</FormLabel>
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            ))}
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                                ))}
-                            </Accordion>
+                             <ScrollArea className="h-72 w-full rounded-md border p-4">
+                                <Accordion type="multiple" className="w-full" defaultValue={Object.keys(PAGE_GROUPS)}>
+                                    {Object.entries(PAGE_GROUPS).map(([groupName, pages]) => (
+                                    <AccordionItem value={groupName} key={groupName}>
+                                        <AccordionTrigger>{groupName}</AccordionTrigger>
+                                        <AccordionContent>
+                                            <div className="space-y-4 ml-2 pl-4 border-l">
+                                                {pages.map((item) => (
+                                                    <FormField
+                                                        key={item.id}
+                                                        control={form.control}
+                                                        name="permissions.pages"
+                                                        render={({ field }) => (
+                                                            <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                                                <FormControl>
+                                                                    <Checkbox
+                                                                        checked={field.value?.includes(item.id)}
+                                                                        onCheckedChange={(checked) => (
+                                                                            checked
+                                                                                ? field.onChange([...field.value, item.id])
+                                                                                : field.onChange(field.value?.filter(value => value !== item.id))
+                                                                        )}
+                                                                    />
+                                                                </FormControl>
+                                                                <FormLabel className="font-normal">{item.label}</FormLabel>
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                    ))}
+                                </Accordion>
+                            </ScrollArea>
                             <FormMessage />
                         </FormItem>
                     )}
