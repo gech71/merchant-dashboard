@@ -1,6 +1,8 @@
 
-import { prisma } from '../src/lib/prisma';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
 
 const MOCK_BRANCHES = [
   { name: 'Downtown Branch', code: 'DT001', address: '123 Main St, Anytown, USA', contact: '555-1234', status: 'Approved' },
@@ -59,8 +61,8 @@ const MOCK_ARIF_REQUESTS = [
 ]
 
 const MOCK_ARIFPAY_ENDPOINTS = [
-    { ID: 'ep_1', BANK: 'Bank of Abyssina', DISPLAYNAME: 'BoA', OTPLENGTH: 6, displayOrder: 1, ENDPOINT1: 'https://api.boa.com/v1/pay', ENDPOINT2: 'https://api.boa.com/v1/confirm', ENDPOINT3: '', CANCELURL: 'https://boa.com/cancel', ERRORURL: 'https://boa.com/error', SUCCESSURL: 'https://boa.com/success', NOTIFYURL: 'https://api.myapp.com/notify/boa', ISTWOSTEP: true, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '987654321', BENEFICIARYBANK: 'BoA', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ep_2', BANK: 'Awash Bank', DISPLAYNAME: 'Awash', OTPLENGTH: 4, displayOrder: 2, ENDPOINT1: 'https://api.awashbank.com/execute', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://awashbank.com/cancel', ERRORURL: 'https://awashbank.com/error', SUCCESSURL: 'https://awashbank.com/success', NOTIFYURL: 'https://api.myapp.com/notify/awash', ISTWOSTEP: false, ISOTP: false, TRANSACTIONTYPE: 'B2B', BENEFICIARYACCOUNT: '123456789', BENEFICIARYBANK: 'Awash', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-02'), UPDATEDATE: new Date('2023-01-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'ep_1', BANK: 'Bank of Abyssina', DISPLAYNAME: 'BoA', OTPLENGTH: 6, ORDER: 1, ENDPOINT1: 'https://api.boa.com/v1/pay', ENDPOINT2: 'https://api.boa.com/v1/confirm', ENDPOINT3: '', CANCELURL: 'https://boa.com/cancel', ERRORURL: 'https://boa.com/error', SUCCESSURL: 'https://boa.com/success', NOTIFYURL: 'https://api.myapp.com/notify/boa', ISTWOSTEP: true, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '987654321', BENEFICIARYBANK: 'BoA', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: 'ep_2', BANK: 'Awash Bank', DISPLAYNAME: 'Awash', OTPLENGTH: 4, ORDER: 2, ENDPOINT1: 'https://api.awashbank.com/execute', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://awashbank.com/cancel', ERRORURL: 'https://awashbank.com/error', SUCCESSURL: 'https://awashbank.com/success', NOTIFYURL: 'https://api.myapp.com/notify/awash', ISTWOSTEP: false, ISOTP: false, TRANSACTIONTYPE: 'B2B', BENEFICIARYACCOUNT: '123456789', BENEFICIARYBANK: 'Awash', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-02'), UPDATEDATE: new Date('2023-01-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
 const MOCK_CONTROLLERSCONFIGS = [
@@ -196,11 +198,10 @@ async function main() {
     console.log(`Seeded ${MOCK_ALLOWED_COMPANIES.length} allowed companies.`);
 
     for (const m of MOCK_MERCHANT_USERS) {
-        const { ID, ...merchantData } = m;
         const hashedPassword = await bcrypt.hash(m.ACCOUNTNUMBER, 10);
         await prisma.merchant_users.create({ 
             data: {
-                ...merchantData,
+                ...m,
                 password: hashedPassword,
                 roleId: m.ROLE === 'Admin' ? adminRole.id : salesRole.id,
             } 
