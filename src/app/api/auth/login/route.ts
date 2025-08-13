@@ -81,7 +81,7 @@ export async function POST(request: Request) {
         { expiresIn: JWT_EXPIRES_IN }
     );
     
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     cookieStore.set('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
