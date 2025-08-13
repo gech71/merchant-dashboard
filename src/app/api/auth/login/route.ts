@@ -12,46 +12,67 @@ const JWT_EXPIRES_IN = '1h';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { phoneNumber, accountNumber } = body;
+    const { identifier, password, userType } = body;
 
-    if (!phoneNumber || !accountNumber) {
+    if (!identifier || !password || !userType) {
       return NextResponse.json(
-        { isSuccess: false, message: 'Phone number and account number are required' },
+        { isSuccess: false, message: 'Identifier, password and user type are required' },
         { status: 400 }
       );
     }
 
-    const user = await prisma.merchant_users.findUnique({
-      where: { PHONENUMBER: phoneNumber },
-      include: { role: true },
-    });
+    let user: any = null;
+    let userPayload: any = null;
 
-    if (!user) {
-      return NextResponse.json(
-        { isSuccess: false, message: 'Invalid credentials' },
-        { status: 401 }
-      );
+    if (userType === 'merchant') {
+        const merchantUser = await prisma.merchant_users.findUnique({
+            where: { PHONENUMBER: identifier },
+            include: { role: true },
+        });
+
+        if (merchantUser && (await bcrypt.compare(password, merchantUser.password))) {
+            user = merchantUser;
+            const permissions = (user.role?.permissions as {pages: string[]})?.pages || [];
+            userPayload = {
+                userId: user.ID,
+                userType: 'merchant',
+                role: user.role?.name || 'No Role',
+                name: user.FULLNAME,
+                email: user.PHONENUMBER,
+                accountNumber: user.ACCOUNTNUMBER,
+                permissions,
+            };
+        }
+    } else if (userType === 'branch') {
+        const branchUser = await prisma.branchUser.findUnique({
+            where: { email: identifier },
+            include: { role: true },
+        });
+        
+        if (branchUser && (await bcrypt.compare(password, branchUser.password))) {
+            user = branchUser;
+            const permissions = (user.role?.permissions as {pages: string[]})?.pages || [];
+            userPayload = {
+                userId: user.id.toString(),
+                userType: 'branch',
+                role: user.role?.name || 'No Role',
+                name: user.name,
+                email: user.email,
+                accountNumber: null, // Branch users are not tied to a single company
+                permissions,
+            };
+        }
+    } else {
+        return NextResponse.json({ isSuccess: false, message: 'Invalid user type' }, { status: 400 });
     }
 
-    const isPasswordValid = await bcrypt.compare(accountNumber, user.password);
-
-    if (!isPasswordValid) {
+    if (!user || !userPayload) {
       return NextResponse.json(
         { isSuccess: false, message: 'Invalid credentials' },
         { status: 401 }
       );
     }
     
-    const permissions = (user.role?.permissions as {pages: string[]})?.pages || [];
-
-    const userPayload = {
-        userId: user.ID,
-        role: user.role?.name || 'No Role',
-        name: user.FULLNAME,
-        email: user.PHONENUMBER, // Using phone number as email for display
-        permissions,
-    };
-
     const accessToken = jwt.sign(
         userPayload,
         JWT_SECRET,

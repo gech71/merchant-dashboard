@@ -1,8 +1,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 const MOCK_BRANCHES = [
   { name: 'Downtown Branch', code: 'DT001', address: '123 Main St, Anytown, USA', contact: '555-1234', status: 'Approved' },
@@ -139,10 +138,10 @@ async function main() {
     await prisma.role.deleteMany({});
 
     // Create default roles
-    const adminRole = await prisma.role.create({
+    const systemAdminRole = await prisma.role.create({
         data: {
-            name: 'Admin',
-            description: 'Has access to all dashboard features.',
+            name: 'System Admin',
+            description: 'Has full access to all system features and data across all companies.',
             permissions: {
                 "pages": [
                     "/dashboard",
@@ -171,11 +170,26 @@ async function main() {
             }
         }
     });
-
-    const salesRole = await prisma.role.create({
+    
+    const merchantAdminRole = await prisma.role.create({
         data: {
-            name: 'Sales',
-            description: 'Can only view their own transactions and basic info.',
+            name: 'Merchant Admin',
+            description: 'Full dashboard access, restricted to their own company.',
+            permissions: {
+                "pages": [
+                    "/dashboard",
+                    "/dashboard/merchant_users",
+                    "/dashboard/daily-balances",
+                    "/dashboard/merchant-txns",
+                ]
+            }
+        }
+    });
+
+    const merchantSalesRole = await prisma.role.create({
+        data: {
+            name: 'Merchant Sales',
+            description: 'Can only view their own transactions and basic company info.',
             permissions: {
                 "pages": [
                     "/dashboard",
@@ -184,7 +198,7 @@ async function main() {
             }
         }
     });
-    console.log('Seeded 2 default roles.');
+    console.log('Seeded 3 default roles.');
 
 
     for (const b of MOCK_BRANCHES) {
@@ -199,11 +213,18 @@ async function main() {
 
     for (const m of MOCK_MERCHANT_USERS) {
         const hashedPassword = await bcrypt.hash(m.ACCOUNTNUMBER, 10);
+        let roleId;
+        if (m.ROLE === 'Admin') {
+            roleId = merchantAdminRole.id;
+        } else {
+            roleId = merchantSalesRole.id;
+        }
+
         await prisma.merchant_users.create({ 
             data: {
                 ...m,
                 password: hashedPassword,
-                roleId: m.ROLE === 'Admin' ? adminRole.id : salesRole.id,
+                roleId: roleId,
             } 
         });
     }
@@ -211,9 +232,11 @@ async function main() {
     
     for (const bu of MOCK_BRANCH_USERS) {
         const { id, ...userData } = bu;
+        const hashedPassword = await bcrypt.hash('password123', 10); // Default password
         await prisma.branchUser.create({ data: {
             ...userData,
-            roleId: adminRole.id // Default to admin for branch users
+            password: hashedPassword,
+            roleId: systemAdminRole.id // Default to System Admin for all branch users
         } });
     }
     console.log(`Seeded ${MOCK_BRANCH_USERS.length} branch users.`);
@@ -237,7 +260,7 @@ async function main() {
 
     for (const ae of MOCK_ARIFPAY_ENDPOINTS) {
       const { ID, ...rest } = ae;
-        await prisma.arifpay_endpoints.create({ data: rest });
+        await prisma.arifpay_endpoints.create({ data: { ...rest, ORDER: ae.ORDER } });
     }
     console.log(`Seeded ${MOCK_ARIFPAY_ENDPOINTS.length} arifpay endpoints.`);
 

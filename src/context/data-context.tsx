@@ -6,9 +6,11 @@ import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_d
 
 type CurrentUser = {
     userId: string;
+    userType: 'merchant' | 'branch';
     role: string;
     name: string;
     email: string;
+    accountNumber: string | null;
     permissions: string[];
 };
 
@@ -59,7 +61,7 @@ type DataContextType = {
   addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => Promise<void>;
   updateAllowedCompany: (company: allowed_companies) => void;
   updateMerchant: (merchant: Merchant_users) => Promise<void>;
-  addBranchUser: (user: Omit<BranchUser, 'id' | 'status'>) => Promise<void>;
+  addBranchUser: (user: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'role'>) => Promise<void>;
   updateBranchUser: (user: BranchUser) => Promise<void>;
   updateBranchStatus: (branchId: number, status: 'Approved' | 'Rejected') => void;
   updateAllowedCompanyApproval: (companyId: string, isApproved: boolean) => Promise<void>;
@@ -74,25 +76,81 @@ type DataContextType = {
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children, initialData }: { children: React.ReactNode, initialData: InitialData }) {
-  const [branches, setBranches] = React.useState<Branch[]>(initialData.branches);
-  const [allowedCompanies, setAllowedCompanies] = React.useState<allowed_companies[]>(initialData.allowedCompanies);
-  const [merchants, setMerchants] = React.useState<Merchant_users[]>(initialData.merchants);
-  const [branchUsers, setBranchUsers] = React.useState<BranchUser[]>(initialData.branchUsers);
-  const [dailyBalances, setDailyBalances] = React.useState<merchants_daily_balances[]>(initialData.dailyBalances);
-  const [merchantTxns, setMerchantTxns] = React.useState<merchant_txns[]>(initialData.merchantTxns);
-  const [arifRequests, setArifRequests] = React.useState<arif_requests[]>(initialData.arifRequests);
-  const [arifpayEndpoints, setArifpayEndpoints] = React.useState<arifpay_endpoints[]>(initialData.arifpayEndpoints);
-  const [controllersConfigs, setControllersConfigs] = React.useState<controllersconfigs[]>(initialData.controllersConfigs);
-  const [coreIntegrationSettings, setCoreIntegrationSettings] = React.useState<core_integration_settings[]>(initialData.coreIntegrationSettings);
-  const [paystreamTxns, setPaystreamTxns] = React.useState<paystream_txns[]>(initialData.paystreamTxns);
-  const [streamPaySettings, setStreamPaySettings] = React.useState<stream_pay_settings[]>(initialData.streamPaySettings);
-  const [ussdPushSettings, setUssdPushSettings] = React.useState<ussd_push_settings[]>(initialData.ussdPushSettings);
-  const [qrPayments, setQrPayments] = React.useState<qr_payments[]>(initialData.qrPayments);
-  const [accountInfos, setAccountInfos] = React.useState<account_infos[]>(initialData.accountInfos);
-  const [promoAdds, setPromoAdds] = React.useState<promo_adds[]>(initialData.promoAdds);
-  const [roleCapabilities, setRoleCapabilities] = React.useState<role_capablities[]>(initialData.roleCapabilities);
-  const [roles, setRoles] = React.useState<Role[]>(initialData.roles);
   const [currentUser, setCurrentUser] = React.useState<CurrentUser | null>(null);
+
+  const isSystemAdmin = currentUser?.userType === 'branch';
+  const userAccountNumber = currentUser?.accountNumber;
+
+  const branches = React.useMemo(() => isSystemAdmin ? initialData.branches : [], [isSystemAdmin, initialData.branches]);
+  const allowedCompanies = React.useMemo(() => {
+    if (isSystemAdmin) return initialData.allowedCompanies;
+    if (userAccountNumber) return initialData.allowedCompanies.filter(c => c.ACCOUNTNUMBER === userAccountNumber);
+    return [];
+  }, [isSystemAdmin, userAccountNumber, initialData.allowedCompanies]);
+
+  const merchants = React.useMemo(() => {
+    if (isSystemAdmin) return initialData.merchants;
+    if (userAccountNumber) return initialData.merchants.filter(m => m.ACCOUNTNUMBER === userAccountNumber);
+    return [];
+  }, [isSystemAdmin, userAccountNumber, initialData.merchants]);
+
+  const branchUsers = React.useMemo(() => isSystemAdmin ? initialData.branchUsers : [], [isSystemAdmin, initialData.branchUsers]);
+
+  const dailyBalances = React.useMemo(() => {
+    if (isSystemAdmin) return initialData.dailyBalances;
+    if (userAccountNumber) return initialData.dailyBalances.filter(db => db.MERCHANTACCOUNT === userAccountNumber);
+    return [];
+  }, [isSystemAdmin, userAccountNumber, initialData.dailyBalances]);
+
+  const merchantTxns = React.useMemo(() => {
+    if (isSystemAdmin) return initialData.merchantTxns;
+    if (userAccountNumber) return initialData.merchantTxns.filter(txn => txn.MERCHANTACCOUNT === userAccountNumber);
+    return [];
+  }, [isSystemAdmin, userAccountNumber, initialData.merchantTxns]);
+
+  const arifRequests = React.useMemo(() => {
+     if (isSystemAdmin) return initialData.arifRequests;
+    if (userAccountNumber) return initialData.arifRequests.filter(ar => ar.MERCHANTACCOUNT === userAccountNumber);
+    return [];
+  }, [isSystemAdmin, userAccountNumber, initialData.arifRequests]);
+  
+  // These are system-level and should probably only be visible to system admins
+  const arifpayEndpoints = React.useMemo(() => isSystemAdmin ? initialData.arifpayEndpoints : [], [isSystemAdmin, initialData.arifpayEndpoints]);
+  const controllersConfigs = React.useMemo(() => isSystemAdmin ? initialData.controllersConfigs : [], [isSystemAdmin, initialData.controllersConfigs]);
+  const coreIntegrationSettings = React.useMemo(() => isSystemAdmin ? initialData.coreIntegrationSettings : [], [isSystemAdmin, initialData.coreIntegrationSettings]);
+  const streamPaySettings = React.useMemo(() => isSystemAdmin ? initialData.streamPaySettings : [], [isSystemAdmin, initialData.streamPaySettings]);
+  const ussdPushSettings = React.useMemo(() => isSystemAdmin ? initialData.ussdPushSettings : [], [isSystemAdmin, initialData.ussdPushSettings]);
+  const roleCapabilities = React.useMemo(() => isSystemAdmin ? initialData.roleCapabilities : [], [isSystemAdmin, initialData.roleCapabilities]);
+  
+  // Roles should be visible to system admins for management
+  const [roles, setRoles] = React.useState<Role[]>(initialData.roles);
+
+
+  const paystreamTxns = React.useMemo(() => {
+    if (isSystemAdmin) return initialData.paystreamTxns;
+    if (userAccountNumber) return initialData.paystreamTxns.filter(pt => pt.MERCHANTACCOUNTNUMBER === userAccountNumber);
+    return [];
+  }, [isSystemAdmin, userAccountNumber, initialData.paystreamTxns]);
+
+  const qrPayments = React.useMemo(() => {
+    if (isSystemAdmin) return initialData.qrPayments;
+    // QR payments don't have a direct company link, filtering by sales phone
+    const companySalesPhones = new Set(merchants.map(m => m.PHONENUMBER));
+    return initialData.qrPayments.filter(qp => companySalesPhones.has(qp.SALERPHONENUMBER));
+  }, [isSystemAdmin, merchants, initialData.qrPayments]);
+
+  const accountInfos = React.useMemo(() => {
+    if (isSystemAdmin) return initialData.accountInfos;
+    if (userAccountNumber) {
+        const relatedAccounts = new Set([userAccountNumber, ...merchants.map(m => m.ACCOUNTNUMBER)]);
+        return initialData.accountInfos.filter(ai => relatedAccounts.has(ai.ACCOUNTNUMBER));
+    }
+    return [];
+  }, [isSystemAdmin, userAccountNumber, merchants, initialData.accountInfos]);
+  
+  // Promo adds are likely global
+  const promoAdds = initialData.promoAdds;
+
 
   const addBranch = async (branchData: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE'>) => {
     const response = await fetch('/api/branches', {
@@ -102,7 +160,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     });
     if (!response.ok) throw new Error('Failed to create branch');
     const newBranch = await response.json();
-    setBranches(prev => [...prev, newBranch]);
+    initialData.branches.push(newBranch);
   };
 
   const updateBranch = async (updatedBranch: Branch) => {
@@ -113,7 +171,8 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     });
     if (!response.ok) throw new Error('Failed to update branch');
     const returnedBranch = await response.json();
-    setBranches(prev => prev.map(b => b.id === returnedBranch.id ? returnedBranch : b));
+    const index = initialData.branches.findIndex(b => b.id === returnedBranch.id);
+    if (index !== -1) initialData.branches[index] = returnedBranch;
   };
 
   const addAllowedCompany = async (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => {
@@ -130,11 +189,12 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     }
 
     const newCompany = await response.json();
-    setAllowedCompanies(prev => [...prev, newCompany]);
+    initialData.allowedCompanies.push(newCompany);
   };
 
   const updateAllowedCompany = (updatedCompany: allowed_companies) => {
-    setAllowedCompanies(prev => prev.map(c => c.Oid === updatedCompany.Oid ? {...updatedCompany, UPDATEDATE: new Date().toISOString(), UPDATEUSER: currentUser?.name || 'system'} : c));
+    const index = initialData.allowedCompanies.findIndex(c => c.Oid === updatedCompany.Oid);
+    if(index !== -1) initialData.allowedCompanies[index] = {...updatedCompany, UPDATEDATE: new Date().toISOString(), UPDATEUSER: currentUser?.name || 'system'};
   };
   
   const updateMerchant = async (updatedMerchant: Merchant_users) => {
@@ -147,10 +207,11 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         throw new Error('Failed to update merchant user');
     }
     const returnedUser = await response.json();
-    setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? returnedUser : m));
+    const index = initialData.merchants.findIndex(m => m.ID === returnedUser.ID);
+    if (index !== -1) initialData.merchants[index] = returnedUser;
   };
 
-  const addBranchUser = async (userData: Omit<BranchUser, 'id' | 'status'>) => {
+  const addBranchUser = async (userData: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'role'>) => {
     const response = await fetch('/api/branch-users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -161,7 +222,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         throw new Error(errorData.message || 'Failed to create branch user');
     }
     const newUser = await response.json();
-    setBranchUsers(prev => [...prev, newUser]);
+    initialData.branchUsers.push(newUser);
   };
 
   const updateBranchUser = async (updatedUser: BranchUser) => {
@@ -174,11 +235,12 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         throw new Error('Failed to update branch user');
     }
     const returnedUser = await response.json();
-    setBranchUsers(prev => prev.map(u => u.id === returnedUser.id ? returnedUser : u));
+    const index = initialData.branchUsers.findIndex(u => u.id === returnedUser.id);
+    if (index !== -1) initialData.branchUsers[index] = returnedUser;
   };
 
   const updateBranchStatus = (branchId: number, status: 'Approved' | 'Rejected') => {
-    const branch = branches.find(b => b.id === branchId);
+    const branch = initialData.branches.find(b => b.id === branchId);
     if (branch) {
       updateBranch({ ...branch, status });
     }
@@ -197,7 +259,8 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         throw new Error('Failed to update company approval status');
     }
     const updatedCompany = await response.json();
-    setAllowedCompanies(prev => prev.map(c => c.Oid === updatedCompany.Oid ? updatedCompany : c));
+    const index = initialData.allowedCompanies.findIndex(c => c.Oid === updatedCompany.Oid);
+    if (index !== -1) initialData.allowedCompanies[index] = updatedCompany;
   };
 
   const updateMerchantStatus = async (merchantId: string, status: 'Active' | 'Disabled') => {
@@ -210,11 +273,12 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         throw new Error('Failed to update merchant status');
     }
     const returnedUser = await response.json();
-    setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? returnedUser : m));
+    const index = initialData.merchants.findIndex(m => m.ID === returnedUser.ID);
+    if (index !== -1) initialData.merchants[index] = returnedUser;
   };
   
   const updateBranchUserStatus = async (userId: number, status: 'Active' | 'Inactive') => {
-    const user = branchUsers.find(u => u.id === userId);
+    const user = initialData.branchUsers.find(u => u.id === userId);
     if (user) {
         await updateBranchUser({ ...user, status });
     }
@@ -259,9 +323,11 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     if (!response.ok) throw new Error('Failed to update user role');
     const updatedUser = await response.json();
     if (userType === 'merchant') {
-        setMerchants(prev => prev.map(u => u.ID === userId ? updatedUser : u));
+        const index = initialData.merchants.findIndex(u => u.ID === userId);
+        if (index !== -1) initialData.merchants[index] = updatedUser;
     } else {
-        setBranchUsers(prev => prev.map(u => u.id.toString() === userId ? updatedUser : u));
+        const index = initialData.branchUsers.findIndex(u => u.id.toString() === userId);
+        if (index !== -1) initialData.branchUsers[index] = updatedUser;
     }
   };
 

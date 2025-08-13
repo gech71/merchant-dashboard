@@ -8,9 +8,11 @@ const secret = new TextEncoder().encode(JWT_SECRET);
 
 type UserPayload = {
     userId: string;
+    userType: 'merchant' | 'branch';
     role: string;
     name: string;
     email: string;
+    accountNumber: string | null;
     permissions: string[];
 };
 
@@ -24,28 +26,50 @@ export async function getCurrentUser(): Promise<UserPayload | null> {
 
   try {
     const { payload } = await jwtVerify(token, secret);
+    const { userId, userType } = payload as { userId: string, userType: 'merchant' | 'branch' };
     
-    // Fetch user from DB to get the latest role and permissions
-    const user = await prisma.merchant_users.findUnique({
-      where: { ID: payload.userId as string },
-      include: {
-        role: true,
-      }
-    });
+    let user: any = null;
+    
+    if (userType === 'merchant') {
+        user = await prisma.merchant_users.findUnique({
+            where: { ID: userId },
+            include: { role: true },
+        });
+    } else if (userType === 'branch') {
+        user = await prisma.branchUser.findUnique({
+            where: { id: parseInt(userId, 10) },
+            include: { role: true },
+        });
+    }
 
     if (!user || !user.role) {
       return null;
     }
     
     const permissions = (user.role.permissions as { pages: string[] })?.pages || [];
+    
+    if (userType === 'merchant') {
+        return {
+            userId: user.ID,
+            userType: 'merchant',
+            role: user.role.name,
+            name: user.FULLNAME,
+            email: user.PHONENUMBER,
+            accountNumber: user.ACCOUNTNUMBER,
+            permissions: permissions,
+        };
+    } else { // userType === 'branch'
+         return {
+            userId: user.id.toString(),
+            userType: 'branch',
+            role: user.role.name,
+            name: user.name,
+            email: user.email,
+            accountNumber: null, // System admins are not tied to a company
+            permissions: permissions,
+        };
+    }
 
-    return {
-        userId: user.ID,
-        role: user.role.name,
-        name: user.FULLNAME,
-        email: user.PHONENUMBER, // Using phone number as email for display
-        permissions: permissions,
-    };
   } catch (err) {
     console.error('Failed to verify JWT:', err);
     return null;

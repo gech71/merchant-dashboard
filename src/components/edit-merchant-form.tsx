@@ -50,14 +50,14 @@ export function EditMerchantForm({
     setIsLoading(true);
     const selectedRole = roles.find(r => r.id === data.roleId);
 
-    if (selectedRole?.name === 'Admin') {
+    if (selectedRole?.name === 'Merchant Admin') {
       const adminExists = merchants.some(
-        (m) => m.ID !== merchantUser.ID && m.ACCOUNTNUMBER === merchantUser.ACCOUNTNUMBER && m.role?.name === 'Admin'
+        (m) => m.ID !== merchantUser.ID && m.ACCOUNTNUMBER === merchantUser.ACCOUNTNUMBER && m.role?.name === 'Merchant Admin'
       );
       if (adminExists) {
         form.setError('roleId', {
           type: 'manual',
-          message: `An Admin user already exists for this account. You can't have more than one.`,
+          message: `An Admin user already exists for this company. You can't have more than one.`,
         });
         setIsLoading(false);
         return;
@@ -112,7 +112,7 @@ export function EditMerchantForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {roles.map(role => (
+                  {roles.filter(r => r.name.startsWith('Merchant')).map(role => (
                     <SelectItem key={role.id} value={role.id}>{role.name}</SelectItem>
                   ))}
                 </SelectContent>
