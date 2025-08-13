@@ -43,7 +43,7 @@ type SortableKeys = 'FIELDNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'APPROVEUSER' | '
 const ITEMS_PER_PAGE = 15;
 
 export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowedCompanies: allowed_companies[], approvalView?: boolean }) {
-  const { updateAllowedCompanyApproval, currentUser, branches, merchants, branchUsers } = useDataContext();
+  const { allowedCompanies: contextCompanies, updateAllowedCompanyApproval, currentUser, branches, merchants, branchUsers } = useDataContext();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -90,9 +90,11 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     }
     setSortConfig({ key, direction });
   };
+  
+  const companiesSource = approvalView ? contextCompanies : initialCompanies;
 
   const filteredAndSortedCompanies = React.useMemo(() => {
-    let sortableItems = [...initialCompanies];
+    let sortableItems = [...companiesSource];
   
     if (branchFilter !== 'all') {
       const usersInBranch = branchUsers.filter(bu => bu.branch === branchFilter);
@@ -136,7 +138,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     }
 
     return sortableItems;
-  }, [initialCompanies, searchTerm, sortConfig, activeTab, approvalView, branchFilter, merchants, branchUsers]);
+  }, [companiesSource, searchTerm, sortConfig, activeTab, approvalView, branchFilter, merchants, branchUsers]);
   
   const paginatedCompanies = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
