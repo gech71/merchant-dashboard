@@ -1,12 +1,7 @@
 
-// datasource db {
-//   provider = "postgresql"
-//   url      = env("DATABASE_URL")
-// }
-
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -19,11 +14,11 @@ model Branch {
   code              String              @unique
   address           String
   contact           String
-  status            String // Approved, Pending, Rejected
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
+  status            String
   allowed_companies allowed_companies[]
   users             BranchUser[]
+  INSERTDATE        DateTime?           @default(now())
+  UPDATEDATE        DateTime?           @updatedAt
 }
 
 model allowed_companies {
@@ -46,12 +41,12 @@ model allowed_companies {
   @@index([branchName])
 }
 
-model Merchant_users {
+model merchant_users {
   ID                String    @id @unique
   password          String
   FULLNAME          String
-  ROLE              String // Admin, Sales
-  STATUS            String // Active, Pending, Disabled
+  ROLE              String
+  STATUS            String
   ACCOUNTNUMBER     String
   ACCOUNTTYPE       String
   PHONENUMBER       String    @unique
@@ -67,24 +62,26 @@ model Merchant_users {
   VALUE3            String?
   INSERTUSERID      String
   UPDATEUSERID      String
-  INSERTDATE        DateTime  @default(now())
-  UPDATEDATE        DateTime  @updatedAt
+  INSERTDATE        DateTime? @default(now())
+  UPDATEDATE        DateTime? @updatedAt
   roleId            String?
   DashBoardRoles    DashBoardRoles? @relation(fields: [roleId], references: [id])
+
+  @@index([roleId])
 }
 
 model BranchUser {
-  id        Int     @id @default(autoincrement())
-  name      String
-  email     String  @unique
-  password  String
-  branch    String
-  status    String // Active, Inactive, Pending
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  roleId    String?
+  id       Int     @id @default(autoincrement())
+  name     String
+  email    String  @unique
+  password String
+  branch   String
+  status   String
+  roleId   String?
+  role     Branch? @relation(fields: [branch], references: [name])
   DashBoardRoles    DashBoardRoles? @relation(fields: [roleId], references: [id])
-  branch_details Branch? @relation(fields: [branch], references: [name])
+
+  @@index([roleId])
 }
 
 model merchants_daily_balances {
@@ -101,25 +98,25 @@ model merchants_daily_balances {
 }
 
 model merchant_txns {
-  ID                   String    @id @default(cuid())
-  MERCHANTACCOUNT      String?
-  MERCHANTPHONE        String?
-  AMOUNT               Float
-  TXNID                String
-  CUSTOMERNAME         String?
-  CUSTOMERACCOUNT      String?
-  T24USER              String?
-  T2TRANSACTIONDATE    DateTime?
-  STATUS               String // Completed, Pending, Failed
-  TRANSACTIONCHANNEL   String?
-  TRANSACTIONSERVICE   String?
-  VALUE1               String?
-  VALUE2               String?
-  VALUE3               String?
-  INSERTDATE           DateTime? @default(now())
-  UPDATEDATE           DateTime? @updatedAt
-  INSERTUSER           String
-  UPDATEUSER           String
+  ID                  String    @id @default(cuid())
+  MERCHANTACCOUNT     String?
+  MERCHANTPHONE       String?
+  AMOUNT              Float
+  TXNID               String
+  CUSTOMERNAME        String
+  CUSTOMERACCOUNT     String
+  T24USER             String?
+  T2TRANSACTIONDATE   DateTime?
+  STATUS              String
+  TRANSACTIONCHANNEL  String?
+  TRANSACTIONSERVICE  String?
+  VALUE1              String?
+  VALUE2              String?
+  VALUE3              String?
+  INSERTDATE          DateTime? @default(now())
+  UPDATEDATE          DateTime? @updatedAt
+  INSERTUSER          String
+  UPDATEUSER          String
 }
 
 model arif_requests {
@@ -167,10 +164,10 @@ model arifpay_endpoints {
   ENDPOINT1           String
   ENDPOINT2           String?
   ENDPOINT3           String?
-  CANCELURL           String
-  ERRORURL            String
-  SUCCESSURL          String
-  NOTIFYURL           String
+  CANCELURL           String?
+  ERRORURL            String?
+  SUCCESSURL          String?
+  NOTIFYURL           String?
   ISTWOSTEP           Boolean
   ISOTP               Boolean
   TRANSACTIONTYPE     String
@@ -265,7 +262,7 @@ model account_infos {
   ACCOUNTNUMBER String
   PHONENUMBER   String
   FULLNAME      String
-  GENDER        String?
+  GENDER        String
   VALUE1        String?
   VALUE2        String?
   INSERTDATE    DateTime? @default(now())
@@ -275,16 +272,16 @@ model account_infos {
 }
 
 model promo_adds {
-  ID           String    @id @default(cuid())
-  ADDTITLE     String
-  ADDSUBTITLE  String
-  ADDADDRESS   String
-  IMAGEADDRESS String
-  displayOrder Int       @default(0)
-  INSERTUSERID String
-  UPDATEUSERID String
-  INSERTDATE   DateTime? @default(now())
-  UPDATEDATE   DateTime? @updatedAt
+  ID            String    @id @default(cuid())
+  ADDTITLE      String
+  ADDSUBTITLE   String
+  ADDADDRESS    String
+  IMAGEADDRESS  String
+  displayOrder  Int
+  INSERTUSERID  String
+  UPDATEUSERID  String
+  INSERTDATE    DateTime? @default(now())
+  UPDATEDATE    DateTime? @updatedAt
 }
 
 model role_capablities {
@@ -305,12 +302,12 @@ model role_capablities {
 }
 
 model DashBoardRoles {
-  id          String           @id @default(cuid())
-  name        String           @unique
+  id          String   @id @default(cuid())
+  name        String   @unique
   description String?
   permissions Json
-  users       BranchUser[]
-  merchantUsers merchant_users[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  BranchUser BranchUser[]
+  merchant_users merchant_users[]
 }
