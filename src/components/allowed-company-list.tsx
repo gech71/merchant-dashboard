@@ -91,7 +91,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     setSortConfig({ key, direction });
   };
   
-  const companiesSource = approvalView ? contextCompanies : initialCompanies;
+  const companiesSource = contextCompanies;
 
   const filteredAndSortedCompanies = React.useMemo(() => {
     let sortableItems = [...companiesSource];
@@ -386,3 +386,5 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     </Dialog>
     </>
   );
+
+    
