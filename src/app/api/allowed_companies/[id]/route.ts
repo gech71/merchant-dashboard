@@ -21,7 +21,7 @@ export async function PUT(
     const body = await request.json();
     const { APPROVED, STATUS } = body;
 
-    if (typeof APPROVED !== 'boolean' || !STATUS) {
+    if (typeof APPROVED !== 'boolean' || typeof STATUS !== 'boolean') {
         return NextResponse.json({ message: 'Missing required approval fields' }, { status: 400 });
     }
 

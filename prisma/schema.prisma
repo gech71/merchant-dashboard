@@ -1,27 +1,29 @@
 
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
 
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 model Branch {
-  id              Int                @id @default(autoincrement())
-  name            String             @unique
-  code            String             @unique
-  address         String
-  contact         String
-  status          String
-  INSERTDATE      DateTime?          @default(now())
-  UPDATEDATE      DateTime?          @updatedAt
-  users           BranchUser[]
-  allowedCompanies allowed_companies[]
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique
+  code              String              @unique
+  address           String
+  contact           String
+  status            String // Approved, Pending, Rejected
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  allowed_companies allowed_companies[]
+  users             BranchUser[]
 }
 
 model allowed_companies {
@@ -31,7 +33,7 @@ model allowed_companies {
   FIELDNAME           String
   APPROVEUSER         String?
   APPROVED            Boolean   @default(false)
-  STATUS              String
+  STATUS              Boolean   @default(false)
   INSERTDATE          DateTime? @default(now())
   UPDATEDATE          DateTime? @updatedAt
   INSERTUSER          String
@@ -44,12 +46,12 @@ model allowed_companies {
   @@index([branchName])
 }
 
-model merchant_users {
+model Merchant_users {
   ID                String    @id @unique
   password          String
   FULLNAME          String
-  ROLE              String
-  STATUS            String
+  ROLE              String // Admin, Sales
+  STATUS            String // Active, Pending, Disabled
   ACCOUNTNUMBER     String
   ACCOUNTTYPE       String
   PHONENUMBER       String    @unique
@@ -65,21 +67,24 @@ model merchant_users {
   VALUE3            String?
   INSERTUSERID      String
   UPDATEUSERID      String
-  INSERTDATE        DateTime? @default(now())
-  UPDATEDATE        DateTime? @updatedAt
+  INSERTDATE        DateTime  @default(now())
+  UPDATEDATE        DateTime  @updatedAt
   roleId            String?
   DashBoardRoles    DashBoardRoles? @relation(fields: [roleId], references: [id])
 }
 
 model BranchUser {
-  id       Int     @id @default(autoincrement())
-  name     String
-  email    String  @unique
-  password String
-  branch   String
-  status   String
-  roleId   String?
-  DashBoardRoles DashBoardRoles? @relation(fields: [roleId], references: [id])
+  id        Int     @id @default(autoincrement())
+  name      String
+  email     String  @unique
+  password  String
+  branch    String
+  status    String // Active, Inactive, Pending
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  roleId    String?
+  DashBoardRoles    DashBoardRoles? @relation(fields: [roleId], references: [id])
+  branch_details Branch? @relation(fields: [branch], references: [name])
 }
 
 model merchants_daily_balances {
@@ -96,25 +101,25 @@ model merchants_daily_balances {
 }
 
 model merchant_txns {
-  ID                  String    @id @default(cuid())
-  MERCHANTACCOUNT     String
-  MERCHANTPHONE       String
-  AMOUNT              Float
-  TXNID               String
-  CUSTOMERNAME        String
-  CUSTOMERACCOUNT     String
-  T24USER             String
-  T2TRANSACTIONDATE   DateTime?
-  STATUS              String
-  TRANSACTIONCHANNEL  String
-  TRANSACTIONSERVICE  String
-  VALUE1              String?
-  VALUE2              String?
-  VALUE3              String?
-  INSERTDATE          DateTime? @default(now())
-  UPDATEDATE          DateTime? @updatedAt
-  INSERTUSER          String
-  UPDATEUSER          String
+  ID                   String    @id @default(cuid())
+  MERCHANTACCOUNT      String?
+  MERCHANTPHONE        String?
+  AMOUNT               Float
+  TXNID                String
+  CUSTOMERNAME         String?
+  CUSTOMERACCOUNT      String?
+  T24USER              String?
+  T2TRANSACTIONDATE    DateTime?
+  STATUS               String // Completed, Pending, Failed
+  TRANSACTIONCHANNEL   String?
+  TRANSACTIONSERVICE   String?
+  VALUE1               String?
+  VALUE2               String?
+  VALUE3               String?
+  INSERTDATE           DateTime? @default(now())
+  UPDATEDATE           DateTime? @updatedAt
+  INSERTUSER           String
+  UPDATEUSER           String
 }
 
 model arif_requests {
@@ -275,7 +280,7 @@ model promo_adds {
   ADDSUBTITLE  String
   ADDADDRESS   String
   IMAGEADDRESS String
-  displayOrder Int
+  displayOrder Int       @default(0)
   INSERTUSERID String
   UPDATEUSERID String
   INSERTDATE   DateTime? @default(now())
@@ -300,12 +305,12 @@ model role_capablities {
 }
 
 model DashBoardRoles {
-  id            String           @id @default(cuid())
-  name          String           @unique
-  description   String?
-  permissions   Json
-  users         BranchUser[]
+  id          String           @id @default(cuid())
+  name        String           @unique
+  description String?
+  permissions Json
+  users       BranchUser[]
   merchantUsers merchant_users[]
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 }

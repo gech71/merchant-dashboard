@@ -59,7 +59,7 @@ type DataContextType = {
   setCurrentUser: (user: CurrentUser | null) => void;
   addBranch: (branch: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE'>) => Promise<void>;
   updateBranch: (branch: Branch) => Promise<void>;
-  addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord' | 'branch'>) => Promise<void>;
+  addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord' | 'branchName'>) => Promise<void>;
   updateAllowedCompany: (company: allowed_companies) => void;
   updateMerchant: (merchant: Merchant_users) => Promise<void>;
   addBranchUser: (user: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'DashBoardRoles' | 'password'>) => Promise<void>;
@@ -279,7 +279,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
             APPROVED: isApproved, 
-            STATUS: isApproved ? 'Active' : 'Inactive'
+            STATUS: isApproved // Automatically set to active on approval
         }),
     });
     if (!response.ok) {

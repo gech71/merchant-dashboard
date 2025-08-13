@@ -53,7 +53,7 @@ export default function DashboardPage() {
   const totalMerchantUsers = merchants.length;
   const totalBranchUsers = branchUsers.length;
 
-  const pendingCompanies = allowedCompanies.filter(c => c.STATUS === 'Pending').length;
+  const pendingCompanies = allowedCompanies.filter(c => !c.APPROVED).length;
   const pendingBranches = branches.filter(b => b.status === 'Pending').length;
   const pendingMerchants = merchants.filter(m => m.STATUS === 'Pending').length;
   const pendingBranchUsers = branchUsers.filter(u => u.status === 'Pending').length;
@@ -98,9 +98,9 @@ export default function DashboardPage() {
   }).filter(b => b.companies > 0); // Only show branches with companies for a cleaner chart.
 
   const companyStatusData = [
-    { name: 'Active', value: allowedCompanies.filter(c => c.STATUS === 'Active').length },
-    { name: 'Pending', value: pendingCompanies },
-    { name: 'Inactive', value: allowedCompanies.filter(c => c.STATUS === 'Inactive').length },
+    { name: 'Active', value: allowedCompanies.filter(c => c.STATUS).length },
+    { name: 'Pending Approval', value: pendingCompanies },
+    { name: 'Inactive', value: allowedCompanies.filter(c => !c.STATUS).length },
   ];
   
   const branchStatusData = [
@@ -227,5 +227,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    

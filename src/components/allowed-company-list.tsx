@@ -100,14 +100,15 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
       sortableItems = sortableItems.filter(c => accountsInBranch.has(c.ACCOUNTNUMBER));
     }
 
-
     if (approvalView) {
-      sortableItems = sortableItems.filter(c => c.STATUS === 'Pending');
+        sortableItems = sortableItems.filter(c => !c.APPROVED);
     }
-    else if (activeTab !== 'all') {
-      sortableItems = sortableItems.filter(
-        (company) => company.STATUS.toLowerCase() === activeTab
-      );
+    else if (activeTab === 'active') {
+        sortableItems = sortableItems.filter(c => c.STATUS);
+    } else if (activeTab === 'inactive') {
+        sortableItems = sortableItems.filter(c => !c.STATUS && c.APPROVED); // Inactive means approved but not active
+    } else if (activeTab === 'pending') {
+        sortableItems = sortableItems.filter(c => !c.APPROVED);
     }
     
     if (searchTerm) {
@@ -154,17 +155,14 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     );
   };
   
-  const getStatusVariant = (status: allowed_companies['STATUS']) => {
-    switch (status) {
-      case 'Active':
-        return 'default';
-      case 'Pending':
-        return 'secondary';
-      case 'Inactive':
-        return 'destructive';
-      default:
-        return 'outline';
+  const getStatusBadge = (company: allowed_companies) => {
+    if (!company.APPROVED) {
+        return <Badge variant="secondary">Pending</Badge>;
     }
+    if (company.STATUS) {
+        return <Badge variant="default">Active</Badge>;
+    }
+    return <Badge variant="destructive">Inactive</Badge>;
   };
 
 
@@ -177,8 +175,8 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
             <TabsList>
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="active">Active</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
               <TabsTrigger value="inactive">Inactive</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
             </TabsList>
           )}
           <div className="ml-auto flex items-center gap-2">
@@ -293,7 +291,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
                              <Badge variant={company.APPROVED ? 'default' : 'secondary'}>{company.APPROVED ? 'Yes' : 'No'}</Badge>
                           </TableCell>
                           <TableCell>
-                             <Badge variant={getStatusVariant(company.STATUS)}>{company.STATUS}</Badge>
+                             {getStatusBadge(company)}
                           </TableCell>
                           <TableCell>{company.APPROVEUSER || 'N/A'}</TableCell>
                            <TableCell>
@@ -307,7 +305,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 {!approvalView && <DropdownMenuItem onClick={() => handleEdit(company)}>Edit</DropdownMenuItem>}
-                                {approvalView && company.STATUS === 'Pending' && (
+                                {approvalView && !company.APPROVED && (
                                   <>
                                     <DropdownMenuItem onClick={() => handleApproval(company.Oid, true)}>
                                       <CheckCircle className="mr-2 h-4 w-4" />

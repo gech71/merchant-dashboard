@@ -9,17 +9,8 @@ import MerchantList from './merchant-list';
 
 export default function AllowedCompanyDetail({ allowedCompany, merchants }: { allowedCompany: allowed_companies, merchants: Merchant_users[] }) {
     
-  const getStatusVariant = (status: allowed_companies['STATUS']) => {
-    switch (status) {
-      case 'Active':
-        return 'default';
-      case 'Pending':
-        return 'secondary';
-      case 'Inactive':
-        return 'destructive';
-      default:
-        return 'outline';
-    }
+  const getStatusVariant = (status: boolean) => {
+    return status ? 'default' : 'secondary';
   };
     
   return (
@@ -40,7 +31,7 @@ export default function AllowedCompanyDetail({ allowedCompany, merchants }: { al
             </div>
            <div>
                 <p className="text-sm font-medium text-muted-foreground">STATUS</p>
-                <Badge variant={getStatusVariant(allowedCompany.STATUS)}>{allowedCompany.STATUS}</Badge>
+                <Badge variant={getStatusVariant(allowedCompany.STATUS)}>{allowedCompany.STATUS ? 'Active' : 'Inactive'}</Badge>
            </div>
            <div>
                 <p className="text-sm font-medium text-muted-foreground">APPROVED</p>

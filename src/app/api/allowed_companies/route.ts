@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     const newOid = `oid_${newId}`;
     
     // If the user is a branch user, associate the company with their branch
-    const branch = user.userType === 'branch' ? user.branch : null;
+    const branchName = user.userType === 'branch' ? user.branch : null;
 
     const newCompany = await prisma.allowed_companies.create({
       data: {
@@ -43,12 +43,12 @@ export async function POST(request: Request) {
         FIELDNAME,
         APPROVEUSER: null,
         APPROVED: false,
-        STATUS: 'Pending',
+        STATUS: false, // Default to inactive
         INSERTUSER: user.name,
         UPDATEUSER: user.name,
         OptimisticLockField: 0,
         GCRecord: 0,
-        branch: branch,
+        branchName: branchName,
       },
     });
 
