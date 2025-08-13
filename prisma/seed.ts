@@ -139,14 +139,14 @@ async function main() {
 
     // Create default roles
     const ALL_PAGES = [
-        "/dashboard", "/dashboard/allowed_companies", "/dashboard/branches", 
-        "/dashboard/branch-users", "/dashboard/merchant_users", "/dashboard/account-infos", 
-        "/dashboard/promo-adds", "/dashboard/daily-balances", "/dashboard/merchant-txns", 
-        "/dashboard/arif-requests", "/dashboard/paystream-txns", "/dashboard/qr-payments", 
-        "/dashboard/arifpay-endpoints", "/dashboard/controllers-configs", 
-        "/dashboard/core-integration-settings", "/dashboard/stream-pay-settings", 
-        "/dashboard/ussd-push-settings", "/dashboard/role-capabilities", 
-        "/dashboard/approvals/allowed_companies", "/dashboard/approvals/branch_users", 
+        "/dashboard", "/dashboard/allowed_companies", "/dashboard/branches",
+        "/dashboard/branch-users", "/dashboard/merchant_users", "/dashboard/account-infos",
+        "/dashboard/promo-adds", "/dashboard/daily-balances", "/dashboard/merchant-txns",
+        "/dashboard/arif-requests", "/dashboard/paystream-txns", "/dashboard/qr-payments",
+        "/dashboard/arifpay-endpoints", "/dashboard/controllers-configs",
+        "/dashboard/core-integration-settings", "/dashboard/stream-pay-settings",
+        "/dashboard/ussd-push-settings", "/dashboard/role-capabilities",
+        "/dashboard/approvals/allowed_companies", "/dashboard/approvals/branch_users",
         "/dashboard/role-management", "/dashboard/user-role-assignment"
     ];
 
@@ -162,21 +162,21 @@ async function main() {
         data: {
             name: 'Branch Admin',
             description: 'Can manage companies and users within their own branch, including approvals.',
-            permissions: { 
+            permissions: {
                 "pages": [
                     "/dashboard",
                     "/dashboard/allowed_companies",
                     "/dashboard/approvals/allowed_companies"
-                ] 
+                ]
             }
         }
     });
-    
+
     const branchUserRole = await prisma.role.create({
         data: {
             name: 'Branch User',
             description: 'Can create and update companies within their branch, but cannot approve them.',
-            permissions: { 
+            permissions: {
                  "pages": [
                     "/dashboard",
                     "/dashboard/allowed_companies",
@@ -184,7 +184,7 @@ async function main() {
             }
         }
     });
-    
+
     const merchantAdminRole = await prisma.role.create({
         data: {
             name: 'Merchant Admin',
@@ -213,7 +213,7 @@ async function main() {
         }
     });
     console.log('Seeded 5 default roles.');
-    
+
     const systemAdminHashedPassword = await bcrypt.hash('Amin@123', 10);
     await prisma.branchUser.create({
         data: {
@@ -247,17 +247,17 @@ async function main() {
             roleId = merchantSalesRole.id;
         }
         const { ID, ...rest } = m;
-        await prisma.merchant_users.create({ 
+        await prisma.merchant_users.create({
             data: {
                 ID,
                 ...rest,
                 password: hashedPassword,
                 roleId: roleId,
-            } 
+            }
         });
     }
     console.log(`Seeded ${MOCK_MERCHANT_USERS.length} merchant users.`);
-    
+
     for (const bu of MOCK_BRANCH_USERS) {
         const { id, ...userData } = bu;
         const hashedPassword = await bcrypt.hash('password123', 10); // Default password
@@ -275,7 +275,7 @@ async function main() {
         await prisma.merchants_daily_balances.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_DAILY_BALANCES.length} daily balances.`);
-    
+
     for (const mt of MOCK_MERCHANT_TXNS) {
        const { ID, ...rest } = mt;
         await prisma.merchant_txns.create({ data: rest });
@@ -304,7 +304,7 @@ async function main() {
         await prisma.core_integration_settings.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_CORE_INTEGRATION_SETTINGS.length} core integration settings.`);
-    
+
     for (const pt of MOCK_PAYSTREAM_TXNS) {
       const { ID, ...rest } = pt;
         await prisma.paystream_txns.create({ data: rest });
@@ -322,7 +322,7 @@ async function main() {
         await prisma.ussd_push_settings.create({ data: rest });
     }
     console.log(`Seeded ${MOCK_USSD_PUSH_SETTINGS.length} ussd push settings.`);
-    
+
     for (const qp of MOCK_QR_PAYMENTS) {
       const { ID, ...rest } = qp;
         await prisma.qr_payments.create({ data: rest });
@@ -336,12 +336,13 @@ async function main() {
     console.log(`Seeded ${MOCK_ACCOUNT_INFOS.length} account infos.`);
 
     for (const pa of MOCK_PROMO_ADDS) {
-        const { ID, ...rest } = pa;
-        await prisma.promo_adds.create({ 
+        const { ID, ORDER, ...rest } = pa;
+        await prisma.promo_adds.create({
             data: {
                 ...rest,
-                displayOrder: rest.ORDER
-            } 
+                ID,
+                displayOrder: ORDER
+            }
         });
     }
     console.log(`Seeded ${MOCK_PROMO_ADDS.length} promo adds.`);
@@ -364,3 +365,5 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
+    
