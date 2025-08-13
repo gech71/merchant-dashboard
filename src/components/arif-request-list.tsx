@@ -26,7 +26,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useDataContext } from '@/context/data-context';
 
-type SortableKeys = 'MERCHANTACCOUNT' | 'AMOUNT' | 'DATESEND1' | 'ARIFPAYTRANSACTIONSTATUS' | 'T24TRANSACTIONSTATUS' | 'DEBITACCOUNT' | 'CREDITACCOUNT';
+type SortableKeys = 'MERCHANTACCOUNT' | 'AMOUNT' | 'DATESEND1' | 'ARIFPAYTRANSACTIONSTATUS' | 'T24TRANSACTIONSTATUS' | 'DEBITACCOUNT' | 'CREDITACCOUNT' | 'T24TRANSACTIONID';
 const ITEMS_PER_PAGE = 15;
 
 export default function ArifRequestList({ arifRequests: initialArifRequests }: { arifRequests: arif_requests[] }) {
@@ -169,6 +169,12 @@ export default function ArifRequestList({ arifRequests: initialArifRequests }: {
                   </Button>
                 </TableHead>
                 <TableHead>
+                    <Button variant="ghost" onClick={() => requestSort('T24TRANSACTIONID')} className="px-2">
+                        T24TRANSACTIONID
+                        {getSortIndicator('T24TRANSACTIONID')}
+                    </Button>
+                </TableHead>
+                <TableHead>
                     <Button variant="ghost" onClick={() => requestSort('T24TRANSACTIONSTATUS')} className="px-2">
                         T24 STATUS
                         {getSortIndicator('T24TRANSACTIONSTATUS')}
@@ -195,6 +201,7 @@ export default function ArifRequestList({ arifRequests: initialArifRequests }: {
                     <TableCell>
                         <Badge variant={getStatusVariant(req.ARIFPAYTRANSACTIONSTATUS)}>{req.ARIFPAYTRANSACTIONSTATUS || 'N/A'}</Badge>
                     </TableCell>
+                    <TableCell>{req.T24TRANSACTIONID || 'N/A'}</TableCell>
                     <TableCell>
                         <Badge variant={getStatusVariant(req.T24TRANSACTIONSTATUS)}>{req.T24TRANSACTIONSTATUS || 'N/A'}</Badge>
                     </TableCell>
@@ -203,7 +210,7 @@ export default function ArifRequestList({ arifRequests: initialArifRequests }: {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={9} className="h-24 text-center">
+                  <TableCell colSpan={10} className="h-24 text-center">
                     No requests found.
                   </TableCell>
                 </TableRow>
