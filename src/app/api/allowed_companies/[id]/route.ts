@@ -11,7 +11,8 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const token = cookies().get('accessToken')?.value;
+    const cookieStore = await cookies();
+    const token = cookieStore.get('accessToken')?.value;
     const user = await getCurrentUser(token);
     if (!user) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });

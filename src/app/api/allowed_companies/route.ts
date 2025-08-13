@@ -8,7 +8,8 @@ import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
-    const token = cookies().get('accessToken')?.value;
+    const cookieStore = await cookies();
+    const token = cookieStore.get('accessToken')?.value;
     const user = await getCurrentUser(token);
     if (!user) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });

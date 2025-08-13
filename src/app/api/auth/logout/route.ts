@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 
 export async function POST() {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     cookieStore.set('accessToken', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
+import { cookies } from 'next/headers';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key';
 const secret = new TextEncoder().encode(JWT_SECRET);
@@ -14,7 +15,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get('accessToken')?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('accessToken')?.value;
 
   if (!token) {
     const url = request.nextUrl.clone();
