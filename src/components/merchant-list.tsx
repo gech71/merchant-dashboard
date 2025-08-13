@@ -118,8 +118,8 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
 
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        const roleA = a.role?.name || '';
-        const roleB = b.role?.name || '';
+        const roleA = a.DashBoardRoles?.name || '';
+        const roleB = b.DashBoardRoles?.name || '';
         if (roleA === 'Admin' && roleB !== 'Admin') return -1;
         if (roleA !== 'Admin' && roleB === 'Admin') return 1;
         
@@ -137,8 +137,8 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     } else {
         // Default sort: Admin first
         sortableItems.sort((a, b) => {
-            if (a.role?.name === 'Admin' && b.role?.name !== 'Admin') return -1;
-            if (a.role?.name !== 'Admin' && b.role?.name === 'Admin') return 1;
+            if (a.DashBoardRoles?.name === 'Admin' && b.DashBoardRoles?.name !== 'Admin') return -1;
+            if (a.DashBoardRoles?.name !== 'Admin' && b.DashBoardRoles?.name === 'Admin') return 1;
             return 0;
         });
     }
@@ -247,7 +247,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                           <TableCell className="font-medium">{merchantUser.FULLNAME}</TableCell>
                           <TableCell>{getCompanyName(merchantUser.ACCOUNTNUMBER)}</TableCell>
                           <TableCell>
-                             <Badge variant={merchantUser.role?.name === 'Admin' ? 'default' : 'secondary'}>{merchantUser.role?.name || 'Unassigned'}</Badge>
+                             <Badge variant={merchantUser.DashBoardRoles?.name === 'Admin' ? 'default' : 'secondary'}>{merchantUser.DashBoardRoles?.name || 'Unassigned'}</Badge>
                           </TableCell>
                           <TableCell className="hidden md:table-cell">{merchantUser.PHONENUMBER}</TableCell>
                           <TableCell>

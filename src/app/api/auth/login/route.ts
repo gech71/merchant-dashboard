@@ -27,16 +27,16 @@ export async function POST(request: Request) {
     if (userType === 'merchant') {
         const merchantUser = await prisma.merchant_users.findUnique({
             where: { PHONENUMBER: identifier },
-            include: { role: true },
+            include: { DashBoardRoles: true },
         });
 
         if (merchantUser && (await bcrypt.compare(password, merchantUser.password))) {
             user = merchantUser;
-            const permissions = (user.role?.permissions as {pages: string[]})?.pages || [];
+            const permissions = (user.DashBoardRoles?.permissions as {pages: string[]})?.pages || [];
             userPayload = {
                 userId: user.ID,
                 userType: 'merchant',
-                role: user.role?.name || 'No Role',
+                role: user.DashBoardRoles?.name || 'No Role',
                 name: user.FULLNAME,
                 email: user.PHONENUMBER,
                 accountNumber: user.ACCOUNTNUMBER,
@@ -47,16 +47,16 @@ export async function POST(request: Request) {
     } else if (userType === 'branch') {
         const branchUser = await prisma.branchUser.findUnique({
             where: { email: identifier },
-            include: { role: true },
+            include: { DashBoardRoles: true },
         });
         
         if (branchUser && (await bcrypt.compare(password, branchUser.password))) {
             user = branchUser;
-            const permissions = (user.role?.permissions as {pages: string[]})?.pages || [];
+            const permissions = (user.DashBoardRoles?.permissions as {pages: string[]})?.pages || [];
             userPayload = {
                 userId: user.id.toString(),
                 userType: 'branch',
-                role: user.role?.name || 'No Role',
+                role: user.DashBoardRoles?.name || 'No Role',
                 name: user.name,
                 email: user.email,
                 accountNumber: null,

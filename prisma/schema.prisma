@@ -1,57 +1,63 @@
 
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
 model Branch {
-  id         Int       @id @default(autoincrement())
-  name       String    @unique
-  code       String    @unique
-  address    String
-  contact    String
-  status     String
-  INSERTDATE DateTime? @default(now())
-  UPDATEDATE DateTime? @updatedAt
-  users      BranchUser[]
+  id              Int                @id @default(autoincrement())
+  name            String             @unique
+  code            String             @unique
+  address         String
+  contact         String
+  status          String
+  INSERTDATE      DateTime?          @default(now())
+  UPDATEDATE      DateTime?          @updatedAt
+  users           BranchUser[]
+  allowedCompanies allowed_companies[]
 }
 
 model allowed_companies {
-  Oid                   String    @id @unique
-  ID                    String    @unique
-  ACCOUNTNUMBER         String    @unique
-  FIELDNAME             String
-  APPROVEUSER           String?
-  APPROVED              Boolean   @default(false)
-  STATUS                String
-  INSERTDATE            DateTime? @default(now())
-  UPDATEDATE            DateTime? @updatedAt
-  INSERTUSER            String
-  UPDATEUSER            String
-  OptimisticLockField   Int
-  GCRecord              Int
-  branch                String?
+  Oid                 String    @id @unique
+  ID                  String    @unique
+  ACCOUNTNUMBER       String    @unique
+  FIELDNAME           String
+  APPROVEUSER         String?
+  APPROVED            Boolean   @default(false)
+  STATUS              String
+  INSERTDATE          DateTime? @default(now())
+  UPDATEDATE          DateTime? @updatedAt
+  INSERTUSER          String
+  UPDATEUSER          String
+  OptimisticLockField Int
+  GCRecord            Int?
+  branchName          String?
+  branch              Branch?   @relation(fields: [branchName], references: [name])
+
+  @@index([branchName])
 }
 
 model merchant_users {
   ID                String    @id @unique
   password          String
-  ACCOUNTNUMBER     String
   FULLNAME          String
+  ROLE              String
+  STATUS            String
+  ACCOUNTNUMBER     String
   ACCOUNTTYPE       String
   PHONENUMBER       String    @unique
-  ROLE              String
   DEVICENAME        String
   ENCRYPTIONKEY     String
   iV                String
   ISLOGGEDIN        Boolean
   authenticationkey String
-  STATUS            String
   FAILEDATTMEPTS    Int
   LASTLOGINATTEMPT  DateTime?
   ISLOCKED          Boolean
@@ -62,7 +68,7 @@ model merchant_users {
   INSERTDATE        DateTime? @default(now())
   UPDATEDATE        DateTime? @updatedAt
   roleId            String?
-  role              Role?     @relation(fields: [roleId], references: [id])
+  DashBoardRoles    DashBoardRoles? @relation(fields: [roleId], references: [id])
 }
 
 model BranchUser {
@@ -73,8 +79,7 @@ model BranchUser {
   branch   String
   status   String
   roleId   String?
-  Branch   Branch? @relation(fields: [branch], references: [name])
-  role     Role?   @relation(fields: [roleId], references: [id])
+  DashBoardRoles DashBoardRoles? @relation(fields: [roleId], references: [id])
 }
 
 model merchants_daily_balances {
@@ -92,8 +97,8 @@ model merchants_daily_balances {
 
 model merchant_txns {
   ID                  String    @id @default(cuid())
-  MERCHANTACCOUNT     String?
-  MERCHANTPHONE       String?
+  MERCHANTACCOUNT     String
+  MERCHANTPHONE       String
   AMOUNT              Float
   TXNID               String
   CUSTOMERNAME        String
@@ -255,7 +260,7 @@ model account_infos {
   ACCOUNTNUMBER String
   PHONENUMBER   String
   FULLNAME      String
-  GENDER        String
+  GENDER        String?
   VALUE1        String?
   VALUE2        String?
   INSERTDATE    DateTime? @default(now())
@@ -265,16 +270,16 @@ model account_infos {
 }
 
 model promo_adds {
-  ID            String    @id @default(cuid())
-  ADDTITLE      String
-  ADDSUBTITLE   String
-  ADDADDRESS    String
-  IMAGEADDRESS  String
-  displayOrder  Int
-  INSERTUSERID  String
-  UPDATEUSERID  String
-  INSERTDATE    DateTime? @default(now())
-  UPDATEDATE    DateTime? @updatedAt
+  ID           String    @id @default(cuid())
+  ADDTITLE     String
+  ADDSUBTITLE  String
+  ADDADDRESS   String
+  IMAGEADDRESS String
+  displayOrder Int
+  INSERTUSERID String
+  UPDATEUSERID String
+  INSERTDATE   DateTime? @default(now())
+  UPDATEDATE   DateTime? @updatedAt
 }
 
 model role_capablities {
@@ -294,13 +299,13 @@ model role_capablities {
   UPDATEDATE   DateTime? @updatedAt
 }
 
-model Role {
-  id          String           @id @default(cuid())
-  name        String           @unique
-  description String?
-  permissions Json
-  users       BranchUser[]
+model DashBoardRoles {
+  id            String           @id @default(cuid())
+  name          String           @unique
+  description   String?
+  permissions   Json
+  users         BranchUser[]
   merchantUsers merchant_users[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 }

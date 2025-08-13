@@ -11,11 +11,11 @@ const MOCK_BRANCHES = [
 ];
 
 const MOCK_ALLOWED_COMPANIES = [
-  { Oid: 'oid_C001', ID: 'C001', ACCOUNTNUMBER: 'ACC001', FIELDNAME: 'Innovate Inc.', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branch: 'Downtown Branch' },
-  { Oid: 'oid_C002', ID: 'C002', ACCOUNTNUMBER: 'ACC002', FIELDNAME: 'Apex Solutions', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branch: 'Uptown Branch' },
-  { Oid: 'oid_C003', ID: 'C003', ACCOUNTNUMBER: 'ACC003', FIELDNAME: 'Quantum Corp', APPROVEUSER: null, APPROVED: false, STATUS: 'Pending', INSERTDATE: new Date('2023-03-10'), UPDATEDATE: new Date('2023-03-10'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branch: 'Downtown Branch' },
-  { Oid: 'oid_C004', ID: 'C004', ACCOUNTNUMBER: 'ACC004', FIELDNAME: 'Synergy Systems', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branch: 'Westside Branch' },
-  { Oid: 'oid_C005', ID: 'C005', ACCOUNTNUMBER: 'ACC005', FIELDNAME: 'Pioneer Ltd.', APPROVEUSER: 'admin', APPROVED: false, STATUS: 'Inactive', INSERTDATE: new Date('2023-05-12'), UPDATEDATE: new Date('2023-05-12'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branch: null },
+  { Oid: 'oid_C001', ID: 'C001', ACCOUNTNUMBER: 'ACC001', FIELDNAME: 'Innovate Inc.', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Downtown Branch' },
+  { Oid: 'oid_C002', ID: 'C002', ACCOUNTNUMBER: 'ACC002', FIELDNAME: 'Apex Solutions', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Uptown Branch' },
+  { Oid: 'oid_C003', ID: 'C003', ACCOUNTNUMBER: 'ACC003', FIELDNAME: 'Quantum Corp', APPROVEUSER: null, APPROVED: false, STATUS: 'Pending', INSERTDATE: new Date('2023-03-10'), UPDATEDATE: new Date('2023-03-10'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Downtown Branch' },
+  { Oid: 'oid_C004', ID: 'C004', ACCOUNTNUMBER: 'ACC004', FIELDNAME: 'Synergy Systems', APPROVEUSER: 'admin', APPROVED: true, STATUS: 'Active', INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Westside Branch' },
+  { Oid: 'oid_C005', ID: 'C005', ACCOUNTNUMBER: 'ACC005', FIELDNAME: 'Pioneer Ltd.', APPROVEUSER: 'admin', APPROVED: false, STATUS: 'Inactive', INSERTDATE: new Date('2023-05-12'), UPDATEDATE: new Date('2023-05-12'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: null },
 ];
 
 const MOCK_MERCHANT_USERS = [
@@ -134,7 +134,7 @@ async function main() {
     await prisma.merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
     await prisma.branch.deleteMany({});
-    await prisma.role.deleteMany({});
+    await prisma.dashBoardRoles.deleteMany({});
 
     // Create default roles
     const ALL_PAGES = [
@@ -149,7 +149,7 @@ async function main() {
         "/dashboard/role-management", "/dashboard/user-role-assignment"
     ];
 
-    const systemAdminRole = await prisma.role.create({
+    const systemAdminRole = await prisma.dashBoardRoles.create({
         data: {
             name: 'System Admin',
             description: 'Has full access to all system features and data across all companies.',
@@ -157,7 +157,7 @@ async function main() {
         }
     });
 
-    const branchAdminRole = await prisma.role.create({
+    const branchAdminRole = await prisma.dashBoardRoles.create({
         data: {
             name: 'Branch Admin',
             description: 'Can manage companies and users within their own branch, including approvals.',
@@ -171,7 +171,7 @@ async function main() {
         }
     });
 
-    const branchUserRole = await prisma.role.create({
+    const branchUserRole = await prisma.dashBoardRoles.create({
         data: {
             name: 'Branch User',
             description: 'Can create and update companies within their branch, but cannot approve them.',
@@ -184,7 +184,7 @@ async function main() {
         }
     });
 
-    const merchantAdminRole = await prisma.role.create({
+    const merchantAdminRole = await prisma.dashBoardRoles.create({
         data: {
             name: 'Merchant Admin',
             description: 'Full dashboard access, restricted to their own company.',
@@ -198,7 +198,7 @@ async function main() {
         }
     });
 
-    const merchantSalesRole = await prisma.role.create({
+    const merchantSalesRole = await prisma.dashBoardRoles.create({
         data: {
             name: 'Merchant Sales',
             description: 'Can only view their own transactions and basic company info.',

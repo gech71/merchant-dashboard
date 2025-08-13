@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useDataContext } from '@/context/data-context';
 import { useToast } from '@/hooks/use-toast';
-import type { Role } from '@/types';
+import type { DashBoardRoles } from '@/types';
 import { ScrollArea } from './ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 
@@ -65,7 +65,7 @@ const roleFormSchema = z.object({
 
 type RoleFormValues = z.infer<typeof roleFormSchema>;
 
-export function RoleForm({ setOpen, role }: { setOpen: (open: boolean) => void, role: Role | null }) {
+export function RoleForm({ setOpen, role }: { setOpen: (open: boolean) => void, role: DashBoardRoles | null }) {
     const { addRole, updateRole } = useDataContext();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = React.useState(false);

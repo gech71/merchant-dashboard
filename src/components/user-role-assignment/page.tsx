@@ -79,7 +79,7 @@ export default function UserRoleAssignmentPage() {
                                         <TableRow key={user.ID}>
                                             <TableCell className="font-medium">{user.FULLNAME}</TableCell>
                                             <TableCell>{user.ACCOUNTNUMBER}</TableCell>
-                                            <TableCell>{user.role?.name || 'Unassigned'}</TableCell>
+                                            <TableCell>{user.DashBoardRoles?.name || 'Unassigned'}</TableCell>
                                             <TableCell>
                                                 <Select onValueChange={(roleId) => handleRoleChange(user.ID, roleId, 'merchant')} defaultValue={user.roleId || ''}>
                                                     <SelectTrigger className="w-[180px]">
@@ -116,7 +116,7 @@ export default function UserRoleAssignmentPage() {
                                             <TableCell className="font-medium">{user.name}</TableCell>
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>{user.branch}</TableCell>
-                                            <TableCell>{user.role?.name || 'Unassigned'}</TableCell>
+                                            <TableCell>{user.DashBoardRoles?.name || 'Unassigned'}</TableCell>
                                             <TableCell>
                                                 <Select onValueChange={(roleId) => handleRoleChange(user.id.toString(), roleId, 'branch')} defaultValue={user.roleId || ''}>
                                                     <SelectTrigger className="w-[180px]">

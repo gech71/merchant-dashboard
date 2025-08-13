@@ -52,7 +52,7 @@ export function EditMerchantForm({
 
     if (selectedRole?.name === 'Merchant Admin') {
       const adminExists = merchants.some(
-        (m) => m.ID !== merchantUser.ID && m.ACCOUNTNUMBER === merchantUser.ACCOUNTNUMBER && m.role?.name === 'Merchant Admin'
+        (m) => m.ID !== merchantUser.ID && m.ACCOUNTNUMBER === merchantUser.ACCOUNTNUMBER && m.DashBoardRoles?.name === 'Merchant Admin'
       );
       if (adminExists) {
         form.setError('roleId', {
