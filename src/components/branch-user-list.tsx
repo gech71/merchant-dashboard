@@ -48,7 +48,7 @@ type SortableKeys = 'name' | 'email' | 'branch' | 'status';
 const ITEMS_PER_PAGE = 15;
 
 export default function BranchUserList({ branchUsers: initialBranchUsers, approvalView = false }: { branchUsers: BranchUser[], approvalView?: boolean }) {
-  const { branchUsers, updateBranchUserStatus } = useDataContext();
+  const { branchUsers: contextBranchUsers, updateBranchUserStatus } = useDataContext();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
@@ -93,9 +93,11 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
     }
     setSortConfig({ key, direction });
   };
+  
+  const usersSource = approvalView ? contextBranchUsers : initialBranchUsers;
 
   const filteredAndSortedUsers = React.useMemo(() => {
-    let sortableItems = [...branchUsers];
+    let sortableItems = [...usersSource];
 
     if (approvalView) {
       sortableItems = sortableItems.filter(u => u.status === 'Pending');
@@ -129,7 +131,7 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
     }
 
     return sortableItems;
-  }, [branchUsers, searchTerm, sortConfig, activeTab, approvalView]);
+  }, [usersSource, searchTerm, sortConfig, activeTab, approvalView]);
 
   const paginatedUsers = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
