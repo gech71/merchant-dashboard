@@ -53,7 +53,7 @@ export default function RoleManagementPage() {
     }
 
     return (
-        <>
+        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h1 className="text-3xl font-bold">Role Management</h1>
@@ -66,72 +66,70 @@ export default function RoleManagementPage() {
                     </Button>
                 </DialogTrigger>
             </div>
-            <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-                <Card>
-                    <CardContent className="p-0">
-                        <div className="rounded-md border">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Role Name</TableHead>
-                                        <TableHead>Description</TableHead>
-                                        <TableHead>Permissions</TableHead>
-                                        <TableHead><span className="sr-only">Actions</span></TableHead>
+            <Card>
+                <CardContent className="p-0">
+                    <div className="rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Role Name</TableHead>
+                                    <TableHead>Description</TableHead>
+                                    <TableHead>Permissions</TableHead>
+                                    <TableHead><span className="sr-only">Actions</span></TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {roles.map(role => (
+                                    <TableRow key={role.id}>
+                                        <TableCell className="font-medium">{role.name}</TableCell>
+                                        <TableCell className="text-muted-foreground">{role.description}</TableCell>
+                                        <TableCell>{((role.permissions as any)?.pages as string[])?.length || 0} pages</TableCell>
+                                        <TableCell>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button aria-haspopup="true" size="icon" variant="ghost">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem onClick={() => handleEdit(role)}>
+                                                        <Edit className="mr-2 h-4 w-4" /> Edit
+                                                    </DropdownMenuItem>
+                                                    <AlertDialog>
+                                                        <AlertDialogTrigger asChild>
+                                                            <button className="w-full text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-red-600 focus:bg-red-50 focus:text-red-600">
+                                                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                                            </button>
+                                                        </AlertDialogTrigger>
+                                                        <AlertDialogContent>
+                                                            <AlertDialogHeader>
+                                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                                <AlertDialogDescription>
+                                                                    This action cannot be undone. This will permanently delete the role and unassign it from all users.
+                                                                </AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <AlertDialogFooter>
+                                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                <AlertDialogAction onClick={() => handleDelete(role.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Continue</AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                    </AlertDialog>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
                                     </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {roles.map(role => (
-                                        <TableRow key={role.id}>
-                                            <TableCell className="font-medium">{role.name}</TableCell>
-                                            <TableCell className="text-muted-foreground">{role.description}</TableCell>
-                                            <TableCell>{((role.permissions as any)?.pages as string[])?.length || 0} pages</TableCell>
-                                            <TableCell>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button aria-haspopup="true" size="icon" variant="ghost">
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => handleEdit(role)}>
-                                                            <Edit className="mr-2 h-4 w-4" /> Edit
-                                                        </DropdownMenuItem>
-                                                        <AlertDialog>
-                                                            <AlertDialogTrigger asChild>
-                                                                <button className="w-full text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-red-600 focus:bg-red-50 focus:text-red-600">
-                                                                    <Trash2 className="mr-2 h-4 w-4" /> Delete
-                                                                </button>
-                                                            </AlertDialogTrigger>
-                                                            <AlertDialogContent>
-                                                                <AlertDialogHeader>
-                                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                                    <AlertDialogDescription>
-                                                                        This action cannot be undone. This will permanently delete the role and unassign it from all users.
-                                                                    </AlertDialogDescription>
-                                                                </AlertDialogHeader>
-                                                                <AlertDialogFooter>
-                                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                                    <AlertDialogAction onClick={() => handleDelete(role.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Continue</AlertDialogAction>
-                                                                </AlertDialogFooter>
-                                                            </AlertDialogContent>
-                                                        </AlertDialog>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </CardContent>
-                </Card>
-                <DialogContent className="sm:max-w-[600px]">
-                    <DialogHeader>
-                        <DialogTitle>{selectedRole ? 'Edit Role' : 'Add New Role'}</DialogTitle>
-                    </DialogHeader>
-                    <RoleForm setOpen={setIsFormOpen} role={selectedRole} />
-                </DialogContent>
-            </Dialog>
-        </>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </CardContent>
+            </Card>
+            <DialogContent className="sm:max-w-[600px]">
+                <DialogHeader>
+                    <DialogTitle>{selectedRole ? 'Edit Role' : 'Add New Role'}</DialogTitle>
+                </DialogHeader>
+                <RoleForm setOpen={setIsFormOpen} role={selectedRole} />
+            </DialogContent>
+        </Dialog>
     );
 }
