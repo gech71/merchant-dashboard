@@ -1,4 +1,3 @@
-
 'use client'
 import AllowedCompanyList from '@/components/allowed-company-list';
 import { useDataContext } from '@/context/data-context';
@@ -9,8 +8,6 @@ type AllowedCompanyWithRelations = Prisma.allowed_companiesGetPayload<{
 }>
 
 export default function CompaniesApprovalPage() {
-  const { allowedCompanies, currentUser } = useDataContext();
-  // Filter for companies that are not yet approved
-  const pendingCompanies = allowedCompanies.filter(c => !c.APPROVED);
-  return <AllowedCompanyList allowedCompanies={pendingCompanies as unknown as AllowedCompanyWithRelations[]} approvalView={true} />;
+  const { allowedCompanies } = useDataContext();
+  return <AllowedCompanyList allowedCompanies={allowedCompanies as unknown as AllowedCompanyWithRelations[]} approvalView={true} />;
 }
