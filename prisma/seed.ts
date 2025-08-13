@@ -1,7 +1,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '../src/lib/prisma';
 
 const MOCK_BRANCHES = [
   { name: 'Downtown Branch', code: 'DT001', address: '123 Main St, Anytown, USA', contact: '555-1234', status: 'Approved' },
@@ -361,5 +361,3 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-
-    
