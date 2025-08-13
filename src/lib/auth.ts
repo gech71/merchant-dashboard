@@ -80,7 +80,7 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
 }
 
 export async function getMe() {
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const token = cookieStore.get('accessToken')?.value;
     const user = await getCurrentUser(token);
     if (!user) {
