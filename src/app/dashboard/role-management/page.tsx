@@ -54,23 +54,21 @@ export default function RoleManagementPage() {
 
     return (
         <>
+            <div className="flex items-center justify-between mb-6">
+                <div>
+                    <h1 className="text-3xl font-bold">Role Management</h1>
+                    <p className="text-muted-foreground">Create, edit, and delete user roles and their permissions.</p>
+                </div>
+                <DialogTrigger asChild>
+                    <Button onClick={handleAdd} size="sm" className="h-9 gap-1">
+                        <PlusCircle className="h-4 w-4" />
+                        <span>Add New Role</span>
+                    </Button>
+                </DialogTrigger>
+            </div>
             <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
                 <Card>
-                    <CardHeader>
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <CardTitle>Role Management</CardTitle>
-                                <CardDescription>Create, edit, and delete user roles and their permissions.</CardDescription>
-                            </div>
-                            <Button onClick={handleAdd} size="sm" className="h-8 gap-1">
-                                <PlusCircle className="h-3.5 w-3.5" />
-                                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                                    Add Role
-                                </span>
-                            </Button>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-0">
                         <div className="rounded-md border">
                             <Table>
                                 <TableHeader>
@@ -85,7 +83,7 @@ export default function RoleManagementPage() {
                                     {roles.map(role => (
                                         <TableRow key={role.id}>
                                             <TableCell className="font-medium">{role.name}</TableCell>
-                                            <TableCell>{role.description}</TableCell>
+                                            <TableCell className="text-muted-foreground">{role.description}</TableCell>
                                             <TableCell>{((role.permissions as any)?.pages as string[])?.length || 0} pages</TableCell>
                                             <TableCell>
                                                 <DropdownMenu>
@@ -100,9 +98,9 @@ export default function RoleManagementPage() {
                                                         </DropdownMenuItem>
                                                         <AlertDialog>
                                                             <AlertDialogTrigger asChild>
-                                                                <Button variant="ghost" className="w-full justify-start text-sm text-red-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 dark:hover:text-red-500 px-2 py-1.5 relative flex cursor-default select-none items-center rounded-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                                                                <button className="w-full text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-red-600 focus:bg-red-50 focus:text-red-600">
                                                                     <Trash2 className="mr-2 h-4 w-4" /> Delete
-                                                                </Button>
+                                                                </button>
                                                             </AlertDialogTrigger>
                                                             <AlertDialogContent>
                                                                 <AlertDialogHeader>
@@ -113,7 +111,7 @@ export default function RoleManagementPage() {
                                                                 </AlertDialogHeader>
                                                                 <AlertDialogFooter>
                                                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                                    <AlertDialogAction onClick={() => handleDelete(role.id)}>Continue</AlertDialogAction>
+                                                                    <AlertDialogAction onClick={() => handleDelete(role.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Continue</AlertDialogAction>
                                                                 </AlertDialogFooter>
                                                             </AlertDialogContent>
                                                         </AlertDialog>
@@ -127,7 +125,7 @@ export default function RoleManagementPage() {
                         </div>
                     </CardContent>
                 </Card>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[600px]">
                     <DialogHeader>
                         <DialogTitle>{selectedRole ? 'Edit Role' : 'Add New Role'}</DialogTitle>
                     </DialogHeader>

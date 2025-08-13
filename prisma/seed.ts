@@ -246,11 +246,9 @@ async function main() {
         } else {
             roleId = merchantSalesRole.id;
         }
-        const { ID, ...rest } = m;
         await prisma.merchant_users.create({
             data: {
-                ID,
-                ...rest,
+                ...m,
                 password: hashedPassword,
                 roleId: roleId,
             }

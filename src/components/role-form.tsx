@@ -5,7 +5,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -13,31 +13,45 @@ import { useDataContext } from '@/context/data-context';
 import { useToast } from '@/hooks/use-toast';
 import type { Role } from '@/types';
 import { ScrollArea } from './ui/scroll-area';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 
-const ALL_PAGES = [
-  { id: '/dashboard', label: 'Dashboard' },
-  { id: '/dashboard/allowed_companies', label: 'Allowed Companies' },
-  { id: '/dashboard/branches', label: 'Branches' },
-  { id: '/dashboard/branch-users', label: 'Branch Users' },
-  { id: '/dashboard/merchant_users', label: 'Merchant Users' },
-  { id: '/dashboard/account-infos', label: 'Account Infos' },
-  { id: '/dashboard/promo-adds', label: 'Promo Ads' },
-  { id: '/dashboard/daily-balances', label: 'Daily Balances' },
-  { id: '/dashboard/merchant-txns', label: 'Merchant Transactions' },
-  { id: '/dashboard/arif-requests', label: 'Arif Requests' },
-  { id: '/dashboard/paystream-txns', label: 'PayStream Transactions' },
-  { id: '/dashboard/qr-payments', label: 'QR Payments' },
-  { id: '/dashboard/arifpay-endpoints', label: 'ArifPay Endpoints' },
-  { id: '/dashboard/controllers-configs', label: 'Controller Configs' },
-  { id: '/dashboard/core-integration-settings', label: 'Core Integration Settings' },
-  { id: '/dashboard/stream-pay-settings', label: 'StreamPay Settings' },
-  { id: '/dashboard/ussd-push-settings', label: 'USSD Push Settings' },
-  { id: '/dashboard/role-capabilities', label: 'Legacy Role Capabilities' },
-  { id: '/dashboard/approvals/allowed_companies', label: 'Approvals: Allowed Companies' },
-  { id: '/dashboard/approvals/branch_users', label: 'Approvals: Branch Users' },
-  { id: '/dashboard/role-management', label: 'Role Management' },
-  { id: '/dashboard/user-role-assignment', label: 'User Role Assignment' },
-];
+const PAGE_GROUPS = {
+  Management: [
+    { id: '/dashboard/allowed_companies', label: 'Allowed Companies' },
+    { id: '/dashboard/branches', label: 'Branches' },
+    { id: '/dashboard/branch-users', label: 'Branch Users' },
+    { id: '/dashboard/merchant_users', label: 'Merchant Users' },
+    { id: '/dashboard/account-infos', label: 'Account Infos' },
+    { id: '/dashboard/promo-adds', label: 'Promo Ads' },
+  ],
+  Transactions: [
+    { id: '/dashboard/daily-balances', label: 'Daily Balances' },
+    { id: '/dashboard/merchant-txns', label: 'Merchant Transactions' },
+    { id: '/dashboard/arif-requests', label: 'Arif Requests' },
+    { id: '/dashboard/paystream-txns', label: 'PayStream Transactions' },
+    { id: '/dashboard/qr-payments', label: 'QR Payments' },
+  ],
+  Approvals: [
+    { id: '/dashboard/approvals/allowed_companies', label: 'Allowed Companies' },
+    { id: '/dashboard/approvals/branch_users', label: 'Branch Users' },
+  ],
+  "System Settings": [
+    { id: '/dashboard/arifpay-endpoints', label: 'ArifPay Endpoints' },
+    { id: '/dashboard/controllers-configs', label: 'Controller Configs' },
+    { id: '/dashboard/core-integration-settings', label: 'Core Integration Settings' },
+    { id: '/dashboard/stream-pay-settings', label: 'StreamPay Settings' },
+    { id: '/dashboard/ussd-push-settings', label: 'USSD Push Settings' },
+    { id: '/dashboard/role-capabilities', label: 'Legacy Role Capabilities' },
+  ],
+  "Administration": [
+     { id: '/dashboard', label: 'Dashboard' },
+     { id: '/dashboard/role-management', label: 'Role Management' },
+     { id: '/dashboard/user-role-assignment', label: 'User Role Assignment' },
+  ]
+};
+
+const ALL_PAGES = Object.values(PAGE_GROUPS).flat();
+
 
 const roleFormSchema = z.object({
     name: z.string().min(2, 'Role name is required.'),
@@ -94,14 +108,14 @@ export function RoleForm({ setOpen, role }: { setOpen: (open: boolean) => void, 
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Role Name</FormLabel>
-                            <FormControl><Input {...field} /></FormControl>
+                            <FormControl><Input {...field} placeholder="e.g., Merchant Sales" /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -112,7 +126,7 @@ export function RoleForm({ setOpen, role }: { setOpen: (open: boolean) => void, 
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Description</FormLabel>
-                            <FormControl><Textarea {...field} /></FormControl>
+                            <FormControl><Textarea {...field} placeholder="A short description of what this role can do." /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -122,44 +136,43 @@ export function RoleForm({ setOpen, role }: { setOpen: (open: boolean) => void, 
                     name="permissions.pages"
                     render={() => (
                         <FormItem>
-                             <div className="mb-4">
-                                <FormLabel className="text-base">Permissions</FormLabel>
+                             <div>
+                                <FormLabel>Permissions</FormLabel>
+                                <FormDescription>Select the pages this role will have access to.</FormDescription>
                             </div>
-                            <ScrollArea className="h-72 w-full rounded-md border p-4">
-                                {ALL_PAGES.map((item) => (
-                                    <FormField
-                                        key={item.id}
-                                        control={form.control}
-                                        name="permissions.pages"
-                                        render={({ field }) => {
-                                        return (
-                                            <FormItem
-                                                key={item.id}
-                                                className="flex flex-row items-start space-x-3 space-y-0"
-                                            >
-                                                <FormControl>
-                                                    <Checkbox
-                                                        checked={field.value?.includes(item.id)}
-                                                        onCheckedChange={(checked) => {
-                                                            return checked
-                                                            ? field.onChange([...field.value, item.id])
-                                                            : field.onChange(
-                                                                field.value?.filter(
-                                                                    (value) => value !== item.id
-                                                                )
-                                                                )
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormLabel className="font-normal">
-                                                    {item.label}
-                                                </FormLabel>
-                                            </FormItem>
-                                        )
-                                        }}
-                                    />
+                            <Accordion type="multiple" className="w-full" defaultValue={Object.keys(PAGE_GROUPS)}>
+                                {Object.entries(PAGE_GROUPS).map(([groupName, pages]) => (
+                                <AccordionItem value={groupName} key={groupName}>
+                                    <AccordionTrigger>{groupName}</AccordionTrigger>
+                                    <AccordionContent>
+                                        <div className="space-y-4 ml-2 pl-4 border-l">
+                                            {pages.map((item) => (
+                                                <FormField
+                                                    key={item.id}
+                                                    control={form.control}
+                                                    name="permissions.pages"
+                                                    render={({ field }) => (
+                                                        <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                                            <FormControl>
+                                                                <Checkbox
+                                                                    checked={field.value?.includes(item.id)}
+                                                                    onCheckedChange={(checked) => (
+                                                                        checked
+                                                                            ? field.onChange([...field.value, item.id])
+                                                                            : field.onChange(field.value?.filter(value => value !== item.id))
+                                                                    )}
+                                                                />
+                                                            </FormControl>
+                                                            <FormLabel className="font-normal">{item.label}</FormLabel>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            ))}
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
                                 ))}
-                            </ScrollArea>
+                            </Accordion>
                             <FormMessage />
                         </FormItem>
                     )}
