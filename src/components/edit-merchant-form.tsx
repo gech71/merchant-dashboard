@@ -22,7 +22,7 @@ import { Merchant_users } from '@/types';
 import { useDataContext } from '@/context/data-context';
 
 const merchantFormSchema = z.object({
-  ROLE: z.enum(['Admin', 'Sales'], { required_error: 'Please select a role.' }),
+  roleId: z.string({ required_error: 'Please select a role.' }),
 });
 
 type MerchantFormValues = z.infer<typeof merchantFormSchema>;
@@ -36,24 +36,26 @@ export function EditMerchantForm({
   setOpen: (open: boolean) => void;
 }) {
   const { toast } = useToast();
-  const { merchants, updateMerchant } = useDataContext();
+  const { roles, merchants, updateUserRole } = useDataContext();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<MerchantFormValues>({
     resolver: zodResolver(merchantFormSchema),
     defaultValues: {
-      ROLE: merchantUser.ROLE,
+      roleId: merchantUser.roleId || '',
     },
   });
 
   async function onSubmit(data: MerchantFormValues) {
     setIsLoading(true);
-    if (data.ROLE === 'Admin') {
+    const selectedRole = roles.find(r => r.id === data.roleId);
+
+    if (selectedRole?.name === 'Admin') {
       const adminExists = merchants.some(
-        (m) => m.ID !== merchantUser.ID && m.ACCOUNTNUMBER === merchantUser.ACCOUNTNUMBER && m.ROLE === 'Admin'
+        (m) => m.ID !== merchantUser.ID && m.ACCOUNTNUMBER === merchantUser.ACCOUNTNUMBER && m.role?.name === 'Admin'
       );
       if (adminExists) {
-        form.setError('ROLE', {
+        form.setError('roleId', {
           type: 'manual',
           message: `An Admin user already exists for this account. You can't have more than one.`,
         });
@@ -63,10 +65,10 @@ export function EditMerchantForm({
     }
 
     try {
-        await updateMerchant({ ...merchantUser, ...data });
+        await updateUserRole(merchantUser.ID, data.roleId, 'merchant');
         toast({
             title: 'Merchant User Updated',
-            description: `${merchantUser.FULLNAME} has been successfully updated.`,
+            description: `${merchantUser.FULLNAME}'s role has been successfully updated.`,
         });
         setOpen(false);
     } catch (error) {
@@ -99,7 +101,7 @@ export function EditMerchantForm({
 
         <FormField
           control={form.control}
-          name="ROLE"
+          name="roleId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>ROLE</FormLabel>
@@ -110,8 +112,9 @@ export function EditMerchantForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Admin">Admin</SelectItem>
-                  <SelectItem value="Sales">Sales</SelectItem>
+                  {roles.map(role => (
+                    <SelectItem key={role.id} value={role.id}>{role.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />

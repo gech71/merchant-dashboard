@@ -21,7 +21,7 @@ export type Branch = Omit<Prisma.BranchGetPayload<{}>, 'INSERTDATE' | 'UPDATEDAT
   UPDATEDATE: string | null;
 };
 
-export type Merchant_users = Omit<Prisma.merchant_usersGetPayload<{}>, 'LASTLOGINATTEMPT' | 'UNLOCKEDTIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
+export type Merchant_users = Omit<Prisma.merchant_usersGetPayload<{ include: { role: true } }>, 'LASTLOGINATTEMPT' | 'UNLOCKEDTIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
   LASTLOGINATTEMPT: string | null;
   UNLOCKEDTIME: string | null;
   INSERTDATE: string | null;
@@ -40,7 +40,7 @@ export type merchant_txns = Omit<Prisma.merchant_txnsGetPayload<{}>, 'T2TRANSACT
     UPDATEDATE: string | null;
 };
 
-export type BranchUser = Prisma.BranchUserGetPayload<{}>;
+export type BranchUser = Prisma.BranchUserGetPayload<{ include: { role: true } }>;
 
 export type arifpay_endpoints = Omit<Prisma.arifpay_endpointsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
   INSERTDATE: string | null;
@@ -93,4 +93,6 @@ export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSE
   UPDATEDATE: string | null;
 };
 
-export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | role_capablities | null;
+export type Role = Prisma.RoleGetPayload<{}>;
+
+export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | role_capablities | Role | null;

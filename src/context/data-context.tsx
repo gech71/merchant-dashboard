@@ -1,15 +1,15 @@
 
-
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos, promo_adds, role_capablities } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos, promo_adds, role_capablities, Role } from '@/types';
 
 type CurrentUser = {
     userId: string;
     role: string;
     name: string;
     email: string;
+    permissions: string[];
 };
 
 type InitialData = {
@@ -30,6 +30,7 @@ type InitialData = {
     accountInfos: account_infos[];
     promoAdds: promo_adds[];
     roleCapabilities: role_capablities[];
+    roles: Role[];
 }
 
 type DataContextType = {
@@ -50,6 +51,7 @@ type DataContextType = {
   accountInfos: account_infos[];
   promoAdds: promo_adds[];
   roleCapabilities: role_capablities[];
+  roles: Role[];
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
   addBranch: (branch: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE'>) => Promise<void>;
@@ -63,6 +65,10 @@ type DataContextType = {
   updateAllowedCompanyApproval: (companyId: string, isApproved: boolean) => Promise<void>;
   updateMerchantStatus: (merchantId: string, status: 'Active' | 'Disabled') => Promise<void>;
   updateBranchUserStatus: (userId: number, status: 'Active' | 'Inactive') => Promise<void>;
+  addRole: (role: Omit<Role, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateRole: (role: Role) => Promise<void>;
+  deleteRole: (roleId: string) => Promise<void>;
+  updateUserRole: (userId: string, roleId: string, userType: 'merchant' | 'branch') => Promise<void>;
 };
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
@@ -85,6 +91,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const [accountInfos, setAccountInfos] = React.useState<account_infos[]>(initialData.accountInfos);
   const [promoAdds, setPromoAdds] = React.useState<promo_adds[]>(initialData.promoAdds);
   const [roleCapabilities, setRoleCapabilities] = React.useState<role_capablities[]>(initialData.roleCapabilities);
+  const [roles, setRoles] = React.useState<Role[]>(initialData.roles);
   const [currentUser, setCurrentUser] = React.useState<CurrentUser | null>(null);
 
   const addBranch = async (branchData: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE'>) => {
@@ -213,6 +220,52 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     }
   };
 
+  const addRole = async (roleData: Omit<Role, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const response = await fetch('/api/roles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(roleData),
+    });
+    if (!response.ok) throw new Error('Failed to create role');
+    const newRole = await response.json();
+    setRoles(prev => [...prev, newRole]);
+  };
+
+  const updateRole = async (roleData: Role) => {
+    const response = await fetch(`/api/roles/${roleData.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(roleData),
+    });
+    if (!response.ok) throw new Error('Failed to update role');
+    const updatedRole = await response.json();
+    setRoles(prev => prev.map(r => r.id === updatedRole.id ? updatedRole : r));
+  };
+
+  const deleteRole = async (roleId: string) => {
+    const response = await fetch(`/api/roles/${roleId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete role');
+    setRoles(prev => prev.filter(r => r.id !== roleId));
+  };
+
+  const updateUserRole = async (userId: string, roleId: string, userType: 'merchant' | 'branch') => {
+    const response = await fetch(`/api/user-roles`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, roleId, userType }),
+    });
+    if (!response.ok) throw new Error('Failed to update user role');
+    const updatedUser = await response.json();
+    if (userType === 'merchant') {
+        setMerchants(prev => prev.map(u => u.ID === userId ? updatedUser : u));
+    } else {
+        setBranchUsers(prev => prev.map(u => u.id.toString() === userId ? updatedUser : u));
+    }
+  };
+
+
   const value = {
     branches,
     allowedCompanies,
@@ -231,6 +284,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     accountInfos,
     promoAdds,
     roleCapabilities,
+    roles,
     currentUser,
     setCurrentUser,
     addBranch,
@@ -244,6 +298,10 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     updateAllowedCompanyApproval,
     updateMerchantStatus,
     updateBranchUserStatus,
+    addRole,
+    updateRole,
+    deleteRole,
+    updateUserRole,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

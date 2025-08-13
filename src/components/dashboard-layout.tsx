@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -30,6 +29,7 @@ import {
   Megaphone,
   UserCheck,
   LogOut,
+  UserPlus,
 } from 'lucide-react';
 
 import {
@@ -58,36 +58,37 @@ import { cn } from '@/lib/utils';
 import { useDataContext } from '@/context/data-context';
 import { useToast } from '@/hooks/use-toast';
 
-const MANAGEMENT_NAV_ITEMS = [
-  { href: '/dashboard/allowed_companies', icon: Building, label: 'Allowed Companies' },
-  { href: '/dashboard/branches', icon: Home, label: 'Branches' },
-  { href: '/dashboard/branch-users', icon: UserCog, label: 'Branch Users' },
-  { href: '/dashboard/merchant_users', icon: Briefcase, label: 'Merchant Users' },
-  { href: '/dashboard/account-infos', icon: FileText, label: 'Account Infos' },
-  { href: '/dashboard/promo-adds', icon: Megaphone, label: 'Promo Ads' },
+const ALL_NAV_ITEMS = [
+  { group: 'Management', href: '/dashboard/allowed_companies', icon: Building, label: 'Allowed Companies' },
+  { group: 'Management', href: '/dashboard/branches', icon: Home, label: 'Branches' },
+  { group: 'Management', href: '/dashboard/branch-users', icon: UserCog, label: 'Branch Users' },
+  { group: 'Management', href: '/dashboard/merchant_users', icon: Briefcase, label: 'Merchant Users' },
+  { group: 'Management', href: '/dashboard/account-infos', icon: FileText, label: 'Account Infos' },
+  { group: 'Management', href: '/dashboard/promo-adds', icon: Megaphone, label: 'Promo Ads' },
+  { group: 'Transactions', href: '/dashboard/daily-balances', icon: DollarSign, label: 'Daily Balances' },
+  { group: 'Transactions', href: '/dashboard/merchant-txns', icon: Receipt, label: 'Merchant Transactions' },
+  { group: 'Transactions', href: '/dashboard/arif-requests', icon: Send, label: 'Arif Requests' },
+  { group: 'Transactions', href: '/dashboard/paystream-txns', icon: Repeat, label: 'PayStream Transactions' },
+  { group: 'Transactions', href: '/dashboard/qr-payments', icon: QrCode, label: 'QR Payments' },
+  { group: 'System Settings', href: '/dashboard/arifpay-endpoints', icon: Link2, label: 'ArifPay Endpoints' },
+  { group: 'System Settings', href: '/dashboard/controllers-configs', icon: KeyRound, label: 'Controller Configs' },
+  { group: 'System Settings', href: '/dashboard/core-integration-settings', icon: Settings, label: 'Core Integration Settings' },
+  { group: 'System Settings', href: '/dashboard/stream-pay-settings', icon: Settings, label: 'StreamPay Settings' },
+  { group: 'System Settings', href: '/dashboard/ussd-push-settings', icon: Smartphone, label: 'USSD Push Settings' },
+  { group: 'System Settings', href: '/dashboard/role-capabilities', icon: UserCheck, label: 'Role Capabilities' },
+  { group: 'System Settings', href: '/dashboard/role-management', icon: ShieldCheck, label: 'Role Management' },
+  { group: 'System Settings', href: '/dashboard/user-role-assignment', icon: UserPlus, label: 'User Role Assignment' },
+  { group: 'Approvals', href: '/dashboard/approvals/allowed_companies', icon: Building, label: 'Allowed Companies' },
+  { group: 'Approvals', href: '/dashboard/approvals/branch_users', icon: UserCog, label: 'Branch Users' },
 ];
 
-const TRANSACTIONS_NAV_ITEMS = [
-  { href: '/dashboard/daily-balances', icon: DollarSign, label: 'Daily Balances' },
-  { href: '/dashboard/merchant-txns', icon: Receipt, label: 'Merchant Transactions' },
-  { href: '/dashboard/arif-requests', icon: Send, label: 'Arif Requests' },
-  { href: '/dashboard/paystream-txns', icon: Repeat, label: 'PayStream Transactions' },
-  { href: '/dashboard/qr-payments', icon: QrCode, label: 'QR Payments' },
+const NAV_GROUPS = [
+    { label: 'Management', icon: Landmark },
+    { label: 'Transactions', icon: Receipt },
+    { label: 'Approvals', icon: ShieldCheck },
+    { label: 'System Settings', icon: Settings2 },
 ];
 
-const SETTINGS_NAV_ITEMS = [
-    { href: '/dashboard/arifpay-endpoints', icon: Link2, label: 'ArifPay Endpoints' },
-    { href: '/dashboard/controllers-configs', icon: KeyRound, label: 'Controller Configs' },
-    { href: '/dashboard/core-integration-settings', icon: Settings, label: 'Core Integration Settings' },
-    { href: '/dashboard/stream-pay-settings', icon: Settings, label: 'StreamPay Settings' },
-    { href: '/dashboard/ussd-push-settings', icon: Smartphone, label: 'USSD Push Settings' },
-    { href: '/dashboard/role-capabilities', icon: UserCheck, label: 'Role Capabilities' },
-]
-
-const APPROVAL_NAV_ITEMS = [
-  { href: '/dashboard/approvals/allowed_companies', icon: Building, label: 'Allowed Companies' },
-  { href: '/dashboard/approvals/branch_users', icon: UserCog, label: 'Branch Users' },
-]
 
 function UserProfile() {
   const { currentUser, setCurrentUser } = useDataContext();
@@ -157,15 +158,25 @@ function UserProfile() {
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { state } = useSidebar();
+  const { currentUser } = useDataContext();
 
-  const NavGroup = ({ label, icon, items }: { label: string, icon: React.ElementType, items: { href: string, icon: React.ElementType, label: string }[] }) => (
+  const hasPermission = (href: string) => {
+    if (!currentUser || !currentUser.permissions) return false;
+    return currentUser.permissions.includes(href);
+  };
+  
+  const NavGroup = ({ label, icon, items }: { label: string, icon: React.ElementType, items: { href: string, icon: React.ElementType, label: string }[] }) => {
+    const visibleItems = items.filter(item => hasPermission(item.href));
+    if (visibleItems.length === 0) return null;
+
+     return (
      <SidebarGroup>
         <SidebarGroupLabel className="flex items-center gap-2">
             {React.createElement(icon, { className: 'h-4 w-4' })}
             <span>{label}</span>
         </SidebarGroupLabel>
         <SidebarMenu>
-          {items.map((item) => (
+          {visibleItems.map((item) => (
             <SidebarMenuItem key={item.href}>
             <SidebarMenuButton
               asChild
@@ -181,7 +192,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           ))}
         </SidebarMenu>
       </SidebarGroup>
-  )
+    )
+  }
 
   return (
       <div className="flex min-h-screen w-full">
@@ -203,22 +215,28 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 </div>
               </SidebarHeader>
                 <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive={pathname === '/dashboard'} className="justify-start text-left">
-                            <Link href="/dashboard">
-                                <LayoutGrid />
-                                <span>Dashboard</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
+                    {hasPermission('/dashboard') && (
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname === '/dashboard'} className="justify-start text-left">
+                                <Link href="/dashboard">
+                                    <LayoutGrid />
+                                    <span>Dashboard</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    )}
                 </SidebarMenu>
 
               <SidebarSeparator />
-
-              <NavGroup label="Management" icon={Landmark} items={MANAGEMENT_NAV_ITEMS} />
-              <NavGroup label="Transactions" icon={Receipt} items={TRANSACTIONS_NAV_ITEMS} />
-              <NavGroup label="System Settings" icon={Settings2} items={SETTINGS_NAV_ITEMS} />
-              <NavGroup label="Approvals" icon={ShieldCheck} items={APPROVAL_NAV_ITEMS} />
+              
+              {NAV_GROUPS.map(group => (
+                  <NavGroup 
+                    key={group.label}
+                    label={group.label} 
+                    icon={group.icon} 
+                    items={ALL_NAV_ITEMS.filter(item => item.group === group.label)} 
+                  />
+              ))}
 
             </div>
             <SidebarFooter>

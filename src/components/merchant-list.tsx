@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -38,8 +37,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { EditMerchantForm } from './edit-merchant-form';
 import { useDataContext } from '@/context/data-context';
 import { useToast } from '@/hooks/use-toast';
 
@@ -55,8 +52,6 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'FULLNAME', direction: 'ascending' });
-  const [isEditMerchantOpen, setIsEditMerchantOpen] = React.useState(false);
-  const [selectedMerchant, setSelectedMerchant] = React.useState<EditableItem>(null);
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
   const [currentPage, setCurrentPage] = React.useState(1);
 
@@ -78,11 +73,6 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
         description: 'Could not update the merchant status.',
       });
     }
-  };
-  
-  const handleEdit = (merchant: Merchant_users) => {
-    setSelectedMerchant(merchant);
-    setIsEditMerchantOpen(true);
   };
 
   const getCompanyName = (accountNumber: string) => {
@@ -128,9 +118,10 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
 
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        // Always put Admin first
-        if (a.ROLE === 'Admin' && b.ROLE !== 'Admin') return -1;
-        if (a.ROLE !== 'Admin' && b.ROLE === 'Admin') return 1;
+        const roleA = a.role?.name || '';
+        const roleB = b.role?.name || '';
+        if (roleA === 'Admin' && roleB !== 'Admin') return -1;
+        if (roleA !== 'Admin' && roleB === 'Admin') return 1;
         
         const valA = a[sortConfig.key] ?? '';
         const valB = b[sortConfig.key] ?? '';
@@ -146,8 +137,8 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     } else {
         // Default sort: Admin first
         sortableItems.sort((a, b) => {
-            if (a.ROLE === 'Admin' && b.ROLE !== 'Admin') return -1;
-            if (a.ROLE !== 'Admin' && b.ROLE === 'Admin') return 1;
+            if (a.role?.name === 'Admin' && b.role?.name !== 'Admin') return -1;
+            if (a.role?.name !== 'Admin' && b.role?.name === 'Admin') return 1;
             return 0;
         });
     }
@@ -256,7 +247,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                           <TableCell className="font-medium">{merchantUser.FULLNAME}</TableCell>
                           <TableCell>{getCompanyName(merchantUser.ACCOUNTNUMBER)}</TableCell>
                           <TableCell>
-                             <Badge variant={merchantUser.ROLE === 'Admin' ? 'default' : 'secondary'}>{merchantUser.ROLE}</Badge>
+                             <Badge variant={merchantUser.role?.name === 'Admin' ? 'default' : 'secondary'}>{merchantUser.role?.name || 'Unassigned'}</Badge>
                           </TableCell>
                           <TableCell className="hidden md:table-cell">{merchantUser.PHONENUMBER}</TableCell>
                           <TableCell>
@@ -272,7 +263,6 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                {!approvalView && <DropdownMenuItem onClick={() => handleEdit(merchantUser)}>Edit</DropdownMenuItem>}
                                 {approvalView && merchantUser.STATUS === 'Pending' && (
                                   <>
                                     <DropdownMenuItem onClick={() => handleStatusChange(merchantUser.ID, 'Active')}>
@@ -327,19 +317,6 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
           </Card>
         </TabsContent>
       </Tabs>
-    <Dialog open={isEditMerchantOpen} onOpenChange={setIsEditMerchantOpen}>
-        <DialogContent>
-            <DialogHeader>
-                <DialogTitle>Edit Merchant User</DialogTitle>
-            </DialogHeader>
-            {selectedMerchant && selectedMerchant.hasOwnProperty('ROLE') && (
-                <EditMerchantForm
-                    merchantUser={selectedMerchant as Merchant_users}
-                    setOpen={setIsEditMerchantOpen}
-                />
-            )}
-        </DialogContent>
-    </Dialog>
     </>
   );
 }

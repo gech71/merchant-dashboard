@@ -134,6 +134,56 @@ async function main() {
     await prisma.merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
     await prisma.branch.deleteMany({});
+    await prisma.role.deleteMany({});
+
+    // Create default roles
+    const adminRole = await prisma.role.create({
+        data: {
+            name: 'Admin',
+            description: 'Has access to all dashboard features.',
+            permissions: {
+                "pages": [
+                    "/dashboard",
+                    "/dashboard/allowed_companies",
+                    "/dashboard/branches",
+                    "/dashboard/branch-users",
+                    "/dashboard/merchant_users",
+                    "/dashboard/account-infos",
+                    "/dashboard/promo-adds",
+                    "/dashboard/daily-balances",
+                    "/dashboard/merchant-txns",
+                    "/dashboard/arif-requests",
+                    "/dashboard/paystream-txns",
+                    "/dashboard/qr-payments",
+                    "/dashboard/arifpay-endpoints",
+                    "/dashboard/controllers-configs",
+                    "/dashboard/core-integration-settings",
+                    "/dashboard/stream-pay-settings",
+                    "/dashboard/ussd-push-settings",
+                    "/dashboard/role-capabilities",
+                    "/dashboard/approvals/allowed_companies",
+                    "/dashboard/approvals/branch_users",
+                    "/dashboard/role-management",
+                    "/dashboard/user-role-assignment"
+                ]
+            }
+        }
+    });
+
+    const salesRole = await prisma.role.create({
+        data: {
+            name: 'Sales',
+            description: 'Can only view their own transactions and basic info.',
+            permissions: {
+                "pages": [
+                    "/dashboard",
+                    "/dashboard/merchant-txns"
+                ]
+            }
+        }
+    });
+    console.log('Seeded 2 default roles.');
+
 
     for (const b of MOCK_BRANCHES) {
         await prisma.branch.create({ data: b });
@@ -152,6 +202,7 @@ async function main() {
             data: {
                 ...merchantData,
                 password: hashedPassword,
+                roleId: m.ROLE === 'Admin' ? adminRole.id : salesRole.id,
             } 
         });
     }
@@ -159,7 +210,10 @@ async function main() {
     
     for (const bu of MOCK_BRANCH_USERS) {
         const { id, ...userData } = bu;
-        await prisma.branchUser.create({ data: userData });
+        await prisma.branchUser.create({ data: {
+            ...userData,
+            roleId: adminRole.id // Default to admin for branch users
+        } });
     }
     console.log(`Seeded ${MOCK_BRANCH_USERS.length} branch users.`);
 

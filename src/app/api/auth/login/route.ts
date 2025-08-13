@@ -23,6 +23,7 @@ export async function POST(request: Request) {
 
     const user = await prisma.merchant_users.findUnique({
       where: { PHONENUMBER: phoneNumber },
+      include: { role: true },
     });
 
     if (!user) {
@@ -41,11 +42,14 @@ export async function POST(request: Request) {
       );
     }
     
+    const permissions = (user.role?.permissions as {pages: string[]})?.pages || [];
+
     const userPayload = {
         userId: user.ID,
-        role: user.ROLE,
+        role: user.role?.name || 'No Role',
         name: user.FULLNAME,
         email: user.PHONENUMBER, // Using phone number as email for display
+        permissions,
     };
 
     const accessToken = jwt.sign(
