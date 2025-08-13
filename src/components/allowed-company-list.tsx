@@ -53,7 +53,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
   const [isAddCompanyOpen, setIsAddCompanyOpen] = React.useState(false);
   const [isEditCompanyOpen, setIsEditCompanyOpen] = React.useState(false);
   const [selectedCompany, setSelectedCompany] = React.useState<EditableItem>(null);
-  const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
+  const [activeTab, setActiveTab] = React.useState('all');
   const [currentPage, setCurrentPage] = React.useState(1);
   const [branchFilter, setBranchFilter] = React.useState('all');
 
@@ -91,7 +91,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     setSortConfig({ key, direction });
   };
   
-  const companiesSource = contextCompanies;
+  const companiesSource = approvalView ? contextCompanies.filter(c => !c.APPROVED) : contextCompanies;
 
   const filteredAndSortedCompanies = React.useMemo(() => {
     let sortableItems = [...companiesSource];
@@ -102,15 +102,14 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
       sortableItems = sortableItems.filter(c => accountsInBranch.has(c.ACCOUNTNUMBER));
     }
 
-    if (approvalView) {
-        sortableItems = sortableItems.filter(c => !c.APPROVED);
-    }
-    else if (activeTab === 'active') {
-        sortableItems = sortableItems.filter(c => c.STATUS);
-    } else if (activeTab === 'inactive') {
-        sortableItems = sortableItems.filter(c => !c.STATUS && c.APPROVED); // Inactive means approved but not active
-    } else if (activeTab === 'pending') {
-        sortableItems = sortableItems.filter(c => !c.APPROVED);
+    if (!approvalView) {
+      if (activeTab === 'active') {
+          sortableItems = sortableItems.filter(c => c.STATUS);
+      } else if (activeTab === 'inactive') {
+          sortableItems = sortableItems.filter(c => !c.STATUS && c.APPROVED); // Inactive means approved but not active
+      } else if (activeTab === 'pending') {
+          sortableItems = sortableItems.filter(c => !c.APPROVED);
+      }
     }
     
     if (searchTerm) {
@@ -167,54 +166,26 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     return <Badge variant="destructive">Inactive</Badge>;
   };
 
+  const renderTabs = () => {
+    if (approvalView) {
+      return (
+        <TabsContent value="pending">
+          {renderCard()}
+        </TabsContent>
+      )
+    }
+    return (
+      <>
+        <TabsContent value="all">{renderCard()}</TabsContent>
+        <TabsContent value="active">{renderCard()}</TabsContent>
+        <TabsContent value="inactive">{renderCard()}</TabsContent>
+        <TabsContent value="pending">{renderCard()}</TabsContent>
+      </>
+    )
+  }
 
-  return (
-    <>
-    <Dialog open={isAddCompanyOpen} onOpenChange={setIsAddCompanyOpen}>
-      <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
-        <div className="flex items-center">
-          {!approvalView && (
-            <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="active">Active</TabsTrigger>
-              <TabsTrigger value="inactive">Inactive</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
-            </TabsList>
-          )}
-          <div className="ml-auto flex items-center gap-2">
-            {!approvalView && (
-                <Select value={branchFilter} onValueChange={setBranchFilter}>
-                    <SelectTrigger className="h-8 w-[150px] lg:w-[200px]">
-                        <SelectValue placeholder="Filter by branch" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Branches</SelectItem>
-                        {branches.map(branch => (
-                            <SelectItem key={branch.id} value={branch.name}>{branch.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            )}
-            <Input
-              placeholder="Search companies..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-8 w-[150px] lg:w-[250px]"
-            />
-            {!approvalView && (
-              <DialogTrigger asChild>
-                <Button size="sm" className="h-8 gap-1">
-                  <PlusCircle className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Add Company
-                  </span>
-                </Button>
-              </DialogTrigger>
-            )}
-          </div>
-        </div>
-        <TabsContent value={approvalView ? 'pending' : activeTab}>
-          <Card>
+  const renderCard = () => (
+     <Card>
             <CardHeader>
               <CardTitle>{approvalView ? 'Allowed Company Approvals' : 'Allowed Companies'}</CardTitle>
               <CardDescription>
@@ -362,7 +333,55 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
                 </div>
             </CardFooter>
           </Card>
-        </TabsContent>
+  )
+
+
+  return (
+    <>
+    <Dialog open={isAddCompanyOpen} onOpenChange={setIsAddCompanyOpen}>
+      <Tabs defaultValue={approvalView ? 'pending' : 'all'} onValueChange={setActiveTab}>
+        <div className="flex items-center">
+          {!approvalView && (
+            <TabsList>
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="active">Active</TabsTrigger>
+              <TabsTrigger value="inactive">Inactive</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
+            </TabsList>
+          )}
+          <div className="ml-auto flex items-center gap-2">
+            {!approvalView && (
+                <Select value={branchFilter} onValueChange={setBranchFilter}>
+                    <SelectTrigger className="h-8 w-[150px] lg:w-[200px]">
+                        <SelectValue placeholder="Filter by branch" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Branches</SelectItem>
+                        {branches.map(branch => (
+                            <SelectItem key={branch.id} value={branch.name}>{branch.name}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            )}
+            <Input
+              placeholder="Search companies..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-8 w-[150px] lg:w-[250px]"
+            />
+            {!approvalView && (
+              <DialogTrigger asChild>
+                <Button size="sm" className="h-8 gap-1">
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                    Add Company
+                  </span>
+                </Button>
+              </DialogTrigger>
+            )}
+          </div>
+        </div>
+        {renderTabs()}
       </Tabs>
       <DialogContent>
         <DialogHeader>
@@ -386,5 +405,3 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     </Dialog>
     </>
   );
-
-    

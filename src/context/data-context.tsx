@@ -80,6 +80,14 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const [currentUser, setCurrentUser] = React.useState<CurrentUser | null>(null);
   const [loading, setLoading] = React.useState(true);
 
+  // Convert mutable data to state
+  const [allowedCompanies, setAllowedCompanies] = React.useState(initialData.allowedCompanies);
+  const [branchUsers, setBranchUsers] = React.useState(initialData.branchUsers);
+  const [merchants, setMerchants] = React.useState(initialData.merchants);
+  const [branches, setBranches] = React.useState(initialData.branches);
+  const [roles, setRoles] = React.useState<DashBoardRoles[]>(initialData.roles);
+
+
   React.useEffect(() => {
     const fetchUser = async () => {
         try {
@@ -104,24 +112,24 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const isBranchUser = currentUser?.userType === 'branch';
   const userAccountNumber = currentUser?.accountNumber;
 
-  const branches = React.useMemo(() => isSystemAdmin ? initialData.branches : [], [isSystemAdmin, initialData.branches]);
+  const filteredBranches = React.useMemo(() => isSystemAdmin ? branches : [], [isSystemAdmin, branches]);
   
-  const allowedCompanies = React.useMemo(() => {
-    if (isSystemAdmin) return initialData.allowedCompanies;
+  const filteredAllowedCompanies = React.useMemo(() => {
+    if (isSystemAdmin) return allowedCompanies;
     if (currentUser?.userType === 'branch') {
-        return initialData.allowedCompanies.filter(c => c.branchName === currentUser.branch);
+        return allowedCompanies.filter(c => c.branchName === currentUser.branch);
     }
-    if (userAccountNumber) return initialData.allowedCompanies.filter(c => c.ACCOUNTNUMBER === userAccountNumber);
+    if (userAccountNumber) return allowedCompanies.filter(c => c.ACCOUNTNUMBER === userAccountNumber);
     return [];
-  }, [isSystemAdmin, userAccountNumber, currentUser, initialData.allowedCompanies]);
+  }, [isSystemAdmin, userAccountNumber, currentUser, allowedCompanies]);
 
-  const merchants = React.useMemo(() => {
-    if (isSystemAdmin) return initialData.merchants;
-    if (userAccountNumber) return initialData.merchants.filter(m => m.ACCOUNTNUMBER === userAccountNumber);
+  const filteredMerchants = React.useMemo(() => {
+    if (isSystemAdmin) return merchants;
+    if (userAccountNumber) return merchants.filter(m => m.ACCOUNTNUMBER === userAccountNumber);
     return [];
-  }, [isSystemAdmin, userAccountNumber, initialData.merchants]);
+  }, [isSystemAdmin, userAccountNumber, merchants]);
 
-  const branchUsers = React.useMemo(() => isSystemAdmin ? initialData.branchUsers : [], [isSystemAdmin, initialData.branchUsers]);
+  const filteredBranchUsers = React.useMemo(() => isSystemAdmin ? branchUsers : [], [isSystemAdmin, branchUsers]);
 
   const dailyBalances = React.useMemo(() => {
     if (isSystemAdmin) return initialData.dailyBalances;
@@ -149,10 +157,6 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const ussdPushSettings = React.useMemo(() => isSystemAdmin ? initialData.ussdPushSettings : [], [isSystemAdmin, initialData.ussdPushSettings]);
   const roleCapabilities = React.useMemo(() => isSystemAdmin ? initialData.roleCapabilities : [], [isSystemAdmin, initialData.roleCapabilities]);
   
-  // Roles should be visible to system admins for management
-  const [roles, setRoles] = React.useState<DashBoardRoles[]>(initialData.roles);
-
-
   const paystreamTxns = React.useMemo(() => {
     if (isSystemAdmin) return initialData.paystreamTxns;
     if (userAccountNumber) return initialData.paystreamTxns.filter(pt => pt.MERCHANTACCOUNTNUMBER === userAccountNumber);
@@ -187,7 +191,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     });
     if (!response.ok) throw new Error('Failed to create branch');
     const newBranch = await response.json();
-    initialData.branches.push(newBranch);
+    setBranches(prev => [...prev, newBranch]);
   };
 
   const updateBranch = async (updatedBranch: Branch) => {
@@ -198,8 +202,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     });
     if (!response.ok) throw new Error('Failed to update branch');
     const returnedBranch = await response.json();
-    const index = initialData.branches.findIndex(b => b.id === returnedBranch.id);
-    if (index !== -1) initialData.branches[index] = returnedBranch;
+    setBranches(prev => prev.map(b => b.id === returnedBranch.id ? returnedBranch : b));
   };
 
   const addAllowedCompany = async (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord' | 'branchName'>) => {
@@ -216,12 +219,11 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     }
 
     const newCompany = await response.json();
-    initialData.allowedCompanies.push(newCompany);
+    setAllowedCompanies(prev => [...prev, newCompany]);
   };
 
   const updateAllowedCompany = (updatedCompany: allowed_companies) => {
-    const index = initialData.allowedCompanies.findIndex(c => c.Oid === updatedCompany.Oid);
-    if(index !== -1) initialData.allowedCompanies[index] = {...updatedCompany, UPDATEDATE: new Date().toISOString(), UPDATEUSER: currentUser?.name || 'system'};
+    setAllowedCompanies(prev => prev.map(c => c.Oid === updatedCompany.Oid ? {...updatedCompany, UPDATEDATE: new Date().toISOString(), UPDATEUSER: currentUser?.name || 'system'} : c));
   };
   
   const updateMerchant = async (updatedMerchant: Merchant_users) => {
@@ -234,8 +236,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         throw new Error('Failed to update merchant user');
     }
     const returnedUser = await response.json();
-    const index = initialData.merchants.findIndex(m => m.ID === returnedUser.ID);
-    if (index !== -1) initialData.merchants[index] = returnedUser;
+    setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? returnedUser : m));
   };
 
   const addBranchUser = async (userData: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'DashBoardRoles' | 'password'>) => {
@@ -249,7 +250,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         throw new Error(errorData.message || 'Failed to create branch user');
     }
     const newUser = await response.json();
-    initialData.branchUsers.push(newUser);
+    setBranchUsers(prev => [...prev, newUser]);
   };
 
   const updateBranchUser = async (updatedUser: BranchUser) => {
@@ -262,12 +263,11 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         throw new Error('Failed to update branch user');
     }
     const returnedUser = await response.json();
-    const index = initialData.branchUsers.findIndex(u => u.id === returnedUser.id);
-    if (index !== -1) initialData.branchUsers[index] = returnedUser;
+    setBranchUsers(prev => prev.map(u => u.id === returnedUser.id ? returnedUser : u));
   };
 
   const updateBranchStatus = (branchId: number, status: 'Approved' | 'Rejected') => {
-    const branch = initialData.branches.find(b => b.id === branchId);
+    const branch = branches.find(b => b.id === branchId);
     if (branch) {
       updateBranch({ ...branch, status });
     }
@@ -286,8 +286,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         throw new Error('Failed to update company approval status');
     }
     const updatedCompany = await response.json();
-    const index = initialData.allowedCompanies.findIndex(c => c.Oid === updatedCompany.Oid);
-    if (index !== -1) initialData.allowedCompanies[index] = updatedCompany;
+    setAllowedCompanies(prev => prev.map(c => c.Oid === updatedCompany.Oid ? updatedCompany : c));
   };
 
   const updateMerchantStatus = async (merchantId: string, status: 'Active' | 'Disabled') => {
@@ -300,12 +299,11 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         throw new Error('Failed to update merchant status');
     }
     const returnedUser = await response.json();
-    const index = initialData.merchants.findIndex(m => m.ID === returnedUser.ID);
-    if (index !== -1) initialData.merchants[index] = returnedUser;
+    setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? returnedUser : m));
   };
   
   const updateBranchUserStatus = async (userId: number, status: 'Active' | 'Inactive') => {
-    const user = initialData.branchUsers.find(u => u.id === userId);
+    const user = branchUsers.find(u => u.id === userId);
     if (user) {
         await updateBranchUser({ ...user, status });
     }
@@ -350,20 +348,18 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     if (!response.ok) throw new Error('Failed to update user role');
     const updatedUser = await response.json();
     if (userType === 'merchant') {
-        const index = initialData.merchants.findIndex(u => u.ID === userId);
-        if (index !== -1) initialData.merchants[index] = updatedUser;
+        setMerchants(prev => prev.map(u => u.ID === userId ? updatedUser : u));
     } else {
-        const index = initialData.branchUsers.findIndex(u => u.id.toString() === userId);
-        if (index !== -1) initialData.branchUsers[index] = updatedUser;
+        setBranchUsers(prev => prev.map(u => u.id.toString() === userId ? updatedUser : u));
     }
   };
 
 
   const value = {
-    branches,
-    allowedCompanies,
-    merchants,
-    branchUsers,
+    branches: filteredBranches,
+    allowedCompanies: filteredAllowedCompanies,
+    merchants: filteredMerchants,
+    branchUsers: filteredBranchUsers,
     dailyBalances,
     merchantTxns,
     arifRequests,
