@@ -191,7 +191,6 @@ async function main() {
             description: 'Full dashboard access, restricted to their own company.',
             permissions: {
                 "pages": [
-                    "/dashboard",
                     "/dashboard/merchant_users",
                     "/dashboard/daily-balances",
                     "/dashboard/merchant-txns",
@@ -206,7 +205,6 @@ async function main() {
             description: 'Can only view their own transactions and basic company info.',
             permissions: {
                 "pages": [
-                    "/dashboard",
                     "/dashboard/merchant-txns"
                 ]
             }
@@ -214,11 +212,11 @@ async function main() {
     });
     console.log('Seeded 5 default roles.');
 
-    const systemAdminHashedPassword = await bcrypt.hash('Amin@123', 10);
+    const systemAdminHashedPassword = await bcrypt.hash('password@1232', 10);
     await prisma.branchUser.create({
         data: {
             name: 'System Admin',
-            email: 'nib@bank.com',
+            email: 'systemadmin@gmail.com',
             branch: 'All Branches', // System admin is not tied to a specific branch
             status: 'Active',
             password: systemAdminHashedPassword,
