@@ -131,11 +131,11 @@ async function main() {
     await prisma.arif_requests.deleteMany({});
     await prisma.merchant_txns.deleteMany({});
     await prisma.merchants_daily_balances.deleteMany({});
-    await prisma.branchUser.deleteMany({});
-    await prisma.merchant_users.deleteMany({});
+    await prisma.BranchUser.deleteMany({});
+    await prisma.Merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
-    await prisma.branch.deleteMany({});
-    await prisma.dashBoardRoles.deleteMany({});
+    await prisma.Branch.deleteMany({});
+    await prisma.DashBoardRoles.deleteMany({});
 
     // Create default roles
     const ALL_PAGES = [
@@ -150,7 +150,7 @@ async function main() {
         "/dashboard/role-management", "/dashboard/user-role-assignment"
     ];
 
-    const systemAdminRole = await prisma.dashBoardRoles.create({
+    const systemAdminRole = await prisma.DashBoardRoles.create({
         data: {
             name: 'System Admin',
             description: 'Has full access to all system features and data across all companies.',
@@ -158,7 +158,7 @@ async function main() {
         }
     });
 
-    const branchAdminRole = await prisma.dashBoardRoles.create({
+    const branchAdminRole = await prisma.DashBoardRoles.create({
         data: {
             name: 'Branch Admin',
             description: 'Can manage companies and users within their own branch, including approvals.',
@@ -172,7 +172,7 @@ async function main() {
         }
     });
 
-    const branchUserRole = await prisma.dashBoardRoles.create({
+    const branchUserRole = await prisma.DashBoardRoles.create({
         data: {
             name: 'Branch User',
             description: 'Can create and update companies within their branch, but cannot approve them.',
@@ -185,7 +185,7 @@ async function main() {
         }
     });
 
-    const merchantAdminRole = await prisma.dashBoardRoles.create({
+    const merchantAdminRole = await prisma.DashBoardRoles.create({
         data: {
             name: 'Merchant Admin',
             description: 'Full dashboard access, restricted to their own company.',
@@ -199,7 +199,7 @@ async function main() {
         }
     });
 
-    const merchantSalesRole = await prisma.dashBoardRoles.create({
+    const merchantSalesRole = await prisma.DashBoardRoles.create({
         data: {
             name: 'Merchant Sales',
             description: 'Can only view their own transactions and basic company info.',
@@ -213,7 +213,7 @@ async function main() {
     console.log('Seeded 5 default roles.');
 
     // Seed "All Branches" first
-    await prisma.branch.create({
+    await prisma.Branch.create({
         data: {
             name: 'All Branches',
             code: 'GLOBAL',
@@ -225,7 +225,7 @@ async function main() {
     console.log('Seeded "All Branches" for system users.');
 
     const systemAdminHashedPassword = await bcrypt.hash('password@1232', 10);
-    await prisma.branchUser.create({
+    await prisma.BranchUser.create({
         data: {
             name: 'System Admin',
             email: 'systemadmin@gmail.com',
@@ -239,7 +239,7 @@ async function main() {
 
 
     for (const b of MOCK_BRANCHES) {
-        await prisma.branch.create({ data: b });
+        await prisma.Branch.create({ data: b });
     }
     console.log(`Seeded ${MOCK_BRANCHES.length} branches.`);
 
@@ -256,7 +256,7 @@ async function main() {
         } else {
             roleId = merchantSalesRole.id;
         }
-        await prisma.merchant_users.create({
+        await prisma.Merchant_users.create({
             data: {
                 ...m,
                 password: hashedPassword,
@@ -269,7 +269,7 @@ async function main() {
     for (const bu of MOCK_BRANCH_USERS) {
         const { id, ...userData } = bu;
         const hashedPassword = await bcrypt.hash('password123', 10); // Default password
-        await prisma.branchUser.create({ data: {
+        await prisma.BranchUser.create({ data: {
             ...userData,
             password: hashedPassword,
             // Assign roles based on name for mock purposes
@@ -334,13 +334,7 @@ async function main() {
     console.log(`Seeded ${MOCK_ACCOUNT_INFOS.length} account infos.`);
 
     for (const pa of MOCK_PROMO_ADDS) {
-        const { ORDER, ...rest } = pa;
-        await prisma.promo_adds.create({
-            data: {
-                ...rest,
-                displayOrder: ORDER
-            }
-        });
+        await prisma.promo_adds.create({ data: pa });
     }
     console.log(`Seeded ${MOCK_PROMO_ADDS.length} promo adds.`);
 
@@ -361,3 +355,5 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
+    

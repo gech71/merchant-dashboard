@@ -26,7 +26,7 @@ export async function PUT(
         return NextResponse.json({ message: 'No fields to update' }, { status: 400 });
     }
 
-    const updatedUser = await prisma.merchant_users.update({
+    const updatedUser = await prisma.Merchant_users.update({
       where: { ID: id },
       data: dataToUpdate,
     });

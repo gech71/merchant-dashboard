@@ -15,16 +15,16 @@ export async function POST(request: Request) {
 
     let updatedUser;
     if (userType === 'merchant') {
-      updatedUser = await prisma.merchant_users.update({
+      updatedUser = await prisma.Merchant_users.update({
         where: { ID: userId },
         data: { roleId },
-        include: { role: true },
+        include: { DashBoardRoles: true },
       });
     } else if (userType === 'branch') {
-      updatedUser = await prisma.branchUser.update({
+      updatedUser = await prisma.BranchUser.update({
         where: { id: parseInt(userId, 10) },
         data: { roleId },
-        include: { role: true },
+        include: { DashBoardRoles: true },
       });
     } else {
       return NextResponse.json({ message: 'Invalid user type' }, { status: 400 });

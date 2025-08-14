@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     let userPayload: any = null;
 
     if (userType === 'merchant') {
-        const merchantUser = await prisma.merchant_users.findUnique({
+        const merchantUser = await prisma.Merchant_users.findUnique({
             where: { PHONENUMBER: identifier },
             include: { DashBoardRoles: true },
         });
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
             };
         }
     } else if (userType === 'branch') {
-        const branchUser = await prisma.branchUser.findUnique({
+        const branchUser = await prisma.BranchUser.findUnique({
             where: { email: identifier },
             include: { DashBoardRoles: true },
         });

@@ -32,12 +32,12 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
     let user: any = null;
     
     if (userType === 'merchant') {
-        user = await prisma.merchant_users.findUnique({
+        user = await prisma.Merchant_users.findUnique({
             where: { ID: userId },
             include: { DashBoardRoles: true },
         });
     } else if (userType === 'branch') {
-        user = await prisma.branchUser.findUnique({
+        user = await prisma.BranchUser.findUnique({
             where: { id: parseInt(userId, 10) },
             include: { DashBoardRoles: true },
         });

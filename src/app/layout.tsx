@@ -16,10 +16,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const branches = await prisma.branch.findMany();
+  const branches = await prisma.Branch.findMany();
   const allowedCompanies = await prisma.allowed_companies.findMany();
-  const merchants = await prisma.merchant_users.findMany({ include: { DashBoardRoles: true }});
-  const branchUsers = await prisma.branchUser.findMany({ include: { DashBoardRoles: true }});
+  const merchants = await prisma.Merchant_users.findMany({ include: { DashBoardRoles: true }});
+  const branchUsers = await prisma.BranchUser.findMany({ include: { DashBoardRoles: true }});
   const dailyBalances = await prisma.merchants_daily_balances.findMany();
   const merchantTxns = await prisma.merchant_txns.findMany();
   const arifRequests = await prisma.arif_requests.findMany();
@@ -33,7 +33,7 @@ export default async function RootLayout({
   const accountInfos = await prisma.account_infos.findMany();
   const promoAdds = await prisma.promo_adds.findMany();
   const roleCapabilities = await prisma.role_capablities.findMany();
-  const roles = await prisma.dashBoardRoles.findMany();
+  const roles = await prisma.DashBoardRoles.findMany();
 
   const initialData = {
     branches: branches.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
@@ -51,7 +51,7 @@ export default async function RootLayout({
     ussdPushSettings: ussdPushSettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     qrPayments: qrPayments.map(item => ({ ...item, EXPIRETIME: item.EXPIRETIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     accountInfos: accountInfos.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
-    promoAdds: promoAdds.map(item => ({ ...item, ORDER: item.displayOrder, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    promoAdds: promoAdds.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     roleCapabilities: roleCapabilities.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     roles: roles.map(role => ({ ...role, createdAt: role.createdAt.toISOString(), updatedAt: role.updatedAt.toISOString() })),
   }

@@ -21,7 +21,7 @@ export type Branch = Omit<Prisma.BranchGetPayload<{}>, 'INSERTDATE' | 'UPDATEDAT
   UPDATEDATE: string | null;
 };
 
-export type Merchant_users = Omit<Prisma.merchant_usersGetPayload<{ include: { DashBoardRoles: true } }>, 'LASTLOGINATTEMPT' | 'UNLOCKEDTIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
+export type Merchant_users = Omit<Prisma.Merchant_usersGetPayload<{ include: { DashBoardRoles: true } }>, 'LASTLOGINATTEMPT' | 'UNLOCKEDTIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
   LASTLOGINATTEMPT: string | null;
   UNLOCKEDTIME: string | null;
   INSERTDATE: string | null;
@@ -84,10 +84,9 @@ export type account_infos = Omit<Prisma.account_infosGetPayload<{}>, 'INSERTDATE
   UPDATEDATE: string | null;
 };
 
-export type promo_adds = Omit<Prisma.promo_addsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE' | 'displayOrder'> & {
+export type promo_adds = Omit<Prisma.promo_addsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
   INSERTDATE: string | null;
   UPDATEDATE: string | null;
-  ORDER: number;
 };
 
 export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {

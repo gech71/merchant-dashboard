@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     } = body;
 
     // Check if user already exists
-    const existingUser = await prisma.merchant_users.findUnique({
+    const existingUser = await prisma.Merchant_users.findUnique({
       where: { PHONENUMBER },
     });
 
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     // Hash the account number to use as a password
     const hashedPassword = await bcrypt.hash(ACCOUNTNUMBER, 10);
 
-    const newUser = await prisma.merchant_users.create({
+    const newUser = await prisma.Merchant_users.create({
       data: {
         ID: randomUUID(),
         ACCOUNTNUMBER,
@@ -73,5 +73,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Something went wrong!' }, { status: 500 });
   }
 }
-
-    
