@@ -131,9 +131,9 @@ async function main() {
     await prisma.merchant_txns.deleteMany({});
     await prisma.merchants_daily_balances.deleteMany({});
     await prisma.branchUser.deleteMany({});
-    await prisma.Merchant_users.deleteMany({});
+    await prisma.merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
-    await prisma.Branch.deleteMany({});
+    await prisma.branch.deleteMany({});
     await prisma.dashBoardRoles.deleteMany({});
 
     // Create default roles
@@ -260,7 +260,7 @@ async function main() {
         } else {
             roleId = merchantSalesRole.id;
         }
-        await prisma.Merchant_users.create({
+        await prisma.merchant_users.create({
             data: {
                 ...m,
                 roleId: roleId,
