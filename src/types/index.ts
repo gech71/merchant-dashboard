@@ -84,7 +84,7 @@ export type account_infos = Omit<Prisma.account_infosGetPayload<{}>, 'INSERTDATE
   UPDATEDATE: string | null;
 };
 
-export type promo_adds = Omit<Prisma.promo_addsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
+export type promo_adds = Omit<Prisma.promo_addsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE' | 'displayOrder'> & {
   INSERTDATE: string | null;
   UPDATEDATE: string | null;
   ORDER: number;
