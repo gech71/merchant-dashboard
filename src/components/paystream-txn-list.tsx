@@ -144,7 +144,7 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
                     <TableCell>{txn.TICKET}</TableCell>
                     <TableCell><Badge variant={txn.ISCOMPLETED ? 'default' : 'secondary'}>{txn.ISCOMPLETED ? 'Yes' : 'No'}</Badge></TableCell>
                     <TableCell className="text-right">{txn.AMOUNT.toFixed(2)}</TableCell>
-                    <TableCell>{txn.PAYERACCOUNT}</TableCell>
+                    <TableCell>{txn.PAYERACCOUNT || 'N/A'}</TableCell>
                     <TableCell>{txn.INSERTDATE ? new Date(txn.INSERTDATE).toLocaleString() : 'N/A'}</TableCell>
                   </TableRow>
                 ))
