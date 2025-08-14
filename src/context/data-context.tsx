@@ -62,7 +62,7 @@ type DataContextType = {
   addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord' | 'branchName'>) => Promise<void>;
   updateAllowedCompany: (company: allowed_companies) => void;
   updateMerchant: (merchant: Merchant_users) => Promise<void>;
-  addBranchUser: (user: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'DashBoardRoles' | 'password'>) => Promise<void>;
+  addBranchUser: (user: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'DashBoardRoles' >) => Promise<void>;
   updateBranchUser: (user: BranchUser) => Promise<void>;
   updateBranchStatus: (branchId: string, status: 'Approved' | 'Rejected') => void;
   updateAllowedCompanyApproval: (companyId: string, isApproved: boolean) => Promise<void>;
@@ -239,7 +239,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? returnedUser : m));
   };
 
-  const addBranchUser = async (userData: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'DashBoardRoles' | 'password'>) => {
+  const addBranchUser = async (userData: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'DashBoardRoles'>) => {
     const response = await fetch('/api/branch-users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

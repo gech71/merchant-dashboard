@@ -22,6 +22,7 @@ export async function POST(request: Request) {
         email,
         branch,
         status: 'Pending', // Default status
+        password: 'password123', // Add a default password
       },
     });
 
