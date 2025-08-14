@@ -1,178 +1,171 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model Branch {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  code      String    @unique
-  address   String
-  contact   String
-  status    String
-  INSERTDATE DateTime? @default(now())
-  UPDATEDATE DateTime? @updatedAt
+  id                      String    @id @default(uuid())
+  name                    String    @unique
+  code                    String    @unique
+  address                 String
+  contact                 String
+  status                  String // e.g., 'Approved', 'Pending', 'Rejected'
+  INSERTDATE              DateTime? @default(now())
+  UPDATEDATE              DateTime? @updatedAt
+  allowed_companies       allowed_companies[]
 }
 
 model allowed_companies {
-  Oid                 String    @id @default(uuid())
-  ID                  String    @unique
-  ACCOUNTNUMBER       String
-  FIELDNAME           String
-  APPROVEUSER         String?
-  APPROVED            Boolean
-  STATUS              Boolean
-  INSERTDATE          DateTime? @default(now())
-  UPDATEDATE          DateTime? @updatedAt
-  INSERTUSER          String?
-  UPDATEUSER          String?
-  OptimisticLockField Int
-  GCRecord            Int
-  branchName          String?
+  Oid                     String    @id @default(uuid())
+  ID                      String    @unique @default(uuid())
+  ACCOUNTNUMBER           String
+  FIELDNAME               String
+  APPROVEUSER             String?
+  APPROVED                Boolean   @default(false)
+  STATUS                  Boolean   @default(false)
+  INSERTDATE              DateTime? @default(now())
+  UPDATEDATE              DateTime? @updatedAt
+  INSERTUSER              String?
+  UPDATEUSER              String?
+  OptimisticLockField     Int?
+  GCRecord                Int?
+  branchName              String?
+  branch                  Branch?   @relation(fields: [branchName], references: [name])
 }
 
-model Merchant_users {
-  ID                String    @id @default(uuid())
-  FULLNAME          String
-  ROLE              String
-  STATUS            String
-  ACCOUNTNUMBER     String
-  ACCOUNTTYPE       String
-  PHONENUMBER       String    @unique
-  DEVICENAME        String
-  ENCRYPTIONKEY     String
-  iV                String
-  ISLOGGEDIN        Boolean
-  authenticationkey String
-  FAILEDATTMEPTS    Int
-  LASTLOGINATTEMPT  DateTime?
-  ISLOCKED          Boolean
-  UNLOCKEDTIME      DateTime?
-  VALUE3            String?
-  INSERTUSERID      String?
-  UPDATEUSERID      String?
-  INSERTDATE        DateTime? @default(now())
-  UPDATEDATE        DateTime? @updatedAt
-  roleId            String?
-  DashBoardRoles    DashBoardRoles? @relation(fields: [roleId], references: [id])
-}
-
-model BranchUser {
-  id        String    @id @default(uuid())
-  name      String
-  email     String    @unique
-  password  String
-  branch    String
-  status    String
-  roleId    String?
-  DashBoardRoles DashBoardRoles? @relation(fields: [roleId], references: [id])
+model merchant_users {
+  ID                      String    @id @default(uuid())
+  FULLNAME                String
+  ROLE                    String
+  STATUS                  String
+  ACCOUNTNUMBER           String
+  ACCOUNTTYPE             String
+  PHONENUMBER             String    @unique
+  DEVICENAME              String
+  ENCRYPTIONKEY           String
+  iV                      String
+  ISLOGGEDIN              Boolean
+  authenticationkey       String
+  FAILEDATTMEPTS          Int
+  LASTLOGINATTEMPT        DateTime?
+  ISLOCKED                Boolean
+  UNLOCKEDTIME            DateTime?
+  VALUE3                  String?
+  INSERTUSERID            String?
+  UPDATEUSERID            String?
+  INSERTDATE              DateTime? @default(now())
+  UPDATEDATE              DateTime? @updatedAt
+  roleId                  String?
+  DashBoardRoles          DashBoardRoles? @relation(fields: [roleId], references: [id])
 }
 
 model merchants_daily_balances {
-  ID              String    @id @default(uuid())
-  MERCHANTACCOUNT String
-  MERCHANTPHONE   String
-  DAILYBALANCE    Float
-  DAILYTXNCOUNT   Int
-  BALANCEDATE     DateTime
-  INSERTDATE      DateTime? @default(now())
-  UPDATEDATE      DateTime? @updatedAt
-  INSERTUSER      String?
-  UPDATEUSER      String?
+  ID                      String    @id @default(uuid())
+  MERCHANTACCOUNT         String?
+  MERCHANTPHONE           String?
+  DAILYBALANCE            Float
+  DAILYTXNCOUNT           Int
+  BALANCEDATE             DateTime?
+  INSERTDATE              DateTime? @default(now())
+  UPDATEDATE              DateTime? @updatedAt
+  INSERTUSER              String?
+  UPDATEUSER              String?
 }
 
 model merchant_txns {
-  ID                   String    @id @default(uuid())
-  MERCHANTACCOUNT      String
-  MERCHANTPHONE        String
-  AMOUNT               Float
-  TXNID                String
-  CUSTOMERNAME         String
-  CUSTOMERACCOUNT      String
-  T24USER              String
-  T2TRANSACTIONDATE    DateTime
-  STATUS               String
-  TRANSACTIONCHANNEL   String
-  TRANSACTIONSERVICE   String
-  VALUE1               String?
-  VALUE2               String?
-  VALUE3               String?
-  INSERTDATE           DateTime? @default(now())
-  UPDATEDATE           DateTime? @updatedAt
-  INSERTUSER           String?
-  UPDATEUSER           String?
+  ID                      String    @id @default(uuid())
+  MERCHANTACCOUNT         String?
+  MERCHANTPHONE           String?
+  AMOUNT                  Float
+  TXNID                   String?
+  CUSTOMERNAME            String?
+  CUSTOMERACCOUNT         String?
+  T24USER                 String?
+  T2TRANSACTIONDATE       DateTime?
+  STATUS                  String
+  TRANSACTIONCHANNEL      String?
+  TRANSACTIONSERVICE      String?
+  VALUE1                  String?
+  VALUE2                  String?
+  VALUE3                  String?
+  INSERTDATE              DateTime? @default(now())
+  UPDATEDATE              DateTime? @updatedAt
+  INSERTUSER              String?
+  UPDATEUSER              String?
 }
 
 model arif_requests {
-  NONCEID                  String    @id
-  SESSIONID                String
-  DEBITACCOUNT             String
-  CREDITACCOUNT            String
-  AMOUNT                   Float
-  MERCHANTACCOUNT          String
-  SALESPHONE               String
-  REQUEST1                 String?
-  RESPONSE1                String?
-  REQUEST2                 String?
-  RESPONSE2                String?
-  REQUEST3                 String?
-  RESPONSE3                String?
-  WEBHOOKRESPONSE          String?
-  ERROR1                   String?
-  MESSAGE1                 String?
-  ERROR2                   String?
-  MESSAGE2                 String?
-  ERROR3                   String?
-  MESSAGE3                 String?
-  DATESEND1                DateTime?
-  DATERECIVED1             DateTime?
-  DATESEND2                DateTime?
-  DATERECIVED2             DateTime?
-  DATESEND3                DateTime?
-  DATERECIVED3             DateTime?
-  WEBHOOKRECEIVEDDATE      DateTime?
-  INSERTUSER               String?
-  UPDATEUSER               String?
-  ARIFPAYTRANSACTIONID     String?
+  NONCEID                 String    @id
+  SESSIONID               String
+  DEBITACCOUNT            String
+  CREDITACCOUNT           String
+  AMOUNT                  Float
+  MERCHANTACCOUNT         String
+  SALESPHONE              String
+  REQUEST1                String
+  RESPONSE1               String
+  REQUEST2                String
+  RESPONSE2               String
+  REQUEST3                String
+  RESPONSE3               String
+  WEBHOOKRESPONSE         String
+  ERROR1                  String
+  MESSAGE1                String
+  ERROR2                  String
+  MESSAGE2                String
+  ERROR3                  String
+  MESSAGE3                String
+  DATESEND1               DateTime?
+  DATERECIVED1            DateTime?
+  DATESEND2               DateTime?
+  DATERECIVED2            DateTime?
+  DATESEND3               DateTime?
+  DATERECIVED3            DateTime?
+  WEBHOOKRECEIVEDDATE     DateTime?
+  INSERTUSER              String?
+  UPDATEUSER              String?
+  ARIFPAYTRANSACTIONID    String?
   ARIFPAYTRANSACTIONSTATUS String?
-  T24TRANSACTIONID         String?
-  T24TRANSACTIONSTATUS     String?
+  T24TRANSACTIONID        String?
+  T24TRANSACTIONSTATUS    String?
 }
 
 model arifpay_endpoints {
-  ID                  String    @id @default(uuid())
-  BANK                String
-  DISPLAYNAME         String
-  OTPLENGTH           Int
-  ORDER               Int
-  ENDPOINT1           String
-  ENDPOINT2           String?
-  ENDPOINT3           String?
-  CANCELURL           String
-  ERRORURL            String
-  SUCCESSURL          String
-  NOTIFYURL           String
-  ISTWOSTEP           Boolean
-  ISOTP               Boolean
-  TRANSACTIONTYPE     String
-  BENEFICIARYACCOUNT  String
-  BENEFICIARYBANK     String
-  IMAGEURL            String
-  INSERTDATE          DateTime? @default(now())
-  UPDATEDATE          DateTime? @updatedAt
-  INSERTUSER          String?
-  UPDATEUSER          String?
+  ID                      String    @id @default(uuid())
+  BANK                    String?
+  DISPLAYNAME             String?
+  OTPLENGTH               Int?
+  ORDER                   Int?
+  ENDPOINT1               String?
+  ENDPOINT2               String?
+  ENDPOINT3               String?
+  CANCELURL               String?
+  ERRORURL                String?
+  SUCCESSURL              String?
+  NOTIFYURL               String?
+  ISTWOSTEP               Boolean
+  ISOTP                   Boolean
+  TRANSACTIONTYPE         String?
+  BENEFICIARYACCOUNT      String?
+  BENEFICIARYBANK         String?
+  IMAGEURL                String?
+  INSERTDATE              DateTime? @default(now())
+  UPDATEDATE              DateTime? @updatedAt
+  INSERTUSER              String?
+  UPDATEUSER              String?
 }
 
 model controllersconfigs {
   ID           String    @id @default(uuid())
-  CONTROLLERKEY String
-  APIKEY       String
+  CONTROLLERKEY String?
+  APIKEY        String?
   INSERTDATE   DateTime? @default(now())
   UPDATEDATE   DateTime? @updatedAt
   INSERTUSER   String?
@@ -180,62 +173,62 @@ model controllersconfigs {
 }
 
 model core_integration_settings {
-  ID         String    @id @default(uuid())
-  UNIQUEKEY  String    @unique
-  ADDRESS    String
-  USERNAME   String
-  PASSWORD   String
-  INSERTDATE DateTime? @default(now())
-  UPDATEDATE DateTime? @updatedAt
-  INSERTUSER String?
-  UPDATEUSER String?
+  ID           String    @id @default(uuid())
+  UNIQUEKEY    String?
+  ADDRESS      String?
+  USERNAME     String?
+  PASSWORD     String
+  INSERTDATE   DateTime? @default(now())
+  UPDATEDATE   DateTime? @updatedAt
+  INSERTUSER   String?
+  UPDATEUSER   String?
 }
 
 model paystream_txns {
-  ID                    String    @id @default(uuid())
-  MERCHANTACCOUNTNUMBER String?
-  SALERPHONENUMBER      String?
-  TICKET                String?
-  ISCOMPLETED           Boolean
-  AMOUNT                Float
-  PAYERACCOUNT          String?
-  INSERTDATE            DateTime? @default(now())
-  UPDATEDATE            DateTime? @updatedAt
-  INSERTUSER            String?
-  UPDATEUSER            String?
+  ID                      String    @id @default(uuid())
+  MERCHANTACCOUNTNUMBER   String?
+  SALERPHONENUMBER        String?
+  TICKET                  String?
+  ISCOMPLETED             Boolean
+  AMOUNT                  Float
+  PAYERACCOUNT            String?
+  INSERTDATE              DateTime? @default(now())
+  UPDATEDATE              DateTime? @updatedAt
+  INSERTUSER              String?
+  UPDATEUSER              String?
 }
 
 model stream_pay_settings {
-  ID         String    @id @default(uuid())
-  ADDRESS    String
-  IV         String
-  KEY        String
-  HV         String
-  USERNAME   String
-  PASSWORD   String
-  INSERTDATE DateTime? @default(now())
-  UPDATEDATE DateTime? @updatedAt
-  INSERTUSER String?
-  UPDATEUSER String?
+  ID           String    @id @default(uuid())
+  ADDRESS      String?
+  IV           String
+  KEY          String
+  HV           String?
+  USERNAME     String?
+  PASSWORD     String
+  INSERTDATE   DateTime? @default(now())
+  UPDATEDATE   DateTime? @updatedAt
+  INSERTUSER   String?
+  UPDATEUSER   String?
 }
 
 model ussd_push_settings {
-  ID         String    @id @default(uuid())
-  ADDRESS    String
-  RESULTURL  String
-  USERNAME   String
-  PASSWORD   String
-  INSERTDATE DateTime? @default(now())
-  UPDATEDATE DateTime? @updatedAt
-  INSERTUSER String?
-  UPDATEUSER String?
+  ID           String    @id @default(uuid())
+  ADDRESS      String?
+  RESULTURL    String?
+  USERNAME     String?
+  PASSWORD     String
+  INSERTDATE   DateTime? @default(now())
+  UPDATEDATE   DateTime? @updatedAt
+  INSERTUSER   String?
+  UPDATEUSER   String?
 }
 
 model qr_payments {
   ID               String    @id @default(uuid())
-  DEBITACCOUNT     String
-  CREDITACCOUNT    String
-  SALERPHONENUMBER String
+  DEBITACCOUNT     String?
+  CREDITACCOUNT    String?
+  SALERPHONENUMBER String?
   AMOUNT           Float
   EXPIRETIME       DateTime
   QRCODE           String
@@ -248,10 +241,10 @@ model qr_payments {
 
 model account_infos {
   ID            String    @id @default(uuid())
-  ACCOUNTNUMBER String    @unique
-  PHONENUMBER   String
-  FULLNAME      String
-  GENDER        String
+  ACCOUNTNUMBER String?
+  PHONENUMBER   String?
+  FULLNAME      String?
+  GENDER        String?
   VALUE1        String?
   VALUE2        String?
   INSERTDATE    DateTime? @default(now())
@@ -262,10 +255,10 @@ model account_infos {
 
 model promo_adds {
   ID           String    @id @default(uuid())
-  ADDTITLE     String
-  ADDSUBTITLE  String
-  ADDADDRESS   String
-  IMAGEADDRESS String
+  ADDTITLE     String?
+  ADDSUBTITLE  String?
+  ADDADDRESS   String?
+  IMAGEADDRESS String?
   ORDER        Int
   INSERTUSERID String?
   UPDATEUSERID String?
@@ -281,8 +274,8 @@ model role_capablities {
   MENUNAME     String
   MENUNAME_am  String
   ADDRESS      String
-  PARENT       Boolean?   @default(false)
-  PARENTID     String
+  PARENT       Boolean?  @default(false)
+  PARENTID     String?
   VALUE3       String?
   INSERTUSERID String?
   UPDATEUSERID String?
@@ -290,15 +283,24 @@ model role_capablities {
   UPDATEDATE   DateTime? @updatedAt
 }
 
-model DashBoardRoles {
-  id          String    @id @default(uuid())
-  name        String    @unique
-  description String?
-  permissions Json?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  branchUsers BranchUser[]
-  merchantUsers Merchant_users[]
+model BranchUser {
+  id        String          @id @default(uuid())
+  name      String
+  email     String          @unique
+  password  String
+  branch    String
+  status    String
+  roleId    String?
+  DashBoardRoles DashBoardRoles? @relation(fields: [roleId], references: [id])
 }
 
-    
+model DashBoardRoles {
+  id           String           @id @default(uuid())
+  name         String           @unique
+  description  String?
+  permissions  Json?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  Merchant_users merchant_users[]
+  BranchUser   BranchUser[]
+}
