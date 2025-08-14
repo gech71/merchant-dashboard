@@ -21,8 +21,8 @@ export async function POST(request: Request) {
         include: { DashBoardRoles: true },
       });
     } else if (userType === 'branch') {
-      updatedUser = await prisma.BranchUser.update({
-        where: { id: parseInt(userId, 10) },
+      updatedUser = await prisma.branchUser.update({
+        where: { id: userId },
         data: { roleId },
         include: { DashBoardRoles: true },
       });

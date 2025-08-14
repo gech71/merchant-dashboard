@@ -37,8 +37,8 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
             include: { DashBoardRoles: true },
         });
     } else if (userType === 'branch') {
-        user = await prisma.BranchUser.findUnique({
-            where: { id: parseInt(userId, 10) },
+        user = await prisma.branchUser.findUnique({
+            where: { id: userId },
             include: { DashBoardRoles: true },
         });
     }
@@ -62,7 +62,7 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
         };
     } else { // userType === 'branch'
          return {
-            userId: user.id.toString(),
+            userId: user.id,
             userType: 'branch',
             role: user.DashBoardRoles.name,
             name: user.name,

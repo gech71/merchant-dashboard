@@ -3,11 +3,11 @@ import { prisma } from '../src/lib/prisma';
 import { randomUUID } from 'crypto';
 
 const MOCK_BRANCHES = [
-  { name: 'Downtown Branch', code: 'DT001', address: '123 Main St, Anytown, USA', contact: '555-1234', status: 'Approved' },
-  { name: 'Uptown Branch', code: 'UP002', address: '456 Oak Ave, Anytown, USA', contact: '555-5678', status: 'Pending' },
-  { name: 'Westside Branch', code: 'WS003', address: '789 Pine Rd, Anytown, USA', contact: '555-9012', status: 'Approved' },
-  { name: 'Eastside Branch', code: 'ES004', address: '101 Maple Blvd, Anytown, USA', contact: '555-3456', status: 'Approved' },
-  { name: 'South Branch', code: 'SB005', address: '212 Birch Ln, Anytown, USA', contact: '555-7890', status: 'Rejected' },
+  { id: randomUUID(), name: 'Downtown Branch', code: 'DT001', address: '123 Main St, Anytown, USA', contact: '555-1234', status: 'Approved' },
+  { id: randomUUID(), name: 'Uptown Branch', code: 'UP002', address: '456 Oak Ave, Anytown, USA', contact: '555-5678', status: 'Pending' },
+  { id: randomUUID(), name: 'Westside Branch', code: 'WS003', address: '789 Pine Rd, Anytown, USA', contact: '555-9012', status: 'Approved' },
+  { id: randomUUID(), name: 'Eastside Branch', code: 'ES004', address: '101 Maple Blvd, Anytown, USA', contact: '555-3456', status: 'Approved' },
+  { id: randomUUID(), name: 'South Branch', code: 'SB005', address: '212 Birch Ln, Anytown, USA', contact: '555-7890', status: 'Rejected' },
 ];
 
 const MOCK_ALLOWED_COMPANIES = [
@@ -30,11 +30,11 @@ const MOCK_MERCHANT_USERS = [
 ];
 
 const MOCK_BRANCH_USERS = [
-  { id: 1, name: 'John Doe', email: 'john.d@branch.com', branch: 'Downtown Branch', status: 'Active' },
-  { id: 2, name: 'Jane Smith', email: 'jane.s@branch.com', branch: 'Uptown Branch', status: 'Active' },
-  { id: 3, name: 'Peter Jones', email: 'peter.j@branch.com', branch: 'Downtown Branch', status: 'Inactive' },
-  { id: 4, name: 'Mary Johnson', email: 'mary.j@branch.com', branch: 'Westside Branch', status: 'Pending' },
-  { id: 5, name: 'David Williams', email: 'david.w@branch.com', branch: 'Uptown Branch', status: 'Active' },
+  { id: randomUUID(), name: 'John Doe', email: 'john.d@branch.com', branch: 'Downtown Branch', status: 'Active' },
+  { id: randomUUID(), name: 'Jane Smith', email: 'jane.s@branch.com', branch: 'Uptown Branch', status: 'Active' },
+  { id: randomUUID(), name: 'Peter Jones', email: 'peter.j@branch.com', branch: 'Downtown Branch', status: 'Inactive' },
+  { id: randomUUID(), name: 'Mary Johnson', email: 'mary.j@branch.com', branch: 'Westside Branch', status: 'Pending' },
+  { id: randomUUID(), name: 'David Williams', email: 'david.w@branch.com', branch: 'Uptown Branch', status: 'Active' },
 ];
 
 const MOCK_DAILY_BALANCES = [
@@ -131,9 +131,9 @@ async function main() {
     await prisma.merchant_txns.deleteMany({});
     await prisma.merchants_daily_balances.deleteMany({});
     await prisma.branchUser.deleteMany({});
-    await prisma.merchant_users.deleteMany({});
+    await prisma.Merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
-    await prisma.branch.deleteMany({});
+    await prisma.Branch.deleteMany({});
     await prisma.dashBoardRoles.deleteMany({});
 
     // Create default roles
@@ -151,6 +151,7 @@ async function main() {
 
     const systemAdminRole = await prisma.dashBoardRoles.create({
         data: {
+            id: randomUUID(),
             name: 'System Admin',
             description: 'Has full access to all system features and data across all companies.',
             permissions: { "pages": ALL_PAGES }
@@ -159,6 +160,7 @@ async function main() {
 
     const branchAdminRole = await prisma.dashBoardRoles.create({
         data: {
+            id: randomUUID(),
             name: 'Branch Admin',
             description: 'Can manage companies and users within their own branch, including approvals.',
             permissions: {
@@ -173,6 +175,7 @@ async function main() {
 
     const branchUserRole = await prisma.dashBoardRoles.create({
         data: {
+            id: randomUUID(),
             name: 'Branch User',
             description: 'Can create and update companies within their branch, but cannot approve them.',
             permissions: {
@@ -186,6 +189,7 @@ async function main() {
 
     const merchantAdminRole = await prisma.dashBoardRoles.create({
         data: {
+            id: randomUUID(),
             name: 'Merchant Admin',
             description: 'Full dashboard access, restricted to their own company.',
             permissions: {
@@ -200,6 +204,7 @@ async function main() {
 
     const merchantSalesRole = await prisma.dashBoardRoles.create({
         data: {
+            id: randomUUID(),
             name: 'Merchant Sales',
             description: 'Can only view their own transactions and basic company info.',
             permissions: {
@@ -214,6 +219,7 @@ async function main() {
     // Seed "All Branches" first
     await prisma.branch.create({
         data: {
+            id: randomUUID(),
             name: 'All Branches',
             code: 'GLOBAL',
             address: 'System-wide',
@@ -225,6 +231,7 @@ async function main() {
 
     await prisma.branchUser.create({
         data: {
+            id: randomUUID(),
             name: 'System Admin',
             email: 'systemadmin@gmail.com',
             branch: 'All Branches', // System admin is not tied to a specific branch
@@ -253,7 +260,7 @@ async function main() {
         } else {
             roleId = merchantSalesRole.id;
         }
-        await prisma.merchant_users.create({
+        await prisma.Merchant_users.create({
             data: {
                 ...m,
                 roleId: roleId,
@@ -263,9 +270,8 @@ async function main() {
     console.log(`Seeded ${MOCK_MERCHANT_USERS.length} merchant users.`);
 
     for (const bu of MOCK_BRANCH_USERS) {
-        const { id, ...userData } = bu;
         await prisma.branchUser.create({ data: {
-            ...userData,
+            ...bu,
             password: 'password123', // This will be hashed in a real app
             // Assign roles based on name for mock purposes
             roleId: bu.name.includes('Jane') ? branchAdminRole.id : branchUserRole.id
@@ -350,5 +356,3 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-
-    

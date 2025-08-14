@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -61,7 +60,7 @@ export default function BranchUserList({ branchUsers: initialBranchUsers, approv
   const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
   const [currentPage, setCurrentPage] = React.useState(1);
 
-  const handleStatusChange = async (userId: number, status: 'Active' | 'Inactive') => {
+  const handleStatusChange = async (userId: string, status: 'Active' | 'Inactive') => {
     try {
       await updateBranchUserStatus(userId, status);
       toast({

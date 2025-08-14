@@ -93,6 +93,9 @@ export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSE
   UPDATEDATE: string | null;
 };
 
-export type DashBoardRoles = Prisma.DashBoardRolesGetPayload<{}>;
+export type DashBoardRoles = Omit<Prisma.DashBoardRolesGetPayload<{}>, 'createdAt' | 'updatedAt'> & {
+  createdAt: string;
+  updatedAt: string;
+};
 
 export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | role_capablities | DashBoardRoles | null;

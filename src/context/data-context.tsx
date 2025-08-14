@@ -64,10 +64,10 @@ type DataContextType = {
   updateMerchant: (merchant: Merchant_users) => Promise<void>;
   addBranchUser: (user: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'DashBoardRoles' | 'password'>) => Promise<void>;
   updateBranchUser: (user: BranchUser) => Promise<void>;
-  updateBranchStatus: (branchId: number, status: 'Approved' | 'Rejected') => void;
+  updateBranchStatus: (branchId: string, status: 'Approved' | 'Rejected') => void;
   updateAllowedCompanyApproval: (companyId: string, isApproved: boolean) => Promise<void>;
   updateMerchantStatus: (merchantId: string, status: 'Active' | 'Disabled') => Promise<void>;
-  updateBranchUserStatus: (userId: number, status: 'Active' | 'Inactive') => Promise<void>;
+  updateBranchUserStatus: (userId: string, status: 'Active' | 'Inactive') => Promise<void>;
   addRole: (role: Omit<DashBoardRoles, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateRole: (role: DashBoardRoles) => Promise<void>;
   deleteRole: (roleId: string) => Promise<void>;
@@ -266,7 +266,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setBranchUsers(prev => prev.map(u => u.id === returnedUser.id ? returnedUser : u));
   };
 
-  const updateBranchStatus = (branchId: number, status: 'Approved' | 'Rejected') => {
+  const updateBranchStatus = (branchId: string, status: 'Approved' | 'Rejected') => {
     const branch = branches.find(b => b.id === branchId);
     if (branch) {
       updateBranch({ ...branch, status });
@@ -302,7 +302,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? returnedUser : m));
   };
   
-  const updateBranchUserStatus = async (userId: number, status: 'Active' | 'Inactive') => {
+  const updateBranchUserStatus = async (userId: string, status: 'Active' | 'Inactive') => {
     const user = branchUsers.find(u => u.id === userId);
     if (user) {
         await updateBranchUser({ ...user, status });

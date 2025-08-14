@@ -5,7 +5,7 @@ import { useDataContext } from '@/context/data-context';
 import { Prisma } from '@prisma/client';
 
 type BranchUserWithRelations = Prisma.BranchUserGetPayload<{
-  include: {}
+  include: { DashBoardRoles: true }
 }>
 
 export default function BranchUsersPage() {
