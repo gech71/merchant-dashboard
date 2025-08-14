@@ -1,62 +1,57 @@
 
-// datasource db defines the database connection details.
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// generator client defines the Prisma Client generator configuration.
-generator client {
-  provider = "prisma-client-js"
-}
-
-// model Branch represents the branches of the bank.
 model Branch {
-  id         String   @id @default(uuid())
-  name       String   @unique
-  code       String   @unique
-  address    String
-  contact    String
-  status     String
+  id       String    @id @default(uuid())
+  name     String    @unique
+  code     String    @unique
+  address  String
+  contact  String
+  status   String
   INSERTDATE DateTime? @default(now())
   UPDATEDATE DateTime? @updatedAt
-  companies  allowed_companies[]
-  users      BranchUser[]
 }
 
-// model allowed_companies represents companies that are allowed to transact.
 model allowed_companies {
-  Oid                 String   @id @default(uuid())
-  ID                  String   @unique @default(uuid())
-  ACCOUNTNUMBER       String
-  FIELDNAME           String
-  APPROVEUSER         String?
-  APPROVED            Boolean  @default(false)
-  STATUS              Boolean  @default(false)
-  INSERTDATE          DateTime? @default(now())
-  UPDATEDATE          DateTime? @updatedAt
-  INSERTUSER          String?
-  UPDATEUSER          String?
-  OptimisticLockField Int?
-  GCRecord            Int?
-  branch              Branch?   @relation(fields: [branchName], references: [name])
-  branchName          String?
+  Oid                   String    @id @default(uuid())
+  ID                    String    @unique
+  ACCOUNTNUMBER         String
+  FIELDNAME             String
+  APPROVEUSER           String?
+  APPROVED              Boolean
+  STATUS                Boolean
+  INSERTDATE            DateTime? @default(now())
+  UPDATEDATE            DateTime? @updatedAt
+  INSERTUSER            String?
+  UPDATEUSER            String?
+  OptimisticLockField   Int?
+  GCRecord              Int?
+  branchName            String?
 }
 
-// model Merchant_users represents the users of the merchants.
 model Merchant_users {
-  ID                String   @id @default(uuid())
-  FULLNAME          String
-  ROLE              String
-  STATUS            String
+  ID                String    @id @default(uuid())
   ACCOUNTNUMBER     String
+  FULLNAME          String
   ACCOUNTTYPE       String?
-  PHONENUMBER       String   @unique
+  PHONENUMBER       String    @unique
+  ROLE              String
   DEVICENAME        String?
   ENCRYPTIONKEY     String?
   iV                String?
   ISLOGGEDIN        Boolean
   authenticationkey String?
+  STATUS            String
   FAILEDATTMEPTS    Int
   LASTLOGINATTEMPT  DateTime?
   ISLOCKED          Boolean
@@ -70,23 +65,21 @@ model Merchant_users {
   DashBoardRoles    DashBoardRoles? @relation(fields: [roleId], references: [id])
 }
 
-// model BranchUser represents the users of the branches.
 model BranchUser {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   name      String
-  email     String   @unique
-  password  String
+  email     String    @unique
   branch    String
   status    String
+  password  String
   roleId    String?
-  DashBoardRoles DashBoardRoles? @relation(fields: [roleId], references: [id])
+  DashBoardRoles    DashBoardRoles? @relation(fields: [roleId], references: [id])
 }
 
-// model merchants_daily_balances represents the daily balances of the merchants.
 model merchants_daily_balances {
-  ID              String   @id @default(uuid())
-  MERCHANTACCOUNT String
-  MERCHANTPHONE   String
+  ID              String    @id @default(uuid())
+  MERCHANTACCOUNT String?
+  MERCHANTPHONE   String?
   DAILYBALANCE    Float
   DAILYTXNCOUNT   Int
   BALANCEDATE     DateTime?
@@ -96,15 +89,14 @@ model merchants_daily_balances {
   UPDATEUSER      String?
 }
 
-// model merchant_txns represents the transactions of the merchants.
 model merchant_txns {
-  ID                   String   @id @default(uuid())
-  MERCHANTACCOUNT      String
-  MERCHANTPHONE        String
+  ID                   String    @id @default(uuid())
+  MERCHANTACCOUNT      String?
+  MERCHANTPHONE        String?
   AMOUNT               Float
-  TXNID                String
-  CUSTOMERNAME         String
-  CUSTOMERACCOUNT      String
+  TXNID                String?
+  CUSTOMERNAME         String?
+  CUSTOMERACCOUNT      String?
   T24USER              String?
   T2TRANSACTIONDATE    DateTime?
   STATUS               String
@@ -119,15 +111,14 @@ model merchant_txns {
   UPDATEUSER           String?
 }
 
-// model arif_requests represents the requests made to the ArifPay gateway.
 model arif_requests {
-  NONCEID                  String    @id @default(uuid())
-  SESSIONID                String
-  DEBITACCOUNT             String
-  CREDITACCOUNT            String
+  NONCEID                  String    @id
+  SESSIONID                String?
+  DEBITACCOUNT             String?
+  CREDITACCOUNT            String?
   AMOUNT                   Float
   MERCHANTACCOUNT          String
-  SALESPHONE               String
+  SALESPHONE               String?
   REQUEST1                 String?
   RESPONSE1                String?
   REQUEST2                 String?
@@ -156,35 +147,33 @@ model arif_requests {
   T24TRANSACTIONSTATUS     String?
 }
 
-// model arifpay_endpoints represents the endpoints for ArifPay.
 model arifpay_endpoints {
-  ID                  String   @id @default(uuid())
-  BANK                String
-  DISPLAYNAME         String
-  OTPLENGTH           Int
-  ORDER               Int
-  ENDPOINT1           String
-  ENDPOINT2           String?
-  ENDPOINT3           String?
-  CANCELURL           String?
-  ERRORURL            String?
-  SUCCESSURL          String?
-  NOTIFYURL           String?
-  ISTWOSTEP           Boolean
-  ISOTP               Boolean
-  TRANSACTIONTYPE     String
-  BENEFICIARYACCOUNT  String
-  BENEFICIARYBANK     String
-  IMAGEURL            String?
-  INSERTDATE          DateTime? @default(now())
-  UPDATEDATE          DateTime? @updatedAt
-  INSERTUSER          String?
-  UPDATEUSER          String?
+  ID                 String    @id @default(uuid())
+  BANK               String
+  DISPLAYNAME        String
+  OTPLENGTH          Int
+  ORDER              Int
+  ENDPOINT1          String?
+  ENDPOINT2          String?
+  ENDPOINT3          String?
+  CANCELURL          String?
+  ERRORURL           String?
+  SUCCESSURL         String?
+  NOTIFYURL          String?
+  ISTWOSTEP          Boolean
+  ISOTP              Boolean
+  TRANSACTIONTYPE    String
+  BENEFICIARYACCOUNT String
+  BENEFICIARYBANK    String
+  IMAGEURL           String?
+  INSERTDATE         DateTime? @default(now())
+  UPDATEDATE         DateTime? @updatedAt
+  INSERTUSER         String?
+  UPDATEUSER         String?
 }
 
-// model controllersconfigs represents the configurations for the controllers.
 model controllersconfigs {
-  ID           String   @id @default(uuid())
+  ID            String    @id @default(uuid())
   CONTROLLERKEY String
   APIKEY        String
   INSERTDATE    DateTime? @default(now())
@@ -193,10 +182,9 @@ model controllersconfigs {
   UPDATEUSER    String?
 }
 
-// model core_integration_settings represents the settings for core integration.
 model core_integration_settings {
-  ID         String   @id @default(uuid())
-  UNIQUEKEY  String   @unique
+  ID         String    @id @default(uuid())
+  UNIQUEKEY  String    @unique
   ADDRESS    String
   USERNAME   String
   PASSWORD   String
@@ -206,24 +194,22 @@ model core_integration_settings {
   UPDATEUSER String?
 }
 
-// model paystream_txns represents the transactions from PayStream.
 model paystream_txns {
-  ID                    String   @id @default(uuid())
-  MERCHANTACCOUNTNUMBER String
-  SALERPHONENUMBER      String
-  TICKET                String
-  ISCOMPLETED           Boolean
-  AMOUNT                Float
-  PAYERACCOUNT          String
-  INSERTDATE            DateTime? @default(now())
-  UPDATEDATE            DateTime? @updatedAt
-  INSERTUSER            String?
-  UPDATEUSER            String?
+  ID                      String    @id @default(uuid())
+  MERCHANTACCOUNTNUMBER   String?
+  SALERPHONENUMBER        String?
+  TICKET                  String?
+  ISCOMPLETED             Boolean
+  AMOUNT                  Float
+  PAYERACCOUNT            String?
+  INSERTDATE              DateTime? @default(now())
+  UPDATEDATE              DateTime? @updatedAt
+  INSERTUSER              String?
+  UPDATEUSER              String?
 }
 
-// model stream_pay_settings represents the settings for StreamPay.
 model stream_pay_settings {
-  ID         String   @id @default(uuid())
+  ID         String    @id @default(uuid())
   ADDRESS    String
   IV         String
   KEY        String
@@ -236,9 +222,8 @@ model stream_pay_settings {
   UPDATEUSER String?
 }
 
-// model ussd_push_settings represents the settings for USSD Push.
 model ussd_push_settings {
-  ID         String   @id @default(uuid())
+  ID         String    @id @default(uuid())
   ADDRESS    String
   RESULTURL  String
   USERNAME   String
@@ -249,14 +234,13 @@ model ussd_push_settings {
   UPDATEUSER String?
 }
 
-// model qr_payments represents the payments made via QR code.
 model qr_payments {
   ID               String    @id @default(uuid())
   DEBITACCOUNT     String
   CREDITACCOUNT    String
   SALERPHONENUMBER String
   AMOUNT           Float
-  EXPIRETIME       DateTime?
+  EXPIRETIME       DateTime
   QRCODE           String
   ISUSED           Boolean
   INSERTDATE       DateTime? @default(now())
@@ -265,13 +249,12 @@ model qr_payments {
   UPDATEUSER       String?
 }
 
-// model account_infos represents the information of the accounts.
 model account_infos {
-  ID            String   @id @default(uuid())
-  ACCOUNTNUMBER String   @unique
-  PHONENUMBER   String   @unique
+  ID            String    @id @default(uuid())
+  ACCOUNTNUMBER String
+  PHONENUMBER   String
   FULLNAME      String
-  GENDER        String?
+  GENDER        String
   VALUE1        String?
   VALUE2        String?
   INSERTDATE    DateTime? @default(now())
@@ -280,9 +263,8 @@ model account_infos {
   UPDATEUSER    String?
 }
 
-// model promo_adds represents the promotional ads.
 model promo_adds {
-  ID           String   @id @default(uuid())
+  ID           String    @id @default(uuid())
   ADDTITLE     String
   ADDSUBTITLE  String
   ADDADDRESS   String
@@ -294,16 +276,15 @@ model promo_adds {
   UPDATEDATE   DateTime? @updatedAt
 }
 
-// model role_capablities represents the capabilities of the roles.
 model role_capablities {
-  ID           String   @id @default(uuid())
+  ID           String    @id @default(uuid())
   ROLEID       String
   MENUORDER    Int
   SUBMENUORDER Int
   MENUNAME     String
   MENUNAME_am  String
   ADDRESS      String
-  PARENT       String
+  PARENT       Boolean?  @default(false)
   PARENTID     String
   VALUE3       String?
   INSERTUSERID String?
@@ -313,12 +294,60 @@ model role_capablities {
 }
 
 model DashBoardRoles {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  description String?
-  permissions Json
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  branch_users BranchUser[]
-  merchant_users Merchant_users[]
+  id           String    @id @default(uuid())
+  name         String    @unique
+  description  String?
+  permissions  Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  Merchant_users Merchant_users[]
+  BranchUser BranchUser[]
+}
+
+model User {
+  id            String       @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  
+  // Custom fields
+  role          String?
+  company       String?
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+  user               User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }

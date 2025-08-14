@@ -23,6 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Badge } from './ui/badge';
 
 type SortableKeys = 'ROLEID' | 'MENUNAME' | 'PARENT' | 'MENUORDER' | 'SUBMENUORDER';
 const ITEMS_PER_PAGE = 15;
@@ -57,8 +58,16 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
       sortableItems.sort((a, b) => {
         const valA = a[sortConfig.key];
         const valB = b[sortConfig.key];
-        if (valA < valB) return sortConfig.direction === 'ascending' ? -1 : 1;
-        if (valA > valB) return sortConfig.direction === 'ascending' ? 1 : -1;
+        if (sortConfig.key === 'PARENT') {
+          const boolA = valA ?? false;
+          const boolB = valB ?? false;
+          if (boolA < boolB) return sortConfig.direction === 'ascending' ? -1 : 1;
+          if (boolA > boolB) return sortConfig.direction === 'ascending' ? 1 : -1;
+        } else {
+            if (valA < valB) return sortConfig.direction === 'ascending' ? -1 : 1;
+            if (valA > valB) return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        
         // Secondary sort by sub-order if primary is the same
         if (sortConfig.key === 'MENUORDER' && a.SUBMENUORDER < b.SUBMENUORDER) return -1;
         if (sortConfig.key === 'MENUORDER' && a.SUBMENUORDER > b.SUBMENUORDER) return 1;
@@ -114,7 +123,11 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
                     <TableCell>{item.MENUNAME}</TableCell>
                     <TableCell>{item.MENUNAME_am}</TableCell>
                     <TableCell>{item.ADDRESS}</TableCell>
-                    <TableCell>{item.PARENT}</TableCell>
+                    <TableCell>
+                      <Badge variant={item.PARENT ? 'default' : 'secondary'}>
+                        {item.PARENT ? 'Yes' : 'No'}
+                      </Badge>
+                    </TableCell>
                     <TableCell>{item.MENUORDER}.{item.SUBMENUORDER}</TableCell>
                   </TableRow>
                 ))

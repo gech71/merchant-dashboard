@@ -1,6 +1,8 @@
 
-import { prisma } from '../src/lib/prisma';
+import { PrismaClient } from '@prisma/client'
 import { randomUUID } from 'crypto';
+
+const prisma = new PrismaClient()
 
 const MOCK_BRANCHES = [
   { id: randomUUID(), name: 'Downtown Branch', code: 'DT001', address: '123 Main St, Anytown, USA', contact: '555-1234', status: 'Approved' },
@@ -108,9 +110,9 @@ const MOCK_PROMO_ADDS = [
 ];
 
 const MOCK_ROLE_CAPABILITIES = [
-    { ID: randomUUID(), ROLEID: 'Admin', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'Dashboard', MENUNAME_am: 'ዳሽቦርድ', ADDRESS: '/dashboard', PARENT: 'ROOT', PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
-    { ID: randomUUID(), ROLEID: 'Admin', MENUORDER: 2, SUBMENUORDER: 1, MENUNAME: 'Allowed Companies', MENUNAME_am: 'የተፈቀዱ ኩባንያዎች', ADDRESS: '/dashboard/allowed_companies', PARENT: 'Management', PARENTID: 'mg_1', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
-    { ID: randomUUID(), ROLEID: 'Sales', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'My Transactions', MENUNAME_am: 'የእኔ ግብይቶች', ADDRESS: '/dashboard/merchant-txns', PARENT: 'ROOT', PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
+    { ID: randomUUID(), ROLEID: 'Admin', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'Dashboard', MENUNAME_am: 'ዳሽቦርድ', ADDRESS: '/dashboard', PARENT: true, PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
+    { ID: randomUUID(), ROLEID: 'Admin', MENUORDER: 2, SUBMENUORDER: 1, MENUNAME: 'Allowed Companies', MENUNAME_am: 'የተፈቀዱ ኩባንያዎች', ADDRESS: '/dashboard/allowed_companies', PARENT: false, PARENTID: 'mg_1', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
+    { ID: randomUUID(), ROLEID: 'Sales', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'My Transactions', MENUNAME_am: 'የእኔ ግብይቶች', ADDRESS: '/dashboard/merchant-txns', PARENT: true, PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
 ];
 
 async function main() {
