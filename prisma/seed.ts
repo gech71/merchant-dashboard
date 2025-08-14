@@ -133,7 +133,7 @@ async function main() {
     await prisma.merchant_txns.deleteMany({});
     await prisma.merchants_daily_balances.deleteMany({});
     await prisma.branchUser.deleteMany({});
-    await prisma.merchant_users.deleteMany({});
+    await prisma.Merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
     await prisma.branch.deleteMany({});
     await prisma.dashBoardRoles.deleteMany({});
@@ -262,7 +262,7 @@ async function main() {
         } else {
             roleId = merchantSalesRole.id;
         }
-        await prisma.merchant_users.create({
+        await prisma.Merchant_users.create({
             data: {
                 ...m,
                 roleId: roleId,
@@ -342,7 +342,10 @@ async function main() {
     console.log(`Seeded ${MOCK_PROMO_ADDS.length} promo adds.`);
 
     for (const rc of MOCK_ROLE_CAPABILITIES) {
-        await prisma.role_capablities.create({ data: rc });
+        await prisma.role_capablities.create({ data: {
+            ...rc,
+            PARENT: rc.PARENT === true
+        } });
     }
     console.log(`Seeded ${MOCK_ROLE_CAPABILITIES.length} role capabilities.`);
 
