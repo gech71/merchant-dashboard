@@ -1,8 +1,6 @@
 
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma';
 import { randomUUID } from 'crypto';
-
-const prisma = new PrismaClient()
 
 const MOCK_BRANCHES = [
   { id: randomUUID(), name: 'Downtown Branch', code: 'DT001', address: '123 Main St, Anytown, USA', contact: '555-1234', status: 'Approved' },
@@ -133,7 +131,7 @@ async function main() {
     await prisma.merchant_txns.deleteMany({});
     await prisma.merchants_daily_balances.deleteMany({});
     await prisma.branchUser.deleteMany({});
-    await prisma.merchant_users.deleteMany({});
+    await prisma.Merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
     await prisma.branch.deleteMany({});
     await prisma.dashBoardRoles.deleteMany({});
@@ -262,7 +260,7 @@ async function main() {
         } else {
             roleId = merchantSalesRole.id;
         }
-        await prisma.merchant_users.create({
+        await prisma.Merchant_users.create({
             data: {
                 ...m,
                 roleId: roleId,

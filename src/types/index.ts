@@ -88,9 +88,11 @@ export type promo_adds = Omit<Prisma.promo_addsGetPayload<{}>, 'INSERTDATE' | 'U
   UPDATEDATE: string | null;
 };
 
-export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
+export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE' | 'PARENT' | 'PARENTID'> & {
   INSERTDATE: string | null;
   UPDATEDATE: string | null;
+  PARENT: boolean | null;
+  PARENTID: string | null;
 };
 
 export type DashBoardRoles = Omit<Prisma.DashBoardRolesGetPayload<{}>, 'createdAt' | 'updatedAt'> & {
