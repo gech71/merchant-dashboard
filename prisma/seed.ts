@@ -1,6 +1,7 @@
 
 import bcrypt from 'bcryptjs';
 import { prisma } from '../src/lib/prisma';
+import { randomUUID } from 'crypto';
 
 const MOCK_BRANCHES = [
   { name: 'Downtown Branch', code: 'DT001', address: '123 Main St, Anytown, USA', contact: '555-1234', status: 'Approved' },
@@ -11,22 +12,22 @@ const MOCK_BRANCHES = [
 ];
 
 const MOCK_ALLOWED_COMPANIES = [
-  { Oid: 'oid_C001', ID: 'C001', ACCOUNTNUMBER: 'ACC001', FIELDNAME: 'Innovate Inc.', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Downtown Branch' },
-  { Oid: 'oid_C002', ID: 'C002', ACCOUNTNUMBER: 'ACC002', FIELDNAME: 'Apex Solutions', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Uptown Branch' },
-  { Oid: 'oid_C003', ID: 'C003', ACCOUNTNUMBER: 'ACC003', FIELDNAME: 'Quantum Corp', APPROVEUSER: null, APPROVED: false, STATUS: false, INSERTDATE: new Date('2023-03-10'), UPDATEDATE: new Date('2023-03-10'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Downtown Branch' },
-  { Oid: 'oid_C004', ID: 'C004', ACCOUNTNUMBER: 'ACC004', FIELDNAME: 'Synergy Systems', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Westside Branch' },
-  { Oid: 'oid_C005', ID: 'C005', ACCOUNTNUMBER: 'ACC005', FIELDNAME: 'Pioneer Ltd.', APPROVEUSER: 'admin', APPROVED: false, STATUS: false, INSERTDATE: new Date('2023-05-12'), UPDATEDATE: new Date('2023-05-12'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: null },
+  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC001', FIELDNAME: 'Innovate Inc.', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Downtown Branch' },
+  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC002', FIELDNAME: 'Apex Solutions', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Uptown Branch' },
+  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC003', FIELDNAME: 'Quantum Corp', APPROVEUSER: null, APPROVED: false, STATUS: false, INSERTDATE: new Date('2023-03-10'), UPDATEDATE: new Date('2023-03-10'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Downtown Branch' },
+  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC004', FIELDNAME: 'Synergy Systems', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Westside Branch' },
+  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC005', FIELDNAME: 'Pioneer Ltd.', APPROVEUSER: 'admin', APPROVED: false, STATUS: false, INSERTDATE: new Date('2023-05-12'), UPDATEDATE: new Date('2023-05-12'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: null },
 ];
 
 const MOCK_MERCHANT_USERS = [
-  { ID: '1',  FULLNAME: 'The Corner Cafe Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '111-222-3333', DEVICENAME: 'Device1', ENCRYPTIONKEY: 'key1', iV: 'iv1', ISLOGGEDIN: true, authenticationkey: 'auth1', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_1', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15') },
-  { ID: '2',  FULLNAME: 'QuickMart Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC002', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '222-333-4444', DEVICENAME: 'Device2', ENCRYPTIONKEY: 'key2', iV: 'iv2', ISLOGGEDIN: false, authenticationkey: 'auth2', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_2', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20') },
-  { ID: '3',  FULLNAME: 'Gadget Hub Admin', ROLE: 'Admin', STATUS: 'Pending', ACCOUNTNUMBER: 'ACC003', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '333-444-5555', DEVICENAME: 'Device3', ENCRYPTIONKEY: 'key3', iV: 'iv3', ISLOGGEDIN: false, authenticationkey: 'auth3', FAILEDATTMEPTS: 2, LASTLOGINATTEMPT: new Date('2023-05-28'), ISLOCKED: true, UNLOCKEDTIME: new Date('2023-06-01T10:00:00Z'), VALUE3: 'v3_3', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-03-10'), UPDATEDATE: new Date('2023-03-10') },
-  { ID: '4',  FULLNAME: 'Style Central Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC004', ACCOUNTTYPE: 'TypeC', PHONENUMBER: '444-555-6666', DEVICENAME: 'Device4', ENCRYPTIONKEY: 'key4', iV: 'iv4', ISLOGGEDIN: true, authenticationkey: 'auth4', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_4', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05') },
-  { ID: '5',  FULLNAME: 'Bookworm Haven Admin', ROLE: 'Admin', STATUS: 'Disabled', ACCOUNTNUMBER: 'ACC005', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '555-666-7777', DEVICENAME: 'Device5', ENCRYPTIONKEY: 'key5', iV: 'iv5', ISLOGGEDIN: false, authenticationkey: 'auth5', FAILEDATTMEPTS: 5, LASTLOGINATTEMPT: new Date('2023-05-20'), ISLOCKED: true, UNLOCKEDTIME: null, VALUE3: 'v3_5', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-05-12'), UPDATEDATE: new Date('2023-05-12') },
-  { ID: '6',  FULLNAME: 'Alice Johnson', ROLE: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '666-777-8888', DEVICENAME: 'Device6', ENCRYPTIONKEY: 'key6', iV: 'iv6', ISLOGGEDIN: false, authenticationkey: 'auth6', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_6', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15') },
-  { ID: '7',  FULLNAME: 'Bob Williams', ROLE: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC002', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '777-888-9999', DEVICENAME: 'Device7', ENCRYPTIONKEY: 'key7', iV: 'iv7', ISLOGGEDIN: true, authenticationkey: 'auth7', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_7', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20') },
-  { ID: '8',  FULLNAME: 'Diana Prince', ROLE: 'Sales', STATUS: 'Pending', ACCOUNTNUMBER: 'ACC004', ACCOUNTTYPE: 'TypeC', PHONENUMBER: '888-999-0000', DEVICENAME: 'Device8', ENCRYPTIONKEY: 'key8', iV: 'iv8', ISLOGGEDIN: false, authenticationkey: 'auth8', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_8', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05') },
+  { ID: randomUUID(),  FULLNAME: 'The Corner Cafe Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '111-222-3333', DEVICENAME: 'Device1', ENCRYPTIONKEY: 'key1', iV: 'iv1', ISLOGGEDIN: true, authenticationkey: 'auth1', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_1', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15') },
+  { ID: randomUUID(),  FULLNAME: 'QuickMart Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC002', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '222-333-4444', DEVICENAME: 'Device2', ENCRYPTIONKEY: 'key2', iV: 'iv2', ISLOGGEDIN: false, authenticationkey: 'auth2', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_2', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20') },
+  { ID: randomUUID(),  FULLNAME: 'Gadget Hub Admin', ROLE: 'Admin', STATUS: 'Pending', ACCOUNTNUMBER: 'ACC003', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '333-444-5555', DEVICENAME: 'Device3', ENCRYPTIONKEY: 'key3', iV: 'iv3', ISLOGGEDIN: false, authenticationkey: 'auth3', FAILEDATTMEPTS: 2, LASTLOGINATTEMPT: new Date('2023-05-28'), ISLOCKED: true, UNLOCKEDTIME: new Date('2023-06-01T10:00:00Z'), VALUE3: 'v3_3', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-03-10'), UPDATEDATE: new Date('2023-03-10') },
+  { ID: randomUUID(),  FULLNAME: 'Style Central Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC004', ACCOUNTTYPE: 'TypeC', PHONENUMBER: '444-555-6666', DEVICENAME: 'Device4', ENCRYPTIONKEY: 'key4', iV: 'iv4', ISLOGGEDIN: true, authenticationkey: 'auth4', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_4', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05') },
+  { ID: randomUUID(),  FULLNAME: 'Bookworm Haven Admin', ROLE: 'Admin', STATUS: 'Disabled', ACCOUNTNUMBER: 'ACC005', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '555-666-7777', DEVICENAME: 'Device5', ENCRYPTIONKEY: 'key5', iV: 'iv5', ISLOGGEDIN: false, authenticationkey: 'auth5', FAILEDATTMEPTS: 5, LASTLOGINATTEMPT: new Date('2023-05-20'), ISLOCKED: true, UNLOCKEDTIME: null, VALUE3: 'v3_5', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-05-12'), UPDATEDATE: new Date('2023-05-12') },
+  { ID: randomUUID(),  FULLNAME: 'Alice Johnson', ROLE: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '666-777-8888', DEVICENAME: 'Device6', ENCRYPTIONKEY: 'key6', iV: 'iv6', ISLOGGEDIN: false, authenticationkey: 'auth6', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_6', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15') },
+  { ID: randomUUID(),  FULLNAME: 'Bob Williams', ROLE: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC002', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '777-888-9999', DEVICENAME: 'Device7', ENCRYPTIONKEY: 'key7', iV: 'iv7', ISLOGGEDIN: true, authenticationkey: 'auth7', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_7', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20') },
+  { ID: randomUUID(),  FULLNAME: 'Diana Prince', ROLE: 'Sales', STATUS: 'Pending', ACCOUNTNUMBER: 'ACC004', ACCOUNTTYPE: 'TypeC', PHONENUMBER: '888-999-0000', DEVICENAME: 'Device8', ENCRYPTIONKEY: 'key8', iV: 'iv8', ISLOGGEDIN: false, authenticationkey: 'auth8', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_8', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05') },
 ];
 
 const MOCK_BRANCH_USERS = [
@@ -38,19 +39,19 @@ const MOCK_BRANCH_USERS = [
 ];
 
 const MOCK_DAILY_BALANCES = [
-  { ID: '1', MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', DAILYBALANCE: 1500.75, DAILYTXNCOUNT: 25, BALANCEDATE: new Date('2023-06-01'), INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-  { ID: '2', MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', DAILYBALANCE: 1800.50, DAILYTXNCOUNT: 30, BALANCEDATE: new Date('2023-06-02'), INSERTDATE: new Date('2023-06-02'), UPDATEDATE: new Date('2023-06-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-  { ID: '3', MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', DAILYBALANCE: 3200.00, DAILYTXNCOUNT: 50, BALANCEDATE: new Date('2023-06-01'), INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-  { ID: '4', MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', DAILYBALANCE: 2950.25, DAILYTXNCOUNT: 45, BALANCEDATE: new Date('2023-06-02'), INSERTDATE: new Date('2023-06-02'), UPDATEDATE: new Date('2023-06-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-  { ID: '5', MERCHANTACCOUNT: 'ACC004', MERCHANTPHONE: '444-555-6666', DAILYBALANCE: 500.00, DAILYTXNCOUNT: 10, BALANCEDATE: new Date('2023-06-01'), INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+  { ID: randomUUID(), MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', DAILYBALANCE: 1500.75, DAILYTXNCOUNT: 25, BALANCEDATE: new Date('2023-06-01'), INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+  { ID: randomUUID(), MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', DAILYBALANCE: 1800.50, DAILYTXNCOUNT: 30, BALANCEDATE: new Date('2023-06-02'), INSERTDATE: new Date('2023-06-02'), UPDATEDATE: new Date('2023-06-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+  { ID: randomUUID(), MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', DAILYBALANCE: 3200.00, DAILYTXNCOUNT: 50, BALANCEDATE: new Date('2023-06-01'), INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+  { ID: randomUUID(), MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', DAILYBALANCE: 2950.25, DAILYTXNCOUNT: 45, BALANCEDATE: new Date('2023-06-02'), INSERTDATE: new Date('2023-06-02'), UPDATEDATE: new Date('2023-06-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+  { ID: randomUUID(), MERCHANTACCOUNT: 'ACC004', MERCHANTPHONE: '444-555-6666', DAILYBALANCE: 500.00, DAILYTXNCOUNT: 10, BALANCEDATE: new Date('2023-06-01'), INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_MERCHANT_TXNS = [
-    { ID: 'txn_1', MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', AMOUNT: 50.25, TXNID: 'TXN001', CUSTOMERNAME: 'Customer A', CUSTOMERACCOUNT: 'CUST001', T24USER: 't24user1', T2TRANSACTIONDATE: new Date('2023-06-01T10:00:00Z'), STATUS: 'Completed', TRANSACTIONCHANNEL: 'Mobile', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'txn_2', MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', AMOUNT: 15.00, TXNID: 'TXN002', CUSTOMERNAME: 'Customer B', CUSTOMERACCOUNT: 'CUST002', T24USER: 't24user1', T2TRANSACTIONDATE: new Date('2023-06-01T11:30:00Z'), STATUS: 'Completed', TRANSACTIONCHANNEL: 'Mobile', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'txn_3', MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', AMOUNT: 200.00, TXNID: 'TXN003', CUSTOMERNAME: 'Customer C', CUSTOMERACCOUNT: 'CUST003', T24USER: 't24user2', T2TRANSACTIONDATE: new Date('2023-06-01T12:00:00Z'), STATUS: 'Pending', TRANSACTIONCHANNEL: 'Online', TRANSACTIONSERVICE: 'Transfer', VALUE1: 'Note A', VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'txn_4', MERCHANTACCOUNT: 'ACC004', MERCHANTPHONE: '444-555-6666', AMOUNT: 75.50, TXNID: 'TXN004', CUSTOMERNAME: 'Customer D', CUSTOMERACCOUNT: 'CUST004', T24USER: 't24user3', T2TRANSACTIONDATE: new Date('2023-06-01T14:00:00Z'), STATUS: 'Failed', TRANSACTIONCHANNEL: 'POS', TRANSACTIONSERVICE: 'Purchase', VALUE1: 'Error X', VALUE2: 'Retry 1', VALUE3: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'txn_5', MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', AMOUNT: 500.00, TXNID: 'TXN005', CUSTOMERNAME: 'Customer E', CUSTOMERACCOUNT: 'CUST005', T24USER: 't24user2', T2TRANSACTIONDATE: new Date('2023-06-02T09:00:00Z'), STATUS: 'Completed', TRANSACTIONCHANNEL: 'Online', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-06-02'), UPDATEDATE: new Date('2023-06-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', AMOUNT: 50.25, TXNID: 'TXN001', CUSTOMERNAME: 'Customer A', CUSTOMERACCOUNT: 'CUST001', T24USER: 't24user1', T2TRANSACTIONDATE: new Date('2023-06-01T10:00:00Z'), STATUS: 'Completed', TRANSACTIONCHANNEL: 'Mobile', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '111-222-3333', AMOUNT: 15.00, TXNID: 'TXN002', CUSTOMERNAME: 'Customer B', CUSTOMERACCOUNT: 'CUST002', T24USER: 't24user1', T2TRANSACTIONDATE: new Date('2023-06-01T11:30:00Z'), STATUS: 'Completed', TRANSACTIONCHANNEL: 'Mobile', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', AMOUNT: 200.00, TXNID: 'TXN003', CUSTOMERNAME: 'Customer C', CUSTOMERACCOUNT: 'CUST003', T24USER: 't24user2', T2TRANSACTIONDATE: new Date('2023-06-01T12:00:00Z'), STATUS: 'Pending', TRANSACTIONCHANNEL: 'Online', TRANSACTIONSERVICE: 'Transfer', VALUE1: 'Note A', VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), MERCHANTACCOUNT: 'ACC004', MERCHANTPHONE: '444-555-6666', AMOUNT: 75.50, TXNID: 'TXN004', CUSTOMERNAME: 'Customer D', CUSTOMERACCOUNT: 'CUST004', T24USER: 't24user3', T2TRANSACTIONDATE: new Date('2023-06-01T14:00:00Z'), STATUS: 'Failed', TRANSACTIONCHANNEL: 'POS', TRANSACTIONSERVICE: 'Purchase', VALUE1: 'Error X', VALUE2: 'Retry 1', VALUE3: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', AMOUNT: 500.00, TXNID: 'TXN005', CUSTOMERNAME: 'Customer E', CUSTOMERACCOUNT: 'CUST005', T24USER: 't24user2', T2TRANSACTIONDATE: new Date('2023-06-02T09:00:00Z'), STATUS: 'Completed', TRANSACTIONCHANNEL: 'Online', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-06-02'), UPDATEDATE: new Date('2023-06-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
 const MOCK_ARIF_REQUESTS = [
@@ -59,58 +60,58 @@ const MOCK_ARIF_REQUESTS = [
 ]
 
 const MOCK_ARIFPAY_ENDPOINTS = [
-    { ID: 'ep_1', BANK: 'Bank of Abyssina', DISPLAYNAME: 'BoA', OTPLENGTH: 6, ORDER: 1, ENDPOINT1: 'https://api.boa.com/v1/pay', ENDPOINT2: 'https://api.boa.com/v1/confirm', ENDPOINT3: '', CANCELURL: 'https://boa.com/cancel', ERRORURL: 'https://boa.com/error', SUCCESSURL: 'https://boa.com/success', NOTIFYURL: 'https://api.myapp.com/notify/boa', ISTWOSTEP: true, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '987654321', BENEFICIARYBANK: 'BoA', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ep_2', BANK: 'Awash Bank', DISPLAYNAME: 'Awash', OTPLENGTH: 4, ORDER: 2, ENDPOINT1: 'https://api.awashbank.com/execute', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://awashbank.com/cancel', ERRORURL: 'https://awashbank.com/error', SUCCESSURL: 'https://awashbank.com/success', NOTIFYURL: 'https://api.myapp.com/notify/awash', ISTWOSTEP: false, ISOTP: false, TRANSACTIONTYPE: 'B2B', BENEFICIARYACCOUNT: '123456789', BENEFICIARYBANK: 'Awash', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-02'), UPDATEDATE: new Date('2023-01-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), BANK: 'Bank of Abyssina', DISPLAYNAME: 'BoA', OTPLENGTH: 6, ORDER: 1, ENDPOINT1: 'https://api.boa.com/v1/pay', ENDPOINT2: 'https://api.boa.com/v1/confirm', ENDPOINT3: '', CANCELURL: 'https://boa.com/cancel', ERRORURL: 'https://boa.com/error', SUCCESSURL: 'https://boa.com/success', NOTIFYURL: 'https://api.myapp.com/notify/boa', ISTWOSTEP: true, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '987654321', BENEFICIARYBANK: 'BoA', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), BANK: 'Awash Bank', DISPLAYNAME: 'Awash', OTPLENGTH: 4, ORDER: 2, ENDPOINT1: 'https://api.awashbank.com/execute', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://awashbank.com/cancel', ERRORURL: 'https://awashbank.com/error', SUCCESSURL: 'https://awashbank.com/success', NOTIFYURL: 'https://api.myapp.com/notify/awash', ISTWOSTEP: false, ISOTP: false, TRANSACTIONTYPE: 'B2B', BENEFICIARYACCOUNT: '123456789', BENEFICIARYBANK: 'Awash', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-02'), UPDATEDATE: new Date('2023-01-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_CONTROLLERSCONFIGS = [
-    { ID: 'cfg_1', CONTROLLERKEY: 'CTRL_KEY_001', APIKEY: 'API_KEY_001_XYZ', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'cfg_2', CONTROLLERKEY: 'CTRL_KEY_002', APIKEY: 'API_KEY_002_ABC', INSERTDATE: new Date('2023-02-15'), UPDATEDATE: new Date('2023-02-15'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), CONTROLLERKEY: 'CTRL_KEY_001', APIKEY: 'API_KEY_001_XYZ', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), CONTROLLERKEY: 'CTRL_KEY_002', APIKEY: 'API_KEY_002_ABC', INSERTDATE: new Date('2023-02-15'), UPDATEDATE: new Date('2023-02-15'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_CORE_INTEGRATION_SETTINGS = [
-    { ID: 'core_1', UNIQUEKEY: 'INTEGRATION_MAIN', ADDRESS: 'https://core.bank.com/api', USERNAME: 'coreapiuser', PASSWORD: 'SuperSecretPassword123', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'core_2', UNIQUEKEY: 'INTEGRATION_BACKUP', ADDRESS: 'https://core-backup.bank.com/api', USERNAME: 'coreapiuser_bk', PASSWORD: 'AnotherSecretPassword456', INSERTDATE: new Date('2023-01-02'), UPDATEDATE: new Date('2023-01-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), UNIQUEKEY: 'INTEGRATION_MAIN', ADDRESS: 'https://core.bank.com/api', USERNAME: 'coreapiuser', PASSWORD: 'SuperSecretPassword123', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), UNIQUEKEY: 'INTEGRATION_BACKUP', ADDRESS: 'https://core-backup.bank.com/api', USERNAME: 'coreapiuser_bk', PASSWORD: 'AnotherSecretPassword456', INSERTDATE: new Date('2023-01-02'), UPDATEDATE: new Date('2023-01-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_PAYSTREAM_TXNS = [
-    { ID: 'ps_1', MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT001', ISCOMPLETED: true, AMOUNT: 125.50, PAYERACCOUNT: 'PAYER001', INSERTDATE: new Date('2023-07-01'), UPDATEDATE: new Date('2023-07-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ps_2', MERCHANTACCOUNTNUMBER: 'ACC002', SALERPHONENUMBER: '777-888-9999', TICKET: 'TKT002', ISCOMPLETED: false, AMOUNT: 300.00, PAYERACCOUNT: 'PAYER002', INSERTDATE: new Date('2023-07-02'), UPDATEDATE: new Date('2023-07-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ps_3', MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT003', ISCOMPLETED: true, AMOUNT: 75.00, PAYERACCOUNT: 'PAYER003', INSERTDATE: new Date('2023-07-03'), UPDATEDATE: new Date('2023-07-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT001', ISCOMPLETED: true, AMOUNT: 125.50, PAYERACCOUNT: 'PAYER001', INSERTDATE: new Date('2023-07-01'), UPDATEDATE: new Date('2023-07-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC002', SALERPHONENUMBER: '777-888-9999', TICKET: 'TKT002', ISCOMPLETED: false, AMOUNT: 300.00, PAYERACCOUNT: 'PAYER002', INSERTDATE: new Date('2023-07-02'), UPDATEDATE: new Date('2023-07-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT003', ISCOMPLETED: true, AMOUNT: 75.00, PAYERACCOUNT: 'PAYER003', INSERTDATE: new Date('2023-07-03'), UPDATEDATE: new Date('2023-07-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
 const MOCK_STREAM_PAY_SETTINGS = [
-    { ID: 'sps_1', ADDRESS: 'https://streampay.api/v1', IV: 'iv_streampay_123', KEY: 'key_streampay_abc', HV: 'hv_streampay_xyz', USERNAME: 'streamuser', PASSWORD: 'StreamPayPassword1', INSERTDATE: new Date('2023-08-01'), UPDATEDATE: new Date('2023-08-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'sps_2', ADDRESS: 'https://streampay.api/v2', IV: 'iv_streampay_456', KEY: 'key_streampay_def', HV: 'hv_streampay_uvw', USERNAME: 'streamuser2', PASSWORD: 'StreamPayPassword2', INSERTDATE: new Date('2023-08-02'), UPDATEDATE: new Date('2023-08-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ADDRESS: 'https://streampay.api/v1', IV: 'iv_streampay_123', KEY: 'key_streampay_abc', HV: 'hv_streampay_xyz', USERNAME: 'streamuser', PASSWORD: 'StreamPayPassword1', INSERTDATE: new Date('2023-08-01'), UPDATEDATE: new Date('2023-08-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ADDRESS: 'https://streampay.api/v2', IV: 'iv_streampay_456', KEY: 'key_streampay_def', HV: 'hv_streampay_uvw', USERNAME: 'streamuser2', PASSWORD: 'StreamPayPassword2', INSERTDATE: new Date('2023-08-02'), UPDATEDATE: new Date('2023-08-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_USSD_PUSH_SETTINGS = [
-    { ID: 'ups_1', ADDRESS: 'https://ussd.gateway.com/push', RESULTURL: 'https://api.myapp.com/ussd/callback', USERNAME: 'ussd_user', PASSWORD: 'UssdPassword123', INSERTDATE: new Date('2023-09-01'), UPDATEDATE: new Date('2023-09-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ups_2', ADDRESS: 'https://another-ussd.gateway.com/push/v2', RESULTURL: 'https://api.myapp.com/ussd/callback2', USERNAME: 'ussd_user2', PASSWORD: 'UssdPassword456', INSERTDATE: new Date('2023-09-02'), UPDATEDATE: new Date('2023-09-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ADDRESS: 'https://ussd.gateway.com/push', RESULTURL: 'https://api.myapp.com/ussd/callback', USERNAME: 'ussd_user', PASSWORD: 'UssdPassword123', INSERTDATE: new Date('2023-09-01'), UPDATEDATE: new Date('2023-09-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ADDRESS: 'https://another-ussd.gateway.com/push/v2', RESULTURL: 'https://api.myapp.com/ussd/callback2', USERNAME: 'ussd_user2', PASSWORD: 'UssdPassword456', INSERTDATE: new Date('2023-09-02'), UPDATEDATE: new Date('2023-09-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_QR_PAYMENTS = [
-    { ID: 'qr_1', DEBITACCOUNT: 'D001', CREDITACCOUNT: 'C001', SALERPHONENUMBER: '666-777-8888', AMOUNT: 50.00, EXPIRETIME: new Date('2023-10-31T23:59:59Z'), QRCODE: 'dummy-qr-code-1', ISUSED: false, INSERTDATE: new Date('2023-10-01'), UPDATEDATE: new Date('2023-10-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'qr_2', DEBITACCOUNT: 'D002', CREDITACCOUNT: 'C002', SALERPHONENUMBER: '777-888-9999', AMOUNT: 150.75, EXPIRETIME: new Date('2023-11-15T12:00:00Z'), QRCODE: 'dummy-qr-code-2', ISUSED: true, INSERTDATE: new Date('2023-10-02'), UPDATEDATE: new Date('2023-10-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'qr_3', DEBITACCOUNT: 'D003', CREDITACCOUNT: 'C001', SALERPHONENUMBER: '888-999-0000', AMOUNT: 25.00, EXPIRETIME: new Date('2023-11-01T08:30:00Z'), QRCODE: 'dummy-qr-code-3', ISUSED: false, INSERTDATE: new Date('2023-10-03'), UPDATEDATE: new Date('2023-10-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), DEBITACCOUNT: 'D001', CREDITACCOUNT: 'C001', SALERPHONENUMBER: '666-777-8888', AMOUNT: 50.00, EXPIRETIME: new Date('2023-10-31T23:59:59Z'), QRCODE: 'dummy-qr-code-1', ISUSED: false, INSERTDATE: new Date('2023-10-01'), UPDATEDATE: new Date('2023-10-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), DEBITACCOUNT: 'D002', CREDITACCOUNT: 'C002', SALERPHONENUMBER: '777-888-9999', AMOUNT: 150.75, EXPIRETIME: new Date('2023-11-15T12:00:00Z'), QRCODE: 'dummy-qr-code-2', ISUSED: true, INSERTDATE: new Date('2023-10-02'), UPDATEDATE: new Date('2023-10-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), DEBITACCOUNT: 'D003', CREDITACCOUNT: 'C001', SALERPHONENUMBER: '888-999-0000', AMOUNT: 25.00, EXPIRETIME: new Date('2023-11-01T08:30:00Z'), QRCODE: 'dummy-qr-code-3', ISUSED: false, INSERTDATE: new Date('2023-10-03'), UPDATEDATE: new Date('2023-10-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
 const MOCK_ACCOUNT_INFOS = [
-    { ID: 'ai_1', ACCOUNTNUMBER: 'ACC001', PHONENUMBER: '111-222-3333', FULLNAME: 'The Corner Cafe Admin', GENDER: 'N/A', VALUE1: null, VALUE2: null, INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ai_2', ACCOUNTNUMBER: 'CUST001', PHONENUMBER: '123-456-7890', FULLNAME: 'Customer A', GENDER: 'Male', VALUE1: 'VIP', VALUE2: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: 'ai_3', ACCOUNTNUMBER: 'CUST002', PHONENUMBER: '098-765-4321', FULLNAME: 'Customer B', GENDER: 'Female', VALUE1: null, VALUE2: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ACCOUNTNUMBER: 'ACC001', PHONENUMBER: '111-222-3333', FULLNAME: 'The Corner Cafe Admin', GENDER: 'N/A', VALUE1: null, VALUE2: null, INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ACCOUNTNUMBER: 'CUST001', PHONENUMBER: '123-456-7890', FULLNAME: 'Customer A', GENDER: 'Male', VALUE1: 'VIP', VALUE2: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ACCOUNTNUMBER: 'CUST002', PHONENUMBER: '098-765-4321', FULLNAME: 'Customer B', GENDER: 'Female', VALUE1: null, VALUE2: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_PROMO_ADDS = [
-    { ID: 'pa_1', ADDTITLE: 'Summer Sale!', ADDSUBTITLE: 'Up to 50% off on selected items.', ADDADDRESS: 'https://example.com/summer-sale', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 1, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-01'), UPDATEDATE: new Date('2023-11-01') },
-    { ID: 'pa_2', ADDTITLE: 'New Arrivals', ADDSUBTITLE: 'Check out the latest fashion trends.', ADDADDRESS: 'https://example.com/new-arrivals', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 2, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-05'), UPDATEDATE: new Date('2023-11-05') },
-    { ID: 'pa_3', ADDTITLE: 'Holiday Special', ADDSUBTITLE: 'Get your gifts now!', ADDADDRESS: 'https://example.com/holiday-special', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 3, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-10'), UPDATEDATE: new Date('2023-11-10') },
+    { ID: randomUUID(), ADDTITLE: 'Summer Sale!', ADDSUBTITLE: 'Up to 50% off on selected items.', ADDADDRESS: 'https://example.com/summer-sale', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 1, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-01'), UPDATEDATE: new Date('2023-11-01') },
+    { ID: randomUUID(), ADDTITLE: 'New Arrivals', ADDSUBTITLE: 'Check out the latest fashion trends.', ADDADDRESS: 'https://example.com/new-arrivals', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 2, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-05'), UPDATEDATE: new Date('2023-11-05') },
+    { ID: randomUUID(), ADDTITLE: 'Holiday Special', ADDSUBTITLE: 'Get your gifts now!', ADDADDRESS: 'https://example.com/holiday-special', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 3, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-10'), UPDATEDATE: new Date('2023-11-10') },
 ];
 
 const MOCK_ROLE_CAPABILITIES = [
-    { ID: 'rc_1', ROLEID: 'Admin', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'Dashboard', MENUNAME_am: 'ዳሽቦርድ', ADDRESS: '/dashboard', PARENT: 'ROOT', PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
-    { ID: 'rc_2', ROLEID: 'Admin', MENUORDER: 2, SUBMENUORDER: 1, MENUNAME: 'Allowed Companies', MENUNAME_am: 'የተፈቀዱ ኩባንያዎች', ADDRESS: '/dashboard/allowed_companies', PARENT: 'Management', PARENTID: 'mg_1', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
-    { ID: 'rc_3', ROLEID: 'Sales', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'My Transactions', MENUNAME_am: 'የእኔ ግብይቶች', ADDRESS: '/dashboard/merchant-txns', PARENT: 'ROOT', PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
+    { ID: randomUUID(), ROLEID: 'Admin', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'Dashboard', MENUNAME_am: 'ዳሽቦርድ', ADDRESS: '/dashboard', PARENT: 'ROOT', PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
+    { ID: randomUUID(), ROLEID: 'Admin', MENUORDER: 2, SUBMENUORDER: 1, MENUNAME: 'Allowed Companies', MENUNAME_am: 'የተፈቀዱ ኩባንያዎች', ADDRESS: '/dashboard/allowed_companies', PARENT: 'Management', PARENTID: 'mg_1', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
+    { ID: randomUUID(), ROLEID: 'Sales', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'My Transactions', MENUNAME_am: 'የእኔ ግብይቶች', ADDRESS: '/dashboard/merchant-txns', PARENT: 'ROOT', PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
 ];
 
 async function main() {
@@ -278,14 +279,12 @@ async function main() {
     console.log(`Seeded ${MOCK_BRANCH_USERS.length} branch users.`);
 
     for (const db of MOCK_DAILY_BALANCES) {
-      const { ID, ...rest } = db;
-        await prisma.merchants_daily_balances.create({ data: rest });
+      await prisma.merchants_daily_balances.create({ data: db });
     }
     console.log(`Seeded ${MOCK_DAILY_BALANCES.length} daily balances.`);
 
     for (const mt of MOCK_MERCHANT_TXNS) {
-       const { ID, ...rest } = mt;
-        await prisma.merchant_txns.create({ data: rest });
+        await prisma.merchant_txns.create({ data: mt });
     }
     console.log(`Seeded ${MOCK_MERCHANT_TXNS.length} merchant txns.`);
 
@@ -295,59 +294,50 @@ async function main() {
     console.log(`Seeded ${MOCK_ARIF_REQUESTS.length} arif requests.`);
 
     for (const ae of MOCK_ARIFPAY_ENDPOINTS) {
-      const { ID, ...rest } = ae;
-        await prisma.arifpay_endpoints.create({ data: rest });
+        await prisma.arifpay_endpoints.create({ data: ae });
     }
     console.log(`Seeded ${MOCK_ARIFPAY_ENDPOINTS.length} arifpay endpoints.`);
 
     for (const cc of MOCK_CONTROLLERSCONFIGS) {
-       const { ID, ...rest } = cc;
-        await prisma.controllersconfigs.create({ data: rest });
+        await prisma.controllersconfigs.create({ data: cc });
     }
     console.log(`Seeded ${MOCK_CONTROLLERSCONFIGS.length} controllers configs.`);
 
     for (const cis of MOCK_CORE_INTEGRATION_SETTINGS) {
-       const { ID, ...rest } = cis;
-        await prisma.core_integration_settings.create({ data: rest });
+        await prisma.core_integration_settings.create({ data: cis });
     }
     console.log(`Seeded ${MOCK_CORE_INTEGRATION_SETTINGS.length} core integration settings.`);
 
     for (const pt of MOCK_PAYSTREAM_TXNS) {
-      const { ID, ...rest } = pt;
-        await prisma.paystream_txns.create({ data: rest });
+        await prisma.paystream_txns.create({ data: pt });
     }
     console.log(`Seeded ${MOCK_PAYSTREAM_TXNS.length} paystream txns.`);
 
     for (const sps of MOCK_STREAM_PAY_SETTINGS) {
-      const { ID, ...rest } = sps;
-        await prisma.stream_pay_settings.create({ data: rest });
+        await prisma.stream_pay_settings.create({ data: sps });
     }
     console.log(`Seeded ${MOCK_STREAM_PAY_SETTINGS.length} stream pay settings.`);
 
     for (const ups of MOCK_USSD_PUSH_SETTINGS) {
-      const { ID, ...rest } = ups;
-        await prisma.ussd_push_settings.create({ data: rest });
+        await prisma.ussd_push_settings.create({ data: ups });
     }
     console.log(`Seeded ${MOCK_USSD_PUSH_SETTINGS.length} ussd push settings.`);
 
     for (const qp of MOCK_QR_PAYMENTS) {
-      const { ID, ...rest } = qp;
-        await prisma.qr_payments.create({ data: rest });
+        await prisma.qr_payments.create({ data: qp });
     }
     console.log(`Seeded ${MOCK_QR_PAYMENTS.length} qr payments.`);
 
     for (const ai of MOCK_ACCOUNT_INFOS) {
-       const { ID, ...rest } = ai;
-        await prisma.account_infos.create({ data: rest });
+        await prisma.account_infos.create({ data: ai });
     }
     console.log(`Seeded ${MOCK_ACCOUNT_INFOS.length} account infos.`);
 
     for (const pa of MOCK_PROMO_ADDS) {
-        const { ID, ORDER, ...rest } = pa;
+        const { ORDER, ...rest } = pa;
         await prisma.promo_adds.create({
             data: {
                 ...rest,
-                ID,
                 displayOrder: ORDER
             }
         });
@@ -355,8 +345,7 @@ async function main() {
     console.log(`Seeded ${MOCK_PROMO_ADDS.length} promo adds.`);
 
     for (const rc of MOCK_ROLE_CAPABILITIES) {
-       const { ID, ...rest } = rc;
-        await prisma.role_capablities.create({ data: rest });
+        await prisma.role_capablities.create({ data: rc });
     }
     console.log(`Seeded ${MOCK_ROLE_CAPABILITIES.length} role capabilities.`);
 

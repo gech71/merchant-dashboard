@@ -51,7 +51,7 @@ export default async function RootLayout({
     ussdPushSettings: ussdPushSettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     qrPayments: qrPayments.map(item => ({ ...item, EXPIRETIME: item.EXPIRETIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     accountInfos: accountInfos.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
-    promoAdds: promoAdds.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    promoAdds: promoAdds.map(item => ({ ...item, ORDER: item.displayOrder, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     roleCapabilities: roleCapabilities.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     roles: roles.map(role => ({ ...role, createdAt: role.createdAt.toISOString(), updatedAt: role.updatedAt.toISOString() })),
   }
@@ -74,3 +74,5 @@ export default async function RootLayout({
     </html>
   );
 }
+
+    

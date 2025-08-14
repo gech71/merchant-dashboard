@@ -87,6 +87,7 @@ export type account_infos = Omit<Prisma.account_infosGetPayload<{}>, 'INSERTDATE
 export type promo_adds = Omit<Prisma.promo_addsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
   INSERTDATE: string | null;
   UPDATEDATE: string | null;
+  ORDER: number;
 };
 
 export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
@@ -97,3 +98,5 @@ export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSE
 export type DashBoardRoles = Prisma.DashBoardRolesGetPayload<{}>;
 
 export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | role_capablities | DashBoardRoles | null;
+
+    

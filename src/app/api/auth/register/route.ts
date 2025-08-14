@@ -3,12 +3,12 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
+import { randomUUID } from 'crypto';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const {
-      ID,
       ACCOUNTNUMBER,
       FULLNAME,
       ACCOUNTTYPE,
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
     const newUser = await prisma.merchant_users.create({
       data: {
-        ID,
+        ID: randomUUID(),
         ACCOUNTNUMBER,
         password: hashedPassword,
         FULLNAME,
@@ -73,3 +73,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Something went wrong!' }, { status: 500 });
   }
 }
+
+    

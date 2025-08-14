@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { cookies } from 'next/headers';
+import { randomUUID } from 'crypto';
 
 export async function POST(request: Request) {
   try {
@@ -25,21 +26,13 @@ export async function POST(request: Request) {
       );
     }
     
-    const companies = await prisma.allowed_companies.findMany({
-        select: { ID: true }
-    });
-
-    const newIdNumber = Math.max(...companies.map(c => parseInt(c.ID.replace('C', ''), 10)), 0) + 1;
-    const newId = `C${newIdNumber.toString().padStart(3, '0')}`;
-    const newOid = `oid_${newId}`;
-    
     // If the user is a branch user, associate the company with their branch
     const branchName = user.userType === 'branch' ? user.branch : null;
 
     const newCompany = await prisma.allowed_companies.create({
       data: {
-        Oid: newOid,
-        ID: newId,
+        Oid: randomUUID(),
+        ID: randomUUID(),
         ACCOUNTNUMBER,
         FIELDNAME,
         APPROVEUSER: null,
@@ -65,3 +58,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Something went wrong!' }, { status: 500 });
   }
 }
+
+    
