@@ -1,5 +1,5 @@
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from '../src/lib/prisma';
 import { randomUUID } from 'crypto';
 
 const MOCK_BRANCHES = [
@@ -359,5 +359,3 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-
-    
