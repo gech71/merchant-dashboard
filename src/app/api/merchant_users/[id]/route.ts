@@ -30,15 +30,13 @@ export async function PUT(
       where: { ID: id },
       data: dataToUpdate,
     });
-    
-    const { password, ...userWithoutPassword } = updatedUser;
 
     const userSerializable = {
-        ...userWithoutPassword,
-        LASTLOGINATTEMPT: userWithoutPassword.LASTLOGINATTEMPT?.toISOString() ?? null,
-        UNLOCKEDTIME: userWithoutPassword.UNLOCKEDTIME?.toISOString() ?? null,
-        INSERTDATE: userWithoutPassword.INSERTDATE?.toISOString() ?? null,
-        UPDATEDATE: userWithoutPassword.UPDATEDATE?.toISOString() ?? null,
+        ...updatedUser,
+        LASTLOGINATTEMPT: updatedUser.LASTLOGINATTEMPT?.toISOString() ?? null,
+        UNLOCKEDTIME: updatedUser.UNLOCKEDTIME?.toISOString() ?? null,
+        INSERTDATE: updatedUser.INSERTDATE?.toISOString() ?? null,
+        UPDATEDATE: updatedUser.UPDATEDATE?.toISOString() ?? null,
     };
 
 

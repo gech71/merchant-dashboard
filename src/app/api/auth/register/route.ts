@@ -2,7 +2,6 @@
 'use server';
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 
 export async function POST(request: Request) {
@@ -35,14 +34,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Hash the account number to use as a password
-    const hashedPassword = await bcrypt.hash(ACCOUNTNUMBER, 10);
-
     const newUser = await prisma.Merchant_users.create({
       data: {
         ID: randomUUID(),
         ACCOUNTNUMBER,
-        password: hashedPassword,
         FULLNAME,
         ACCOUNTTYPE,
         PHONENUMBER,
@@ -62,11 +57,9 @@ export async function POST(request: Request) {
         UPDATEUSERID,
       },
     });
-    
-    const { password, ...userWithoutPassword } = newUser;
 
     return NextResponse.json(
-      { user: userWithoutPassword, message: 'User created successfully' },
+      { user: newUser, message: 'User created successfully' },
       { status: 201 }
     );
   } catch (error) {

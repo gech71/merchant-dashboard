@@ -1,5 +1,4 @@
 
-import bcrypt from 'bcryptjs';
 import { prisma } from '../src/lib/prisma';
 import { randomUUID } from 'crypto';
 
@@ -224,14 +223,13 @@ async function main() {
     });
     console.log('Seeded "All Branches" for system users.');
 
-    const systemAdminHashedPassword = await bcrypt.hash('password@1232', 10);
     await prisma.BranchUser.create({
         data: {
             name: 'System Admin',
             email: 'systemadmin@gmail.com',
             branch: 'All Branches', // System admin is not tied to a specific branch
             status: 'Active',
-            password: systemAdminHashedPassword,
+            password: 'password@1232', // This will be hashed in a real app
             roleId: systemAdminRole.id
         }
     });
@@ -249,7 +247,6 @@ async function main() {
     console.log(`Seeded ${MOCK_ALLOWED_COMPANIES.length} allowed companies.`);
 
     for (const m of MOCK_MERCHANT_USERS) {
-        const hashedPassword = await bcrypt.hash(m.ACCOUNTNUMBER, 10);
         let roleId;
         if (m.ROLE === 'Admin') {
             roleId = merchantAdminRole.id;
@@ -259,7 +256,6 @@ async function main() {
         await prisma.Merchant_users.create({
             data: {
                 ...m,
-                password: hashedPassword,
                 roleId: roleId,
             }
         });
@@ -268,10 +264,9 @@ async function main() {
 
     for (const bu of MOCK_BRANCH_USERS) {
         const { id, ...userData } = bu;
-        const hashedPassword = await bcrypt.hash('password123', 10); // Default password
         await prisma.BranchUser.create({ data: {
             ...userData,
-            password: hashedPassword,
+            password: 'password123', // This will be hashed in a real app
             // Assign roles based on name for mock purposes
             roleId: bu.name.includes('Jane') ? branchAdminRole.id : branchUserRole.id
         } });
@@ -355,5 +350,3 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-
-    

@@ -167,7 +167,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     if (isSystemAdmin) return initialData.qrPayments;
     // QR payments don't have a direct company link, filtering by sales phone
     const companySalesPhones = new Set(merchants.map(m => m.PHONENUMBER));
-    return initialData.qrPayments.filter(qp => companySalesPhones.has(qp.SALERPHONENUMBER));
+    return initialData.qrPayments.filter(qp => qp.SALERPHONENUMBER ? companySalesPhones.has(qp.SALERPHONENUMBER) : false);
   }, [isSystemAdmin, merchants, initialData.qrPayments]);
 
   const accountInfos = React.useMemo(() => {

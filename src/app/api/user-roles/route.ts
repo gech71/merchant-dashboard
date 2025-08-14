@@ -29,11 +29,8 @@ export async function POST(request: Request) {
     } else {
       return NextResponse.json({ message: 'Invalid user type' }, { status: 400 });
     }
-    
-    const { password, ...userWithoutPassword } = (updatedUser as any);
 
-
-    return NextResponse.json(userWithoutPassword, { status: 200 });
+    return NextResponse.json(updatedUser, { status: 200 });
   } catch (error) {
     console.error('Error updating user role:', error);
     return NextResponse.json({ message: 'Something went wrong!' }, { status: 500 });

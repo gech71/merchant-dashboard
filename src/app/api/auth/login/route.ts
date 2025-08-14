@@ -2,7 +2,6 @@
 'use server';
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 
@@ -14,9 +13,9 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { identifier, password, userType } = body;
 
-    if (!identifier || !password || !userType) {
+    if (!identifier || !userType) {
       return NextResponse.json(
-        { isSuccess: false, message: 'Identifier, password and user type are required' },
+        { isSuccess: false, message: 'Identifier and user type are required' },
         { status: 400 }
       );
     }
@@ -25,12 +24,13 @@ export async function POST(request: Request) {
     let userPayload: any = null;
 
     if (userType === 'merchant') {
+        // Password check is removed. We just find the user by phone number.
         const merchantUser = await prisma.Merchant_users.findUnique({
             where: { PHONENUMBER: identifier },
             include: { DashBoardRoles: true },
         });
 
-        if (merchantUser && (await bcrypt.compare(password, merchantUser.password))) {
+        if (merchantUser) {
             user = merchantUser;
             const permissions = (user.DashBoardRoles?.permissions as {pages: string[]})?.pages || [];
             userPayload = {
@@ -50,7 +50,9 @@ export async function POST(request: Request) {
             include: { DashBoardRoles: true },
         });
         
-        if (branchUser && (await bcrypt.compare(password, branchUser.password))) {
+        // Assuming branch users still use passwords for now.
+        // If they also don't need passwords, this should be updated.
+        if (branchUser && password && branchUser.password === password) {
             user = branchUser;
             const permissions = (user.DashBoardRoles?.permissions as {pages: string[]})?.pages || [];
             userPayload = {
