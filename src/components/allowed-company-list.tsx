@@ -41,7 +41,7 @@ import { useToast } from '@/hooks/use-toast';
 type SortableKeys = 'FIELDNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'APPROVEUSER' | 'APPROVED';
 const ITEMS_PER_PAGE = 15;
 
-export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowed_companies[], approvalView?: boolean }) {
+export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowedCompanies: allowed_companies[], approvalView?: boolean }) {
   const { allowedCompanies: contextCompanies, updateAllowedCompanyApproval } = useDataContext();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = React.useState('');
@@ -254,8 +254,8 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                {!approvalView && !company.APPROVED && (
-                                  <DropdownMenuItem onClick={() => handleEdit(company)}>
+                                {!approvalView && (
+                                  <DropdownMenuItem onClick={() => handleEdit(company)} disabled={company.APPROVED}>
                                     <Edit className="mr-2 h-4 w-4" />
                                     Edit
                                   </DropdownMenuItem>
