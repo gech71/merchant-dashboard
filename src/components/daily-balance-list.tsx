@@ -40,7 +40,7 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
   const [companyFilter, setCompanyFilter] = React.useState('all');
   const [searchField, setSearchField] = React.useState('all');
 
-  const getMerchantName = (accountNumber: string | null) => {
+  const getCompanyName = (accountNumber: string | null) => {
     if (!accountNumber) return 'N/A';
     const company = allowedCompanies.find(c => c.ACCOUNTNUMBER === accountNumber);
     return company ? company.FIELDNAME : 'N/A';
@@ -68,10 +68,14 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
     if (searchTerm) {
         const lowercasedTerm = searchTerm.toLowerCase();
         sortableItems = sortableItems.filter((balance) => {
+            const companyName = getCompanyName(balance.MERCHANTACCOUNT).toLowerCase();
             if (searchField === 'all') {
-                return getMerchantName(balance.MERCHANTACCOUNT).toLowerCase().includes(lowercasedTerm) ||
+                return companyName.includes(lowercasedTerm) ||
                        (balance.MERCHANTACCOUNT && balance.MERCHANTACCOUNT.toLowerCase().includes(lowercasedTerm)) ||
                        (balance.MERCHANTPHONE && balance.MERCHANTPHONE.toLowerCase().includes(lowercasedTerm));
+            }
+             if (searchField === 'company') {
+                return companyName.includes(lowercasedTerm);
             }
             const fieldValue = balance[searchField as keyof merchants_daily_balances] as string;
             return fieldValue?.toLowerCase().includes(lowercasedTerm);
@@ -143,6 +147,7 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">All Fields</SelectItem>
+                        <SelectItem value="company">Company</SelectItem>
                         <SelectItem value="MERCHANTACCOUNT">Account No.</SelectItem>
                         <SelectItem value="MERCHANTPHONE">Phone No.</SelectItem>
                     </SelectContent>
@@ -159,34 +164,34 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Merchant Name</TableHead>
+                <TableHead>Company</TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNT')} className="px-2">
-                    MERCHANTACCOUNT
+                    Merchantaccount
                     {getSortIndicator('MERCHANTACCOUNT')}
                   </Button>
                 </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('MERCHANTPHONE')} className="px-2">
-                    MERCHANTPHONE
+                    Merchantphone
                     {getSortIndicator('MERCHANTPHONE')}
                   </Button>
                 </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('DAILYBALANCE')} className="px-2">
-                    DAILYBALANCE
+                    Dailybalance
                     {getSortIndicator('DAILYBALANCE')}
                   </Button>
                 </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('DAILYTXNCOUNT')} className="px-2">
-                    DAILYTXNCOUNT
+                    Dailytxncount
                     {getSortIndicator('DAILYTXNCOUNT')}
                   </Button>
                 </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('BALANCEDATE')} className="px-2">
-                    BALANCEDATE
+                    Balancedate
                     {getSortIndicator('BALANCEDATE')}
                   </Button>
                 </TableHead>
@@ -196,7 +201,7 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
               {paginatedBalances.length > 0 ? (
                 paginatedBalances.map((balance) => (
                   <TableRow key={balance.ID}>
-                    <TableCell className="font-medium">{getMerchantName(balance.MERCHANTACCOUNT)}</TableCell>
+                    <TableCell className="font-medium">{getCompanyName(balance.MERCHANTACCOUNT)}</TableCell>
                     <TableCell>{balance.MERCHANTACCOUNT}</TableCell>
                     <TableCell>{balance.MERCHANTPHONE}</TableCell>
                     <TableCell className="text-right">{balance.DAILYBALANCE.toFixed(2)}</TableCell>
