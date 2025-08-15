@@ -49,7 +49,7 @@ export default async function RootLayout({
     paystreamTxns: paystreamTxns.map(item => ({ ...item, AMOUNT: parseFloat(item.AMOUNT), INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     streamPaySettings: streamPaySettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     ussdPushSettings: ussdPushSettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
-    qrPayments: qrPayments.map(item => ({ ...item, AMOUNT: item.AMOUNT.toNumber(), EXPIRETIME: item.EXPIRETIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    qrPayments: qrPayments.map(item => ({ ...item, AMOUNT: item.AMOUNT, EXPIRETIME: item.EXPIRETIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     accountInfos: accountInfos.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     promoAdds: promoAdds.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     roleCapabilities: roleCapabilities.map(item => ({ ...item, PARENT: item.PARENT ?? false, PARENTID: item.PARENTID ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
