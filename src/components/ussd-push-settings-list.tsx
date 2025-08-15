@@ -23,12 +23,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type SortableKeys = 'ADDRESS' | 'USERNAME';
 const ITEMS_PER_PAGE = 15;
 
 export default function UssdPushSettingsList({ ussdPushSettings: initialSettings }: { ussdPushSettings: ussd_push_settings[] }) {
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchField, setSearchField] = React.useState('all');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
@@ -48,9 +50,13 @@ export default function UssdPushSettingsList({ ussdPushSettings: initialSettings
 
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
-      sortableItems = sortableItems.filter((setting) =>
-        Object.values(setting).some(val => String(val).toLowerCase().includes(lowercasedTerm))
-      );
+      sortableItems = sortableItems.filter((setting) => {
+        if (searchField === 'all') {
+            return Object.values(setting).some(val => String(val).toLowerCase().includes(lowercasedTerm))
+        }
+        const fieldValue = setting[searchField as keyof ussd_push_settings] as string;
+        return fieldValue?.toLowerCase().includes(lowercasedTerm)
+      });
     }
 
     if (sortConfig !== null) {
@@ -64,7 +70,7 @@ export default function UssdPushSettingsList({ ussdPushSettings: initialSettings
     }
 
     return sortableItems;
-  }, [initialSettings, searchTerm, sortConfig]);
+  }, [initialSettings, searchTerm, searchField, sortConfig]);
 
   const paginatedSettings = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -84,21 +90,34 @@ export default function UssdPushSettingsList({ ussdPushSettings: initialSettings
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-end gap-2 py-4">
-          <Input
-            placeholder="Search settings..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
+          <div className="flex items-center gap-2">
+            <Select value={searchField} onValueChange={setSearchField}>
+              <SelectTrigger className="h-9 w-[150px]">
+                <SelectValue placeholder="Search by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Fields</SelectItem>
+                <SelectItem value="ADDRESS">Address</SelectItem>
+                <SelectItem value="RESULTURL">Result URL</SelectItem>
+                <SelectItem value="USERNAME">Username</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input
+              placeholder="Search settings..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-9 max-w-sm"
+            />
+          </div>
         </div>
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('ADDRESS')} className="px-2">ADDRESS{getSortIndicator('ADDRESS')}</Button></TableHead>
-                <TableHead>RESULTURL</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('USERNAME')} className="px-2">USERNAME{getSortIndicator('USERNAME')}</Button></TableHead>
-                <TableHead>PASSWORD</TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('ADDRESS')} className="px-2">Address{getSortIndicator('ADDRESS')}</Button></TableHead>
+                <TableHead>Result URL</TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('USERNAME')} className="px-2">Username{getSortIndicator('USERNAME')}</Button></TableHead>
+                <TableHead>Password</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
