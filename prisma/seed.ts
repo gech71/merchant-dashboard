@@ -135,6 +135,8 @@ async function main() {
     await prisma.allowed_companies.deleteMany({});
     await prisma.Branch.deleteMany({});
     await prisma.DashBoardRoles.deleteMany({});
+    await prisma.Roles.deleteMany({});
+
 
     // Create default roles
     const ALL_PAGES = [
@@ -214,7 +216,13 @@ async function main() {
             }
         }
     });
-    console.log('Seeded 5 default roles.');
+    console.log('Seeded 5 default dashboard roles.');
+
+    // Seed Application Roles
+    await prisma.Roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
+    await prisma.Roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
+    console.log('Seeded 2 application roles (Admin, Sales).');
+
 
     // Seed "All Branches" first
     await prisma.Branch.create({
@@ -364,3 +372,5 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
+    
