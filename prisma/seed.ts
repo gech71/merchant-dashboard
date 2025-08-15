@@ -273,9 +273,7 @@ async function main() {
                 data: {
                     ...rest,
                     roleId: roleId,
-                    ApplicationRole: {
-                        connect: { ID: appRole.ID }
-                    }
+                    appRoleId: appRole.ID,
                 }
             });
         }
@@ -373,3 +371,5 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
+    
