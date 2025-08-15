@@ -233,6 +233,8 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
             <TableHeader>
               <TableRow>
                 <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNTNUMBER')} className="px-2">Merchant Account Number{getSortIndicator('MERCHANTACCOUNTNUMBER')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap">Company</TableHead>
+                <TableHead className="whitespace-nowrap">Saler</TableHead>
                 <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('SALERPHONENUMBER')} className="px-2">Saler Phone Number{getSortIndicator('SALERPHONENUMBER')}</Button></TableHead>
                 <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('TICKET')} className="px-2">Ticket{getSortIndicator('TICKET')}</Button></TableHead>
                 <TableHead className="whitespace-nowrap">Is Completed</TableHead>
@@ -246,6 +248,8 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
                 paginatedTxns.map((txn) => (
                   <TableRow key={txn.ID}>
                     <TableCell className="font-medium">{txn.MERCHANTACCOUNTNUMBER}</TableCell>
+                    <TableCell>{getCompanyName(txn.MERCHANTACCOUNTNUMBER)}</TableCell>
+                    <TableCell>{getSalerName(txn.SALERPHONENUMBER)}</TableCell>
                     <TableCell>{txn.SALERPHONENUMBER}</TableCell>
                     <TableCell>{txn.TICKET}</TableCell>
                     <TableCell><Badge variant={txn.ISCOMPLETED ? 'default' : 'secondary'}>{txn.ISCOMPLETED ? 'Yes' : 'No'}</Badge></TableCell>
@@ -256,7 +260,7 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">
+                  <TableCell colSpan={9} className="h-24 text-center">
                     No transactions found.
                   </TableCell>
                 </TableRow>
@@ -291,5 +295,3 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
     </Card>
   );
 }
-
-    
