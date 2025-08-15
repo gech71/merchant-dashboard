@@ -1,291 +1,295 @@
 
-// datasource db defines the database connection details.
-datasource db {
-  provider = "postgresql" // Specifies the database provider.
-  url      = env("DATABASE_URL") // The database URL is read from an environment variable.
-}
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// generator client specifies that Prisma Client should be generated.
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
-  provider = "prisma-client-js" // The provider for the Prisma Client.
+  provider = "prisma-client-js"
 }
 
-// model Branch represents the branches in the system.
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
 model Branch {
-  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name              String              @unique
-  code              String
-  address           String
-  contact           String
-  status            String // Approved, Pending, Rejected
-  users             BranchUser[]
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String @unique
+  code       String
+  address    String
+  contact    String
+  status     String // Approved, Pending, Rejected
+  INSERTDATE DateTime? @default(now())
+  UPDATEDATE DateTime? @updatedAt
+  users      BranchUser[]
   allowed_companies allowed_companies[]
 }
 
-// model BranchUser represents the users associated with branches.
-model BranchUser {
-  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String
-  email     String  @unique
-  branch    String
-  Branch    Branch  @relation(fields: [branch], references: [name])
-  password  String
-  status    String // Active, Pending, Inactive
-  roleId    String? @db.Uuid
-  DashBoardRoles DashBoardRoles? @relation(fields: [roleId], references: [id])
-}
 
-// model allowed_companies represents companies that are allowed to transact.
 model allowed_companies {
-  Oid                 String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ID                  String  @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ACCOUNTNUMBER       String  @unique
+  Oid                 String    @id @db.Uuid
+  ID                  String    @db.Uuid
+  ACCOUNTNUMBER       String
   FIELDNAME           String
   APPROVEUSER         String?
   APPROVED            Boolean
   STATUS              Boolean
   INSERTDATE          DateTime? @default(now())
   UPDATEDATE          DateTime? @updatedAt
-  INSERTUSER          String?
-  UPDATEUSER          String?
-  OptimisticLockField Int?
-  GCRecord            Int?
+  INSERTUSER          String
+  UPDATEUSER          String
+  OptimisticLockField Int
+  GCRecord            Int
   branchName          String?
   Branch              Branch?   @relation(fields: [branchName], references: [name])
 }
 
-// model Merchant_users represents the users for a specific merchant.
-model Merchant_users {
-  ID                  String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  FULLNAME            String
-  ROLE                String
-  STATUS              String
-  ACCOUNTNUMBER       String
-  ACCOUNTTYPE         String
-  PHONENUMBER         String        @unique
-  DEVICENAME          String
-  ENCRYPTIONKEY       String
-  iV                  String
-  ISLOGGEDIN          Boolean
-  authenticationkey   String
-  FAILEDATTMEPTS      Int
-  LASTLOGINATTEMPT    DateTime?
-  ISLOCKED            Boolean
-  UNLOCKEDTIME        DateTime?
-  VALUE3              String?
-  INSERTUSERID        String?
-  UPDATEUSERID        String?
-  INSERTDATE          DateTime?
-  UPDATEDATE          DateTime?
-  roleId              String?       @db.Uuid
-  DashBoardRoles      DashBoardRoles? @relation(fields: [roleId], references: [id])
-  ApplicationRole     Roles?        @relation(fields: [ROLE], references: [ROLENAME])
 
+model Merchant_users {
+  ID                String    @id @db.Uuid
+  FULLNAME          String
+  ROLE              String
+  STATUS            String
+  ACCOUNTNUMBER     String
+  ACCOUNTTYPE       String
+  PHONENUMBER       String    @unique
+  DEVICENAME        String
+  ENCRYPTIONKEY     String
+  iV                String
+  ISLOGGEDIN        Boolean
+  authenticationkey String
+  FAILEDATTMEPTS    Int
+  LASTLOGINATTEMPT  DateTime?
+  ISLOCKED          Boolean
+  UNLOCKEDTIME      DateTime?
+  VALUE3            String?
+  INSERTUSERID      String
+  UPDATEUSERID      String
+  INSERTDATE        DateTime? @default(now())
+  UPDATEDATE        DateTime? @updatedAt
+  roleId            String? @db.Uuid
+  DashBoardRoles    DashBoardRoles? @relation(fields: [roleId], references: [id])
+  ApplicationRole   Roles? @relation(fields: [ROLE], references: [ROLENAME])
 }
 
-// model merchants_daily_balances represents the daily balance summary for merchants.
+
+model BranchUser {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  email     String   @unique
+  password  String
+  branchName String?
+  status    String // Active, Pending, Inactive
+  roleId    String?  @db.Uuid
+  Branch    Branch?  @relation(fields: [branchName], references: [name])
+  DashBoardRoles DashBoardRoles? @relation(fields: [roleId], references: [id])
+
+  @@map("branch_users")
+}
+
 model merchants_daily_balances {
-  ID              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  MERCHANTACCOUNT String
-  MERCHANTPHONE   String
+  ID              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  MERCHANTACCOUNT String?
+  MERCHANTPHONE   String?
   DAILYBALANCE    Float
   DAILYTXNCOUNT   Int
   BALANCEDATE     DateTime?
-  INSERTDATE      DateTime?
-  UPDATEDATE      DateTime?
-  INSERTUSER      String?
-  UPDATEUSER      String?
+  INSERTDATE      DateTime? @default(now())
+  UPDATEDATE      DateTime? @updatedAt
+  INSERTUSER      String
+  UPDATEUSER      String
 }
 
-// model merchant_txns represents individual transactions for merchants.
 model merchant_txns {
-  ID                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  MERCHANTACCOUNT      String
-  MERCHANTPHONE        String
-  AMOUNT               Float
-  TXNID                String
-  CUSTOMERNAME         String
-  CUSTOMERACCOUNT      String
-  T24USER              String
-  T2TRANSACTIONDATE    DateTime?
-  STATUS               String
-  TRANSACTIONCHANNEL   String
-  TRANSACTIONSERVICE   String
-  VALUE1               String?
-  VALUE2               String?
-  VALUE3               String?
-  INSERTDATE           DateTime?
-  UPDATEDATE           DateTime?
-  INSERTUSER           String?
-  UPDATEUSER           String?
+  ID                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  MERCHANTACCOUNT     String
+  MERCHANTPHONE       String
+  AMOUNT              Float
+  TXNID               String
+  CUSTOMERNAME        String
+  CUSTOMERACCOUNT     String
+  T24USER             String
+  T2TRANSACTIONDATE   DateTime?
+  STATUS              String
+  TRANSACTIONCHANNEL  String
+  TRANSACTIONSERVICE  String
+  VALUE1              String?
+  VALUE2              String?
+  VALUE3              String?
+  INSERTDATE          DateTime? @default(now())
+  UPDATEDATE          DateTime? @updatedAt
+  INSERTUSER          String
+  UPDATEUSER          String
 }
 
-// model arif_requests represents requests made to the ArifPay gateway.
 model arif_requests {
-  ID                       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  SESSIONID                String
-  NONCEID                  String
-  MERCHANTACCOUNT          String
-  AMOUNT                   Float
-  DATESEND1                DateTime?
-  DATERECIVED1             DateTime?
-  ARIFPAYTRANSACTIONID     String
-  ARIFPAYTRANSACTIONSTATUS String?
-  DATESEND2                DateTime?
-  DATERECIVED2             DateTime?
-  T24TRANSACTIONID         String?
-  T24TRANSACTIONSTATUS     String?
-  DATESEND3                DateTime?
-  DATERECIVED3             DateTime?
-  DEBITACCOUNT             String
-  DEBITAMOUNT              String
-  CREDITACCOUNT            String
-  CREDITAMOUNT             String
-  WEBHOOKRECEIVED          Boolean?
-  WEBHOOKRECEIVEDDATE      DateTime?
-  WEBHOOKJSON              String?
-  WEBHOOKSTATUS            String?
+  NONCEID                  String    @id @db.Uuid
+  SESSIONID                String?   @db.VarChar(500)
+  DEBITACCOUNT             String    @db.VarChar(30)
+  CREDITACCOUNT            String    @db.VarChar(30)
+  AMOUNT                   Decimal
+  MERCHANTACCOUNT          String    @db.VarChar(30)
+  SALESPHONE               String    @db.VarChar(20)
+  ARIFPAYTRANSACTIONID     String?   @db.VarChar(100)
+  ARIFPAYTRANSACTIONSTATUS String?   @db.VarChar(50)
+  T24TRANSACTIONSTATUS     String?   @db.VarChar(50)
+  REQUEST1                 String?
+  RESPONSE1                String?
+  REQUEST2                 String?
+  RESPONSE2                String?
+  REQUEST3                 String?
+  RESPONSE3                String?
+  WEBHOOKRESPONSE          String?
+  ERROR1                   String?   @db.VarChar(20)
+  MESSAGE1                 String?
+  ERROR2                   String?   @db.VarChar(20)
+  MESSAGE2                 String?
+  ERROR3                   String?   @db.VarChar(20)
+  MESSAGE3                 String?
+  DATESEND1                DateTime
+  DATERECIVED1             DateTime
+  DATESEND2                DateTime  @default(now())
+  DATERECIVED2             DateTime  @default(now())
+  DATESEND3                DateTime
+  DATERECIVED3             DateTime
+  WEBHOOKRECEIVEDDATE      DateTime
+  INSERTUSER               String?
+  UPDATEUSER               String?
+  T24TRANSACTIONID         String?   @db.VarChar(150)
 }
 
-// model arifpay_endpoints represents the configuration for different payment endpoints.
 model arifpay_endpoints {
-  ID                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  BANK               String
-  DISPLAYNAME        String
-  OTPLENGTH          Int
-  ORDER              Int
-  ENDPOINT1          String
-  ENDPOINT2          String
-  ENDPOINT3          String
-  CANCELURL          String
-  ERRORURL           String
-  SUCCESSURL         String
-  NOTIFYURL          String
-  ISTWOSTEP          Boolean
-  ISOTP              Boolean
-  TRANSACTIONTYPE    String
-  BENEFICIARYACCOUNT String
-  BENEFICIARYBANK    String
-  IMAGEURL           String
-  INSERTDATE         DateTime?
-  UPDATEDATE         DateTime?
-  INSERTUSER         String?
-  UPDATEUSER         String?
+  ID                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  BANK                String
+  DISPLAYNAME         String
+  OTPLENGTH           Int
+  ORDER               Int
+  ENDPOINT1           String
+  ENDPOINT2           String?
+  ENDPOINT3           String?
+  CANCELURL           String
+  ERRORURL            String
+  SUCCESSURL          String
+  NOTIFYURL           String
+  ISTWOSTEP           Boolean
+  ISOTP               Boolean
+  TRANSACTIONTYPE     String
+  BENEFICIARYACCOUNT  String
+  BENEFICIARYBANK     String
+  IMAGEURL            String
+  INSERTDATE          DateTime? @default(now())
+  UPDATEDATE          DateTime? @updatedAt
+  INSERTUSER          String
+  UPDATEUSER          String
 }
 
-// model controllersconfigs represents configurations for controllers.
 model controllersconfigs {
-  ID           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ID            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   CONTROLLERKEY String
-  APIKEY       String
-  INSERTDATE   DateTime?
-  UPDATEDATE   DateTime?
-  INSERTUSER   String?
-  UPDATEUSER   String?
+  APIKEY        String
+  INSERTDATE    DateTime? @default(now())
+  UPDATEDATE    DateTime? @updatedAt
+  INSERTUSER    String
+  UPDATEUSER    String
 }
 
-// model core_integration_settings represents settings for core banking integration.
 model core_integration_settings {
-  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  UNIQUEKEY  String    @unique
-  ADDRESS    String
-  USERNAME   String
-  PASSWORD   String
-  INSERTDATE DateTime?
-  UPDATEDATE DateTime?
-  INSERTUSER String?
-  UPDATEUSER String?
+  ID          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  UNIQUEKEY   String
+  ADDRESS     String
+  USERNAME    String
+  PASSWORD    String
+  INSERTDATE  DateTime? @default(now())
+  UPDATEDATE  DateTime? @updatedAt
+  INSERTUSER  String
+  UPDATEUSER  String
 }
 
-// model paystream_txns represents transactions from the PayStream service.
 model paystream_txns {
-  ID                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  MERCHANTACCOUNTNUMBER   String
-  SALERPHONENUMBER        String
-  TICKET                  String
-  ISCOMPLETED             Boolean
-  AMOUNT                  Decimal   @db.Decimal(18, 2)
-  PAYERACCOUNT            String?
-  INSERTDATE              DateTime?
-  UPDATEDATE              DateTime?
-  INSERTUSER              String?
-  UPDATEUSER              String?
+  ID                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  MERCHANTACCOUNTNUMBER String
+  SALERPHONENUMBER      String
+  TICKET                String
+  ISCOMPLETED           Boolean
+  AMOUNT                String
+  PAYERACCOUNT          String?
+  INSERTDATE            DateTime? @default(now())
+  UPDATEDATE            DateTime? @updatedAt
+  INSERTUSER            String
+  UPDATEUSER            String
 }
 
-// model stream_pay_settings represents settings for the StreamPay service.
 model stream_pay_settings {
-  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ADDRESS    String
-  IV         String
-  KEY        String
-  HV         String
-  USERNAME   String
-  PASSWORD   String
-  INSERTDATE DateTime?
-  UPDATEDATE DateTime?
-  INSERTUSER String?
-  UPDATEUSER String?
+  ID          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ADDRESS     String
+  IV          String
+  KEY         String
+  HV          String
+  USERNAME    String
+  PASSWORD    String
+  INSERTDATE  DateTime? @default(now())
+  UPDATEDATE  DateTime? @updatedAt
+  INSERTUSER  String
+  UPDATEUSER  String
 }
 
-// model ussd_push_settings represents settings for USSD push notifications.
 model ussd_push_settings {
   ID          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ADDRESS     String
   RESULTURL   String
   USERNAME    String
   PASSWORD    String
-  INSERTDATE  DateTime?
-  UPDATEDATE  DateTime?
-  INSERTUSER  String?
-  UPDATEUSER  String?
+  INSERTDATE  DateTime? @default(now())
+  UPDATEDATE  DateTime? @updatedAt
+  INSERTUSER  String
+  UPDATEUSER  String
 }
 
-// model qr_payments represents payments made via QR codes.
 model qr_payments {
   ID               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   DEBITACCOUNT     String
   CREDITACCOUNT    String
   SALERPHONENUMBER String
   AMOUNT           Float
-  EXPIRETIME       DateTime
+  EXPIRETIME       DateTime?
   QRCODE           String
   ISUSED           Boolean
-  INSERTDATE       DateTime?
-  UPDATEDATE       DateTime?
-  INSERTUSER       String?
-  UPDATEUSER       String?
+  INSERTDATE       DateTime? @default(now())
+  UPDATEDATE       DateTime? @updatedAt
+  INSERTUSER       String
+  UPDATEUSER       String
 }
 
-// model account_infos represents additional information for accounts.
 model account_infos {
-  ID            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ACCOUNTNUMBER String    @unique
+  ID            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ACCOUNTNUMBER String
   PHONENUMBER   String
   FULLNAME      String
   GENDER        String
   VALUE1        String?
   VALUE2        String?
-  INSERTDATE    DateTime?
-  UPDATEDATE    DateTime?
-  INSERTUSER    String?
-  UPDATEUSER    String?
+  INSERTDATE    DateTime? @default(now())
+  UPDATEDATE    DateTime? @updatedAt
+  INSERTUSER    String
+  UPDATEUSER    String
 }
 
-// model promo_adds represents promotional advertisements.
 model promo_adds {
-  ID           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ADDTITLE     String
-  ADDSUBTITLE  String
-  ADDADDRESS   String
-  IMAGEADDRESS String
-  ORDER        Int
-  INSERTUSERID String?
-  UPDATEUSERID String?
-  INSERTDATE   DateTime?
-  UPDATEDATE   DateTime?
+  ID            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ADDTITLE      String
+  ADDSUBTITLE   String
+  ADDADDRESS    String
+  IMAGEADDRESS  String
+  ORDER         Int
+  INSERTUSERID  String
+  UPDATEUSERID  String
+  INSERTDATE    DateTime? @default(now())
+  UPDATEDATE    DateTime? @updatedAt
 }
 
-// model role_capablities represents the capabilities or permissions for a role.
 model role_capablities {
   ID           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ROLEID       String    @db.Uuid
@@ -297,35 +301,36 @@ model role_capablities {
   PARENT       Boolean?
   PARENTID     String?
   VALUE3       String?
-  INSERTUSERID String?
-  UPDATEUSERID String?
-  INSERTDATE   DateTime?
-  UPDATEDATE   DateTime?
-  Role         Roles     @relation(fields: [ROLEID], references: [ID])
-}
-
-// model DashBoardRoles represents the roles available in the dashboard.
-model DashBoardRoles {
-  id          String   @id @db.Uuid
-  name        String   @unique
-  description String?
-  permissions Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  BranchUser  BranchUser[]
-  Merchant_users Merchant_users[]
+  INSERTUSERID String
+  UPDATEUSERID String
+  INSERTDATE   DateTime? @default(now())
+  UPDATEDATE   DateTime? @updatedAt
+  Roles        Roles?    @relation(fields: [ROLEID], references: [ID])
 }
 
 model Roles {
-    ID String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-    ROLENAME String @unique
-    VALUE1 String?
-    VALUE2 String?
-    VALUE3 String?
-    INSERTUSERID String?
-    UPDATEUSERID String?
-    INSERTDATE DateTime? @default(now())
-    UPDATEDATE DateTime? @updatedAt
-    Merchant_users Merchant_users[]
-    Role_capablities role_capablities[]
+  ID           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ROLENAME     String  @unique @db.VarChar(100)
+  VALUE1       String?
+  VALUE2       String?
+  VALUE3       String?
+  INSERTUSERID String?
+  UPDATEUSERID String?
+  INSERTDATE   DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE   DateTime? @updatedAt @db.Timestamp()
+  Merchant_users Merchant_users[]
+  role_capablities role_capablities[]
+}
+
+model DashBoardRoles {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique
+  description String?
+  permissions Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  BranchUser BranchUser[]
+  Merchant_users Merchant_users[]
+
+  @@map("dashboard_roles")
 }

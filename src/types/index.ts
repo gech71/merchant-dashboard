@@ -1,14 +1,15 @@
 
 import { Prisma } from '@prisma/client';
 
-export type arif_requests = Omit<Prisma.arif_requestsGetPayload<{}>, 'DATESEND1' | 'DATERECIVED1' | 'DATESEND2' | 'DATERECIVED2' | 'DATESEND3' | 'DATERECIVED3' | 'WEBHOOKRECEIVEDDATE'> & {
-  DATESEND1: string | null;
-  DATERECIVED1: string | null;
-  DATESEND2: string | null;
-  DATERECIVED2: string | null;
-  DATESEND3: string | null;
-  DATERECIVED3: string | null;
-  WEBHOOKRECEIVEDDATE: string | null;
+export type arif_requests = Omit<Prisma.arif_requestsGetPayload<{}>, 'AMOUNT' | 'DATESEND1' | 'DATERECIVED1' | 'DATESEND2' | 'DATERECIVED2' | 'DATESEND3' | 'DATERECIVED3' | 'WEBHOOKRECEIVEDDATE'> & {
+  AMOUNT: Prisma.Decimal;
+  DATESEND1: string;
+  DATERECIVED1: string;
+  DATESEND2: string;
+  DATERECIVED2: string;
+  DATESEND3: string;
+  DATERECIVED3: string;
+  WEBHOOKRECEIVEDDATE: string;
 };
 
 export type allowed_companies = Omit<Prisma.allowed_companiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
