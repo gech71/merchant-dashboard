@@ -45,18 +45,19 @@ export function AddAllowedCompanyForm({
     },
   });
 
-  const handleGenerateName = () => {
+  const handleGenerateName = async () => {
+    // 1. Trigger validation and get the value
+    const isAccountNumberValid = await form.trigger('ACCOUNTNUMBER');
     const accountNumber = form.getValues('ACCOUNTNUMBER');
-    // Trigger validation for ACCOUNTNUMBER field
-    form.trigger('ACCOUNTNUMBER');
-    
-    // Check if the account number field has errors
-    if (form.formState.errors.ACCOUNTNUMBER) {
+
+    // 2. If client-side validation fails (e.g., too short), stop here
+    if (!isAccountNumberValid) {
         form.setValue('FIELDNAME', '');
         setFieldNameIsSet(false);
         return;
     }
     
+    // 3. Check for duplicates
     const alreadyExists = allowedCompanies.some(c => c.ACCOUNTNUMBER === accountNumber);
     if (alreadyExists) {
         form.setError('ACCOUNTNUMBER', {
@@ -68,15 +69,17 @@ export function AddAllowedCompanyForm({
         return;
     }
 
+    // 4. If all is well, generate name
     const randomName = `NewCo-${Math.floor(Math.random() * 10000)}`;
     form.setValue('FIELDNAME', randomName, { shouldValidate: true });
     setFieldNameIsSet(true);
-    form.clearErrors('ACCOUNTNUMBER');
+    form.clearErrors('ACCOUNTNUMBER'); // Clear any previous errors
   }
 
   async function onSubmit(data: AllowedCompanyFormValues) {
     setIsLoading(true);
     
+    // Final check for safety, though handleGenerateName should prevent this state
     const alreadyExists = allowedCompanies.some(c => c.ACCOUNTNUMBER === data.ACCOUNTNUMBER);
     if (alreadyExists) {
         form.setError('ACCOUNTNUMBER', {
