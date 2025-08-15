@@ -89,6 +89,7 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
   } | null>({ key: 'FULLNAME', direction: 'ascending' });
   const [activeTab, setActiveTab] = React.useState('all');
   const [companyFilter, setCompanyFilter] = React.useState('all');
+  const [searchField, setSearchField] = React.useState('all');
   const [currentPage, setCurrentPage] = React.useState(1);
   
 
@@ -115,7 +116,7 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
 
     if (activeTab !== 'all') {
       sortableItems = sortableItems.filter(
-        (merchant) => merchant.STATUS.toUpperCase() === activeTab
+        (merchant) => merchant.STATUS.toUpperCase() === activeTab.toUpperCase()
       );
     }
     
@@ -125,13 +126,20 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
 
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
-      sortableItems = sortableItems.filter((merchant) =>
-        Object.values(merchant).some(
-          (value) =>
-            typeof value === 'string' &&
-            value.toLowerCase().includes(lowercasedTerm)
-        ) || getCompanyName(merchant.ACCOUNTNUMBER).toLowerCase().includes(lowercasedTerm)
-      );
+      sortableItems = sortableItems.filter((merchant) => {
+        if (searchField === 'all') {
+          return Object.values(merchant).some(
+              (value) =>
+                typeof value === 'string' &&
+                value.toLowerCase().includes(lowercasedTerm)
+            ) || getCompanyName(merchant.ACCOUNTNUMBER).toLowerCase().includes(lowercasedTerm)
+        }
+        if (searchField === 'company') {
+          return getCompanyName(merchant.ACCOUNTNUMBER).toLowerCase().includes(lowercasedTerm);
+        }
+        const field_value = merchant[searchField as keyof Merchant_users] as string;
+        return field_value?.toLowerCase().includes(lowercasedTerm)
+      });
     }
 
     if (sortConfig !== null) {
@@ -156,7 +164,7 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
     }
 
     return sortableItems;
-  }, [contextMerchants, searchTerm, sortConfig, activeTab, companyFilter, allowedCompanies]);
+  }, [contextMerchants, searchTerm, sortConfig, activeTab, companyFilter, searchField, allowedCompanies]);
   
   const paginatedMerchants = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -187,7 +195,7 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
             </TabsList>
           <div className="ml-auto flex items-center gap-2">
             <Select value={companyFilter} onValueChange={setCompanyFilter}>
-                <SelectTrigger className="h-8 w-[150px] lg:w-[250px]">
+                <SelectTrigger className="h-8 w-[150px] lg:w-[200px]">
                     <SelectValue placeholder="Filter by company" />
                 </SelectTrigger>
                 <SelectContent>
@@ -199,12 +207,26 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
                     ))}
                 </SelectContent>
             </Select>
-            <Input
-              placeholder="Search users..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-8 w-[150px] lg:w-[250px]"
-            />
+            <div className="flex items-center gap-2">
+                <Select value={searchField} onValueChange={setSearchField}>
+                    <SelectTrigger className="h-8 w-[140px]">
+                        <SelectValue placeholder="Search by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Fields</SelectItem>
+                        <SelectItem value="FULLNAME">User Name</SelectItem>
+                        <SelectItem value="ACCOUNTNUMBER">Account No.</SelectItem>
+                        <SelectItem value="PHONENUMBER">Phone No.</SelectItem>
+                        <SelectItem value="company">Company</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Input
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-8 w-[150px] lg:w-[200px]"
+                />
+            </div>
           </div>
         </div>
         <TabsContent value={activeTab}>
