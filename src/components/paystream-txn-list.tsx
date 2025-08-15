@@ -3,8 +3,11 @@
 
 import * as React from 'react';
 import type { paystream_txns } from '@/types';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, Calendar as CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
 
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -23,6 +26,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { useDataContext } from '@/context/data-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
@@ -40,6 +49,7 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
   const [currentPage, setCurrentPage] = React.useState(1);
   const [companyFilter, setCompanyFilter] = React.useState('all');
   const [searchField, setSearchField] = React.useState('all');
+  const [date, setDate] = React.useState<DateRange | undefined>();
 
   const getCompanyName = (accountNumber: string | null) => {
     if (!accountNumber) return 'N/A';
@@ -68,6 +78,22 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
   const filteredAndSortedTxns = React.useMemo(() => {
     let sortableItems = [...initialPaystreamTxns];
     
+     if (date?.from) {
+      sortableItems = sortableItems.filter(txn => {
+          if (!txn.INSERTDATE) return false;
+          const txnDate = new Date(txn.INSERTDATE);
+          if (date.from && !date.to) {
+              return txnDate >= date.from;
+          }
+          if (date.from && date.to) {
+              const toDate = new Date(date.to);
+              toDate.setHours(23, 59, 59, 999);
+              return txnDate >= date.from && txnDate <= toDate;
+          }
+          return true;
+      });
+    }
+
     if (companyFilter !== 'all') {
         sortableItems = sortableItems.filter(txn => txn.MERCHANTACCOUNTNUMBER === companyFilter);
     }
@@ -107,7 +133,7 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
     }
 
     return sortableItems;
-  }, [initialPaystreamTxns, searchTerm, sortConfig, allowedCompanies, merchants, companyFilter, searchField]);
+  }, [initialPaystreamTxns, searchTerm, sortConfig, allowedCompanies, merchants, companyFilter, searchField, date]);
 
   const paginatedTxns = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -131,18 +157,56 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-between gap-2 py-4">
-           <Select value={companyFilter} onValueChange={setCompanyFilter}>
-              <SelectTrigger className="h-9 w-[180px]">
-                  <SelectValue placeholder="Filter by company" />
-              </SelectTrigger>
-              <SelectContent>
-                  <SelectItem value="all">All Companies</SelectItem>
-                  {allowedCompanies.map(company => (
-                      <SelectItem key={company.Oid} value={company.ACCOUNTNUMBER}>{company.FIELDNAME}</SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
+        <div className="flex flex-wrap items-center justify-between gap-2 py-4">
+            <div className="flex flex-wrap items-center gap-2">
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                        id="date"
+                        variant={"outline"}
+                        className={cn(
+                            "h-9 w-[240px] justify-start text-left font-normal",
+                            !date && "text-muted-foreground"
+                        )}
+                        >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {date?.from ? (
+                            date.to ? (
+                            <>
+                                {format(date.from, "LLL dd, y")} -{" "}
+                                {format(date.to, "LLL dd, y")}
+                            </>
+                            ) : (
+                            format(date.from, "LLL dd, y")
+                            )
+                        ) : (
+                            <span>Filter by Insert Date</span>
+                        )}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                        initialFocus
+                        mode="range"
+                        defaultMonth={date?.from}
+                        selected={date}
+                        onSelect={setDate}
+                        numberOfMonths={2}
+                        />
+                    </PopoverContent>
+                </Popover>
+                <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                    <SelectTrigger className="h-9 w-[180px]">
+                        <SelectValue placeholder="Filter by company" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Companies</SelectItem>
+                        {allowedCompanies.map(company => (
+                            <SelectItem key={company.Oid} value={company.ACCOUNTNUMBER}>{company.FIELDNAME}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
             <div className="flex items-center gap-2">
                 <Select value={searchField} onValueChange={setSearchField}>
                     <SelectTrigger className="h-9 w-[150px]">
@@ -168,21 +232,21 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNTNUMBER')} className="px-2">Company{getSortIndicator('MERCHANTACCOUNTNUMBER')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('SALERPHONENUMBER')} className="px-2">Saler{getSortIndicator('SALERPHONENUMBER')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('TICKET')} className="px-2">Ticket{getSortIndicator('TICKET')}</Button></TableHead>
-                <TableHead>Is Completed</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">Amount{getSortIndicator('AMOUNT')}</Button></TableHead>
-                <TableHead>Payer Account</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('INSERTDATE')} className="px-2">Date{getSortIndicator('INSERTDATE')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNTNUMBER')} className="px-2">Merchant Account Number{getSortIndicator('MERCHANTACCOUNTNUMBER')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('SALERPHONENUMBER')} className="px-2">Saler Phone Number{getSortIndicator('SALERPHONENUMBER')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('TICKET')} className="px-2">Ticket{getSortIndicator('TICKET')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap">Is Completed</TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">Amount{getSortIndicator('AMOUNT')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap">Payer Account</TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('INSERTDATE')} className="px-2">Insert Date{getSortIndicator('INSERTDATE')}</Button></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedTxns.length > 0 ? (
                 paginatedTxns.map((txn) => (
                   <TableRow key={txn.ID}>
-                    <TableCell className="font-medium">{getCompanyName(txn.MERCHANTACCOUNTNUMBER)}</TableCell>
-                    <TableCell>{getSalerName(txn.SALERPHONENUMBER)}</TableCell>
+                    <TableCell className="font-medium">{txn.MERCHANTACCOUNTNUMBER}</TableCell>
+                    <TableCell>{txn.SALERPHONENUMBER}</TableCell>
                     <TableCell>{txn.TICKET}</TableCell>
                     <TableCell><Badge variant={txn.ISCOMPLETED ? 'default' : 'secondary'}>{txn.ISCOMPLETED ? 'Yes' : 'No'}</Badge></TableCell>
                     <TableCell className="text-right">{txn.AMOUNT.toFixed(2)}</TableCell>
@@ -227,3 +291,5 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
     </Card>
   );
 }
+
+    
