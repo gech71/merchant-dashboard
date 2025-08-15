@@ -74,9 +74,9 @@ const MOCK_CORE_INTEGRATION_SETTINGS = [
 ];
 
 const MOCK_PAYSTREAM_TXNS = [
-    { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT001', ISCOMPLETED: true, AMOUNT: 125.50, PAYERACCOUNT: 'PAYER001', INSERTDATE: new Date('2023-07-01'), UPDATEDATE: new Date('2023-07-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC002', SALERPHONENUMBER: '777-888-9999', TICKET: 'TKT002', ISCOMPLETED: false, AMOUNT: 300.00, PAYERACCOUNT: 'PAYER002', INSERTDATE: new Date('2023-07-02'), UPDATEDATE: new Date('2023-07-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT003', ISCOMPLETED: true, AMOUNT: 75.00, PAYERACCOUNT: 'PAYER003', INSERTDATE: new Date('2023-07-03'), UPDATEDATE: new Date('2023-07-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT001', ISCOMPLETED: true, AMOUNT: "125.50", PAYERACCOUNT: 'PAYER001', INSERTDATE: new Date('2023-07-01'), UPDATEDATE: new Date('2023-07-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC002', SALERPHONENUMBER: '777-888-9999', TICKET: 'TKT002', ISCOMPLETED: false, AMOUNT: "300.00", PAYERACCOUNT: 'PAYER002', INSERTDATE: new Date('2023-07-02'), UPDATEDATE: new Date('2023-07-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT003', ISCOMPLETED: true, AMOUNT: "75.00", PAYERACCOUNT: 'PAYER003', INSERTDATE: new Date('2023-07-03'), UPDATEDATE: new Date('2023-07-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
 const MOCK_STREAM_PAY_SETTINGS = [
@@ -130,11 +130,11 @@ async function main() {
     await prisma.arif_requests.deleteMany({});
     await prisma.merchant_txns.deleteMany({});
     await prisma.merchants_daily_balances.deleteMany({});
-    await prisma.branchUser.deleteMany({});
-    await prisma.merchant_users.deleteMany({});
+    await prisma.BranchUser.deleteMany({});
+    await prisma.Merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
-    await prisma.branch.deleteMany({});
-    await prisma.dashBoardRoles.deleteMany({});
+    await prisma.Branch.deleteMany({});
+    await prisma.DashBoardRoles.deleteMany({});
 
     // Create default roles
     const ALL_PAGES = [
@@ -149,7 +149,7 @@ async function main() {
         "/dashboard/role-management", "/dashboard/user-role-assignment"
     ];
 
-    const systemAdminRole = await prisma.dashBoardRoles.create({
+    const systemAdminRole = await prisma.DashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'System Admin',
@@ -158,7 +158,7 @@ async function main() {
         }
     });
 
-    const branchAdminRole = await prisma.dashBoardRoles.create({
+    const branchAdminRole = await prisma.DashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Branch Admin',
@@ -173,7 +173,7 @@ async function main() {
         }
     });
 
-    const branchUserRole = await prisma.dashBoardRoles.create({
+    const branchUserRole = await prisma.DashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Branch User',
@@ -187,7 +187,7 @@ async function main() {
         }
     });
 
-    const merchantAdminRole = await prisma.dashBoardRoles.create({
+    const merchantAdminRole = await prisma.DashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Merchant Admin',
@@ -202,7 +202,7 @@ async function main() {
         }
     });
 
-    const merchantSalesRole = await prisma.dashBoardRoles.create({
+    const merchantSalesRole = await prisma.DashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Merchant Sales',
@@ -217,7 +217,7 @@ async function main() {
     console.log('Seeded 5 default roles.');
 
     // Seed "All Branches" first
-    await prisma.branch.create({
+    await prisma.Branch.create({
         data: {
             id: randomUUID(),
             name: 'All Branches',
@@ -229,7 +229,7 @@ async function main() {
     });
     console.log('Seeded "All Branches" for system users.');
 
-    await prisma.branchUser.create({
+    await prisma.BranchUser.create({
         data: {
             id: randomUUID(),
             name: 'System Admin',
@@ -244,7 +244,7 @@ async function main() {
 
 
     for (const b of MOCK_BRANCHES) {
-        await prisma.branch.create({ data: b });
+        await prisma.Branch.create({ data: b });
     }
     console.log(`Seeded ${MOCK_BRANCHES.length} branches.`);
 
@@ -260,7 +260,7 @@ async function main() {
         } else {
             roleId = merchantSalesRole.id;
         }
-        await prisma.merchant_users.create({
+        await prisma.Merchant_users.create({
             data: {
                 ...m,
                 roleId: roleId,
@@ -270,7 +270,7 @@ async function main() {
     console.log(`Seeded ${MOCK_MERCHANT_USERS.length} merchant users.`);
 
     for (const bu of MOCK_BRANCH_USERS) {
-        await prisma.branchUser.create({ data: {
+        await prisma.BranchUser.create({ data: {
             ...bu,
             password: 'password123', // This will be hashed in a real app
             // Assign roles based on name for mock purposes
@@ -340,10 +340,15 @@ async function main() {
     console.log(`Seeded ${MOCK_PROMO_ADDS.length} promo adds.`);
 
     for (const rc of MOCK_ROLE_CAPABILITIES) {
-        await prisma.role_capablities.create({ data: {
-            ...rc,
-            PARENT: rc.PARENT === true
-        } });
+        const { ROLEID, ...rest } = rc;
+        const role = await prisma.DashBoardRoles.findFirst({ where: { name: ROLEID } });
+        if(role){
+            await prisma.role_capablities.create({ data: {
+                ...rest,
+                ROLEID: role.id,
+                PARENT: rc.PARENT === true
+            } });
+        }
     }
     console.log(`Seeded ${MOCK_ROLE_CAPABILITIES.length} role capabilities.`);
 
