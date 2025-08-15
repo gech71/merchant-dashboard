@@ -49,6 +49,7 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [date, setDate] = React.useState<DateRange | undefined>();
   const [companyFilter, setCompanyFilter] = React.useState('all');
+  const [merchantFilter, setMerchantFilter] = React.useState('all');
   const [searchField, setSearchField] = React.useState('all');
 
   const getCompanyName = (accountNumber: string | null) => {
@@ -110,6 +111,10 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
     if (companyFilter !== 'all') {
         sortableItems = sortableItems.filter(txn => txn.MERCHANTACCOUNT === companyFilter);
     }
+    
+    if (merchantFilter !== 'all') {
+        sortableItems = sortableItems.filter(txn => txn.MERCHANTPHONE === merchantFilter);
+    }
 
     if (searchTerm) {
         const lowercasedTerm = searchTerm.toLowerCase();
@@ -148,7 +153,7 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
     }
 
     return sortableItems;
-  }, [initialMerchantTxns, searchTerm, sortConfig, date, companyFilter, searchField, allowedCompanies, merchants]);
+  }, [initialMerchantTxns, searchTerm, sortConfig, date, companyFilter, merchantFilter, searchField, allowedCompanies, merchants]);
 
   const paginatedTxns = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -226,6 +231,19 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
                 ))}
               </SelectContent>
             </Select>
+             <Select value={merchantFilter} onValueChange={setMerchantFilter}>
+              <SelectTrigger className="h-9 w-full sm:w-[180px] lg:w-[200px]">
+                <SelectValue placeholder="Filter by merchant" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Merchants</SelectItem>
+                {merchants.map(merchant => (
+                  <SelectItem key={merchant.ID} value={merchant.PHONENUMBER}>
+                    {merchant.FULLNAME}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex items-center gap-2">
             <Select value={searchField} onValueChange={setSearchField}>
@@ -260,12 +278,6 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
                   <Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">
                     Amount
                     {getSortIndicator('AMOUNT')}
-                  </Button>
-                </TableHead>
-                 <TableHead>
-                  <Button variant="ghost" onClick={() => requestSort('STATUS')} className="px-2">
-                    Status
-                    {getSortIndicator('STATUS')}
                   </Button>
                 </TableHead>
                 <TableHead>
@@ -310,6 +322,12 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
                     {getSortIndicator('T2TRANSACTIONDATE')}
                   </Button>
                 </TableHead>
+                <TableHead>
+                  <Button variant="ghost" onClick={() => requestSort('STATUS')} className="px-2">
+                    Status
+                    {getSortIndicator('STATUS')}
+                  </Button>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -319,9 +337,6 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
                     <TableCell className="font-medium whitespace-nowrap">{getCompanyName(txn.MERCHANTACCOUNT)}</TableCell>
                     <TableCell className="font-medium whitespace-nowrap">{getMerchantName(txn.MERCHANTPHONE)}</TableCell>
                     <TableCell className="text-right">{txn.AMOUNT.toFixed(2)}</TableCell>
-                    <TableCell>
-                        <Badge variant={getStatusVariant(txn.STATUS)}>{txn.STATUS}</Badge>
-                    </TableCell>
                     <TableCell>{txn.TXNID}</TableCell>
                     <TableCell>{txn.CUSTOMERNAME}</TableCell>
                     <TableCell>{txn.CUSTOMERACCOUNT}</TableCell>
@@ -329,6 +344,9 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
                     <TableCell>{txn.TRANSACTIONCHANNEL}</TableCell>
                     <TableCell>{txn.TRANSACTIONSERVICE}</TableCell>
                     <TableCell>{txn.T2TRANSACTIONDATE ? new Date(txn.T2TRANSACTIONDATE).toLocaleString() : 'N/A'}</TableCell>
+                    <TableCell>
+                        <Badge variant={getStatusVariant(txn.STATUS)}>{txn.STATUS}</Badge>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
