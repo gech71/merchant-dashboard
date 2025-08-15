@@ -95,13 +95,13 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('BANK')} className="px-2">BANK{getSortIndicator('BANK')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('DISPLAYNAME')} className="px-2">DISPLAYNAME{getSortIndicator('DISPLAYNAME')}</Button></TableHead>
-                <TableHead>ISTWOSTEP</TableHead>
-                <TableHead>ISOTP</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('TRANSACTIONTYPE')} className="px-2">TRANSACTIONTYPE{getSortIndicator('TRANSACTIONTYPE')}</Button></TableHead>
-                <TableHead>BENEFICIARYACCOUNT</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('ORDER')} className="px-2">ORDER{getSortIndicator('ORDER')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('BANK')} className="px-2">Bank{getSortIndicator('BANK')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('DISPLAYNAME')} className="px-2">Display Name{getSortIndicator('DISPLAYNAME')}</Button></TableHead>
+                <TableHead>Two Step</TableHead>
+                <TableHead>OTP</TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('TRANSACTIONTYPE')} className="px-2">Transaction Type{getSortIndicator('TRANSACTIONTYPE')}</Button></TableHead>
+                <TableHead>Beneficiary Account</TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('ORDER')} className="px-2">Order{getSortIndicator('ORDER')}</Button></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
