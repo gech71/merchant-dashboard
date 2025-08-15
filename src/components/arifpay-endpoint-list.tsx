@@ -97,24 +97,26 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
         <CardDescription>A list of all configured ArifPay payment gateway endpoints.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-between gap-2 py-4">
-           <Select value={searchField} onValueChange={setSearchField}>
-                <SelectTrigger className="h-9 w-[180px]">
-                    <SelectValue placeholder="Search by" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">All Fields</SelectItem>
-                    <SelectItem value="BANK">Bank</SelectItem>
-                    <SelectItem value="DISPLAYNAME">Display Name</SelectItem>
-                    <SelectItem value="TRANSACTIONTYPE">Transaction Type</SelectItem>
-                </SelectContent>
-            </Select>
-            <Input
-              placeholder="Search endpoints..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-9 max-w-sm"
-            />
+        <div className="flex items-center justify-end py-4">
+           <div className="flex items-center gap-2">
+             <Select value={searchField} onValueChange={setSearchField}>
+                  <SelectTrigger className="h-9 w-[180px]">
+                      <SelectValue placeholder="Search by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      <SelectItem value="all">All Fields</SelectItem>
+                      <SelectItem value="BANK">Bank</SelectItem>
+                      <SelectItem value="DISPLAYNAME">Display Name</SelectItem>
+                      <SelectItem value="TRANSACTIONTYPE">Transaction Type</SelectItem>
+                  </SelectContent>
+              </Select>
+              <Input
+                placeholder="Search endpoints..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-9 max-w-sm"
+              />
+          </div>
         </div>
         <div className="rounded-md border">
           <TooltipProvider>
