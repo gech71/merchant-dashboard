@@ -2,8 +2,8 @@
 'use client';
 
 import * as React from 'react';
-import type { Merchant_users, EditableItem, allowed_companies } from '@/types';
-import { ArrowUpDown, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
+import type { Merchant_users, allowed_companies } from '@/types';
+import { ArrowUpDown } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,13 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Card,
   CardContent,
@@ -38,42 +31,50 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { useDataContext } from '@/context/data-context';
-import { useToast } from '@/hooks/use-toast';
 
 type SortableKeys = 'FULLNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'ROLE';
 const ITEMS_PER_PAGE = 15;
 
-export default function MerchantList({ merchants: initialMerchants, approvalView = false }: { merchants: Merchant_users[], approvalView?: boolean }) {
-  const { merchants: contextMerchants, updateMerchantStatus, allowedCompanies } = useDataContext();
-  const { toast } = useToast();
+const StatusBadge = ({ status }: { status: string }) => {
+    let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'outline';
+    let text = 'Unknown';
+
+    switch (status?.toUpperCase()) {
+        case 'A':
+            variant = 'default';
+            text = 'Active';
+            break;
+        case 'P':
+            variant = 'secondary';
+            text = 'Pending';
+            break;
+        case 'B':
+            variant = 'destructive';
+            text = 'Blocked';
+            break;
+        default:
+            text = status;
+            break;
+    }
+    return <Badge variant={variant}>{text}</Badge>;
+};
+
+
+export default function MerchantList({ merchants: initialMerchants }: { merchants: Merchant_users[] }) {
+  const { merchants: contextMerchants, allowedCompanies } = useDataContext();
   const [merchants, setMerchants] = React.useState(initialMerchants);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'FULLNAME', direction: 'ascending' });
-  const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
+  const [activeTab, setActiveTab] = React.useState('all');
   const [currentPage, setCurrentPage] = React.useState(1);
 
   React.useEffect(() => {
     setMerchants(initialMerchants);
   }, [initialMerchants]);
   
-  const handleStatusChange = async (merchantId: string, status: 'Active' | 'Disabled') => {
-    try {
-      await updateMerchantStatus(merchantId, status);
-      toast({
-        title: 'Merchant Status Updated',
-        description: `The merchant has been ${status === 'Active' ? 'approved' : 'rejected'}.`,
-      });
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Update Failed',
-        description: 'Could not update the merchant status.',
-      });
-    }
-  };
 
   const getCompanyName = (accountNumber: string) => {
     const company = allowedCompanies.find(c => c.ACCOUNTNUMBER === accountNumber);
@@ -93,15 +94,12 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
   };
 
   const filteredAndSortedMerchants = React.useMemo(() => {
-    let sourceData = approvalView ? contextMerchants : merchants;
+    let sourceData = contextMerchants;
     let sortableItems = [...sourceData];
 
-    if (approvalView) {
-      sortableItems = sortableItems.filter(m => m.STATUS === 'Pending');
-    }
-    else if (activeTab !== 'all') {
+    if (activeTab !== 'all') {
       sortableItems = sortableItems.filter(
-        (merchant) => merchant.STATUS.toLowerCase() === activeTab
+        (merchant) => merchant.STATUS.toUpperCase() === activeTab.toUpperCase()
       );
     }
 
@@ -130,7 +128,6 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
         return 0;
       });
     } else {
-        // Default sort: Admin first
         sortableItems.sort((a, b) => {
             if (a.ROLE === 'Admin' && b.ROLE !== 'Admin') return -1;
             if (a.ROLE !== 'Admin' && b.ROLE === 'Admin') return 1;
@@ -139,7 +136,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     }
 
     return sortableItems;
-  }, [merchants, contextMerchants, searchTerm, sortConfig, activeTab, approvalView, allowedCompanies]);
+  }, [contextMerchants, searchTerm, sortConfig, activeTab, allowedCompanies]);
   
   const paginatedMerchants = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -158,32 +155,16 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     );
   };
   
-  const getStatusVariant = (status: Merchant_users['STATUS']) => {
-    switch (status) {
-      case 'Active':
-        return 'default';
-      case 'Pending':
-        return 'secondary';
-      case 'Disabled':
-        return 'destructive';
-      default:
-        return 'outline';
-    }
-  };
-
-
   return (
     <>
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
         <div className="flex items-center">
-          {!approvalView && (
             <TabsList>
               <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="active">Active</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
-              <TabsTrigger value="disabled">Disabled</TabsTrigger>
+              <TabsTrigger value="A">Active</TabsTrigger>
+              <TabsTrigger value="P">Pending</TabsTrigger>
+              <TabsTrigger value="B">Blocked</TabsTrigger>
             </TabsList>
-          )}
           <div className="ml-auto flex items-center gap-2">
             <Input
               placeholder="Search users..."
@@ -196,9 +177,9 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
         <TabsContent value={activeTab}>
           <Card>
             <CardHeader>
-              <CardTitle>{approvalView ? 'Merchant User Approvals' : 'Merchant Users'}</CardTitle>
+              <CardTitle>Merchant Users</CardTitle>
               <CardDescription>
-                {approvalView ? 'Review and approve pending merchant users.' : 'Manage all merchant admins and sales representatives.'}
+                Manage all merchant admins and sales representatives.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -246,7 +227,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                           </TableCell>
                           <TableCell className="hidden md:table-cell">{merchantUser.PHONENUMBER}</TableCell>
                           <TableCell>
-                            <Badge variant={getStatusVariant(merchantUser.STATUS)}>{merchantUser.STATUS}</Badge>
+                            <StatusBadge status={merchantUser.STATUS} />
                           </TableCell>
                         </TableRow>
                       ))
