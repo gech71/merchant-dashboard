@@ -33,8 +33,9 @@ export function AddAllowedCompanyForm({
   setOpen: (open: boolean) => void,
 }) {
   const { toast } = useToast();
-  const { addAllowedCompany } = useDataContext();
+  const { addAllowedCompany, allowedCompanies } = useDataContext();
   const [isLoading, setIsLoading] = React.useState(false);
+  const [fieldNameIsSet, setFieldNameIsSet] = React.useState(false);
 
   const form = useForm<AllowedCompanyFormValues>({
     resolver: zodResolver(allowedCompanyFormSchema),
@@ -44,8 +45,47 @@ export function AddAllowedCompanyForm({
     },
   });
 
+  const handleAccountBlur = () => {
+    const accountNumber = form.getValues('ACCOUNTNUMBER');
+    if (accountNumber && accountNumber.length >= 4) {
+        // Check for duplicates before generating name
+        const alreadyExists = allowedCompanies.some(c => c.ACCOUNTNUMBER === accountNumber);
+        if (alreadyExists) {
+            form.setError('ACCOUNTNUMBER', {
+                type: 'manual',
+                message: 'Company with this account number already exists.',
+            });
+            form.setValue('FIELDNAME', '');
+            setFieldNameIsSet(false);
+            return;
+        }
+
+        // Generate a random field name
+        const randomName = `NewCo-${Math.floor(Math.random() * 10000)}`;
+        form.setValue('FIELDNAME', randomName);
+        setFieldNameIsSet(true);
+        // Clear previous error if any
+        form.clearErrors('ACCOUNTNUMBER');
+    } else {
+        form.setValue('FIELDNAME', '');
+        setFieldNameIsSet(false);
+    }
+  }
+
   async function onSubmit(data: AllowedCompanyFormValues) {
     setIsLoading(true);
+    
+    // Final check for duplicates before submission
+    const alreadyExists = allowedCompanies.some(c => c.ACCOUNTNUMBER === data.ACCOUNTNUMBER);
+    if (alreadyExists) {
+        form.setError('ACCOUNTNUMBER', {
+            type: 'manual',
+            message: 'Company with this account number already exists.',
+        });
+        setIsLoading(false);
+        return;
+    }
+
     try {
         await addAllowedCompany(data);
         toast({
@@ -69,12 +109,12 @@ export function AddAllowedCompanyForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="FIELDNAME"
+          name="ACCOUNTNUMBER"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>FIELDNAME</FormLabel>
+              <FormLabel>ACCOUNTNUMBER</FormLabel>
               <FormControl>
-                <Input placeholder="Innovate Inc." {...field} />
+                <Input placeholder="Enter account number to generate a name" {...field} onBlur={handleAccountBlur} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -82,12 +122,12 @@ export function AddAllowedCompanyForm({
         />
         <FormField
           control={form.control}
-          name="ACCOUNTNUMBER"
+          name="FIELDNAME"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>ACCOUNTNUMBER</FormLabel>
+              <FormLabel>FIELDNAME (Auto-generated)</FormLabel>
               <FormControl>
-                <Input placeholder="ACC12345" {...field} />
+                <Input placeholder="Will be auto-filled" {...field} readOnly />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -95,7 +135,7 @@ export function AddAllowedCompanyForm({
         />
         <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isLoading}>Cancel</Button>
-            <Button type="submit" disabled={isLoading}>{isLoading ? 'Adding...' : 'Add Company'}</Button>
+            <Button type="submit" disabled={isLoading || !fieldNameIsSet}>{isLoading ? 'Adding...' : 'Add Company'}</Button>
         </div>
       </form>
     </Form>
