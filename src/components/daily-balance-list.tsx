@@ -24,23 +24,26 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useDataContext } from '@/context/data-context';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type SortableKeys = 'MERCHANTACCOUNT' | 'MERCHANTPHONE' | 'DAILYBALANCE' | 'DAILYTXNCOUNT' | 'BALANCEDATE';
 const ITEMS_PER_PAGE = 15;
 
 export default function DailyBalanceList({ dailyBalances: initialDailyBalances }: { dailyBalances: merchants_daily_balances[] }) {
-  const { merchants } = useDataContext();
+  const { merchants, allowedCompanies } = useDataContext();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'BALANCEDATE', direction: 'descending' });
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [companyFilter, setCompanyFilter] = React.useState('all');
+  const [searchField, setSearchField] = React.useState('all');
 
   const getMerchantName = (accountNumber: string | null) => {
     if (!accountNumber) return 'N/A';
-    const merchant = merchants.find(m => m.ACCOUNTNUMBER === accountNumber);
-    return merchant ? merchant.FULLNAME : 'N/A';
+    const company = allowedCompanies.find(c => c.ACCOUNTNUMBER === accountNumber);
+    return company ? company.FIELDNAME : 'N/A';
   }
 
   const requestSort = (key: SortableKeys) => {
@@ -58,13 +61,21 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
   const filteredAndSortedBalances = React.useMemo(() => {
     let sortableItems = [...initialDailyBalances];
 
+    if (companyFilter !== 'all') {
+        sortableItems = sortableItems.filter(balance => balance.MERCHANTACCOUNT === companyFilter);
+    }
+
     if (searchTerm) {
         const lowercasedTerm = searchTerm.toLowerCase();
-        sortableItems = sortableItems.filter((balance) =>
-            (balance.MERCHANTACCOUNT && balance.MERCHANTACCOUNT.toLowerCase().includes(lowercasedTerm)) ||
-            getMerchantName(balance.MERCHANTACCOUNT).toLowerCase().includes(lowercasedTerm) ||
-            (balance.MERCHANTPHONE && balance.MERCHANTPHONE.toLowerCase().includes(lowercasedTerm))
-      );
+        sortableItems = sortableItems.filter((balance) => {
+            if (searchField === 'all') {
+                return getMerchantName(balance.MERCHANTACCOUNT).toLowerCase().includes(lowercasedTerm) ||
+                       (balance.MERCHANTACCOUNT && balance.MERCHANTACCOUNT.toLowerCase().includes(lowercasedTerm)) ||
+                       (balance.MERCHANTPHONE && balance.MERCHANTPHONE.toLowerCase().includes(lowercasedTerm));
+            }
+            const fieldValue = balance[searchField as keyof merchants_daily_balances] as string;
+            return fieldValue?.toLowerCase().includes(lowercasedTerm);
+        });
     }
 
     if (sortConfig !== null) {
@@ -83,7 +94,7 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
     }
 
     return sortableItems;
-  }, [initialDailyBalances, searchTerm, sortConfig]);
+  }, [initialDailyBalances, searchTerm, sortConfig, companyFilter, searchField, allowedCompanies]);
 
   const paginatedBalances = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -111,13 +122,38 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-end gap-2 py-4">
-          <Input
-            placeholder="Search by account, name, or phone..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
+        <div className="flex items-center justify-between gap-2 py-4">
+             <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                <SelectTrigger className="h-9 w-[180px] lg:w-[200px]">
+                    <SelectValue placeholder="Filter by company" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Companies</SelectItem>
+                    {allowedCompanies.map(company => (
+                        <SelectItem key={company.Oid} value={company.ACCOUNTNUMBER}>
+                            {company.FIELDNAME}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            <div className="flex items-center gap-2">
+                 <Select value={searchField} onValueChange={setSearchField}>
+                    <SelectTrigger className="h-9 w-[150px]">
+                        <SelectValue placeholder="Search by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Fields</SelectItem>
+                        <SelectItem value="MERCHANTACCOUNT">Account No.</SelectItem>
+                        <SelectItem value="MERCHANTPHONE">Phone No.</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Input
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="h-9 max-w-sm"
+                />
+            </div>
         </div>
         <div className="rounded-md border">
           <Table>
