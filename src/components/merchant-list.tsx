@@ -31,12 +31,14 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { useDataContext } from '@/context/data-context';
+import type { VariantProps } from 'class-variance-authority';
+import { badgeVariants } from '@/components/ui/badge';
 
 type SortableKeys = 'FULLNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'ROLE';
 const ITEMS_PER_PAGE = 15;
 
 const StatusBadge = ({ status }: { status: string }) => {
-    let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'outline';
+    let variant: VariantProps<typeof badgeVariants>["variant"] = 'outline';
     let text = 'Unknown';
 
     switch (status?.toUpperCase()) {
@@ -62,7 +64,6 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 export default function MerchantList({ merchants: initialMerchants }: { merchants: Merchant_users[] }) {
   const { merchants: contextMerchants, allowedCompanies } = useDataContext();
-  const [merchants, setMerchants] = React.useState(initialMerchants);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
@@ -70,10 +71,6 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
   } | null>({ key: 'FULLNAME', direction: 'ascending' });
   const [activeTab, setActiveTab] = React.useState('all');
   const [currentPage, setCurrentPage] = React.useState(1);
-
-  React.useEffect(() => {
-    setMerchants(initialMerchants);
-  }, [initialMerchants]);
   
 
   const getCompanyName = (accountNumber: string) => {
@@ -99,7 +96,7 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
 
     if (activeTab !== 'all') {
       sortableItems = sortableItems.filter(
-        (merchant) => merchant.STATUS.toUpperCase() === activeTab.toUpperCase()
+        (merchant) => merchant.STATUS.toUpperCase() === activeTab
       );
     }
 
