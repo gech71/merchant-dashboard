@@ -232,15 +232,15 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="whitespace-nowrap">Company</TableHead>
-                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNTNUMBER')} className="px-2">Merchant Account Number{getSortIndicator('MERCHANTACCOUNTNUMBER')}</Button></TableHead>
-                <TableHead className="whitespace-nowrap">Saler</TableHead>
-                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('SALERPHONENUMBER')} className="px-2">Saler Phone Number{getSortIndicator('SALERPHONENUMBER')}</Button></TableHead>
-                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('TICKET')} className="px-2">Ticket{getSortIndicator('TICKET')}</Button></TableHead>
-                <TableHead className="whitespace-nowrap">Is Completed</TableHead>
-                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">Amount{getSortIndicator('AMOUNT')}</Button></TableHead>
-                <TableHead className="whitespace-nowrap">Payer Account</TableHead>
-                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('INSERTDATE')} className="px-2">Insert Date{getSortIndicator('INSERTDATE')}</Button></TableHead>
+                <TableHead>Company</TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNTNUMBER')} className="px-2">Merchant Acct.{getSortIndicator('MERCHANTACCOUNTNUMBER')}</Button></TableHead>
+                <TableHead>Saler</TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('SALERPHONENUMBER')} className="px-2">Saler Phone{getSortIndicator('SALERPHONENUMBER')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('TICKET')} className="px-2">Ticket{getSortIndicator('TICKET')}</Button></TableHead>
+                <TableHead>Completed</TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">Amount{getSortIndicator('AMOUNT')}</Button></TableHead>
+                <TableHead>Payer Account</TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('INSERTDATE')} className="px-2">Date{getSortIndicator('INSERTDATE')}</Button></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -295,3 +295,5 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
     </Card>
   );
 }
+
+    
