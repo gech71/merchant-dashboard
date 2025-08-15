@@ -40,7 +40,7 @@ export type merchant_txns = Omit<Prisma.merchant_txnsGetPayload<{}>, 'T2TRANSACT
     UPDATEDATE: string | null;
 };
 
-export type BranchUser = Omit<Prisma.BranchUserGetPayload<{ include: { role: true } }>, 'password'> & { password?: string };
+export type BranchUser = Omit<Prisma.BranchUserGetPayload<{ include: { DashBoardRoles: true } }>, 'password'> & { password?: string };
 
 export type arifpay_endpoints = Omit<Prisma.arifpay_endpointsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
   INSERTDATE: string | null;
@@ -100,4 +100,9 @@ export type DashBoardRoles = Omit<Prisma.DashBoardRolesGetPayload<{}>, 'createdA
   updatedAt: string;
 };
 
-export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | role_capablities | DashBoardRoles | null;
+export type Roles = Omit<Prisma.RolesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
+    INSERTDATE: string | null;
+    UPDATEDATE: string | null;
+};
+
+export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | role_capablities | DashBoardRoles | Roles | null;
