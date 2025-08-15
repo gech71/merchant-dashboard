@@ -23,12 +23,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type SortableKeys = 'ACCOUNTNUMBER' | 'PHONENUMBER' | 'FULLNAME' | 'GENDER';
 const ITEMS_PER_PAGE = 15;
 
 export default function AccountInfoList({ accountInfos: initialAccountInfos }: { accountInfos: account_infos[] }) {
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchField, setSearchField] = React.useState('all');
+  const [accountFilter, setAccountFilter] = React.useState('all');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
@@ -42,18 +45,33 @@ export default function AccountInfoList({ accountInfos: initialAccountInfos }: {
     }
     setSortConfig({ key, direction });
   };
+  
+  const uniqueAccountNumbers = React.useMemo(() => {
+    const accounts = new Set(initialAccountInfos.map(info => info.ACCOUNTNUMBER));
+    return Array.from(accounts);
+  }, [initialAccountInfos]);
 
   const filteredAndSortedInfos = React.useMemo(() => {
     let sortableItems = [...initialAccountInfos];
+    
+    if (accountFilter !== 'all') {
+      sortableItems = sortableItems.filter(info => info.ACCOUNTNUMBER === accountFilter);
+    }
 
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
-      sortableItems = sortableItems.filter((info) =>
-        info.FULLNAME.toLowerCase().includes(lowercasedTerm) ||
-        info.ACCOUNTNUMBER.toLowerCase().includes(lowercasedTerm) ||
-        info.PHONENUMBER.toLowerCase().includes(lowercasedTerm) ||
-        info.GENDER.toLowerCase().includes(lowercasedTerm)
-      );
+      sortableItems = sortableItems.filter((info) => {
+        if (searchField === 'all') {
+          return (
+            info.FULLNAME.toLowerCase().includes(lowercasedTerm) ||
+            info.ACCOUNTNUMBER.toLowerCase().includes(lowercasedTerm) ||
+            info.PHONENUMBER.toLowerCase().includes(lowercasedTerm) ||
+            info.GENDER.toLowerCase().includes(lowercasedTerm)
+          );
+        }
+        const fieldValue = info[searchField as keyof account_infos] as string;
+        return fieldValue?.toLowerCase().includes(lowercasedTerm);
+      });
     }
 
     if (sortConfig !== null) {
@@ -67,7 +85,7 @@ export default function AccountInfoList({ accountInfos: initialAccountInfos }: {
     }
 
     return sortableItems;
-  }, [initialAccountInfos, searchTerm, sortConfig]);
+  }, [initialAccountInfos, searchTerm, searchField, accountFilter, sortConfig]);
 
   const paginatedInfos = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -86,13 +104,38 @@ export default function AccountInfoList({ accountInfos: initialAccountInfos }: {
         <CardDescription>A list of all account information records.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-end gap-2 py-4">
-          <Input
-            placeholder="Search by name, account, phone..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
+        <div className="flex items-center justify-between gap-2 py-4">
+           <Select value={accountFilter} onValueChange={setAccountFilter}>
+              <SelectTrigger className="h-9 w-[180px]">
+                  <SelectValue placeholder="Filter by Account" />
+              </SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="all">All Accounts</SelectItem>
+                  {uniqueAccountNumbers.map(acc => (
+                      <SelectItem key={acc} value={acc}>{acc}</SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+           <div className="flex items-center gap-2">
+            <Select value={searchField} onValueChange={setSearchField}>
+                <SelectTrigger className="h-9 w-[150px]">
+                    <SelectValue placeholder="Search by" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Fields</SelectItem>
+                    <SelectItem value="FULLNAME">Full Name</SelectItem>
+                    <SelectItem value="ACCOUNTNUMBER">Account Number</SelectItem>
+                    <SelectItem value="PHONENUMBER">Phone Number</SelectItem>
+                    <SelectItem value="GENDER">Gender</SelectItem>
+                </SelectContent>
+            </Select>
+            <Input
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-9 max-w-sm"
+            />
+          </div>
         </div>
         <div className="rounded-md border">
           <Table>
