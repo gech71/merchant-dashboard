@@ -203,7 +203,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
                           onClick={() => requestSort('FIELDNAME')}
                           className="px-2"
                         >
-                          FIELDNAME
+                          Company Name
                           {getSortIndicator('FIELDNAME')}
                         </Button>
                       </TableHead>
@@ -213,7 +213,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
                           onClick={() => requestSort('ACCOUNTNUMBER')}
                           className="px-2"
                         >
-                          ACCOUNTNUMBER
+                          Account Number
                           {getSortIndicator('ACCOUNTNUMBER')}
                         </Button>
                       </TableHead>
@@ -223,7 +223,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
                           onClick={() => requestSort('APPROVED')}
                           className="px-2"
                         >
-                          APPROVED
+                          Approved
                           {getSortIndicator('APPROVED')}
                         </Button>
                       </TableHead>
@@ -233,7 +233,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
                           onClick={() => requestSort('STATUS')}
                           className="px-2"
                         >
-                          STATUS
+                          Status
                           {getSortIndicator('STATUS')}
                         </Button>
                       </TableHead>
@@ -243,7 +243,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
                           onClick={() => requestSort('APPROVEUSER')}
                           className="px-2"
                         >
-                          APPROVEUSER
+                          Approved By
                           {getSortIndicator('APPROVEUSER')}
                         </Button>
                       </TableHead>
@@ -405,3 +405,5 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     </Dialog>
     </>
   );
+
+    
