@@ -49,7 +49,10 @@ export default function AccountInfoList({ accountInfos: initialAccountInfos }: {
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
       sortableItems = sortableItems.filter((info) =>
-        Object.values(info).some(val => String(val).toLowerCase().includes(lowercasedTerm))
+        info.FULLNAME.toLowerCase().includes(lowercasedTerm) ||
+        info.ACCOUNTNUMBER.toLowerCase().includes(lowercasedTerm) ||
+        info.PHONENUMBER.toLowerCase().includes(lowercasedTerm) ||
+        info.GENDER.toLowerCase().includes(lowercasedTerm)
       );
     }
 
@@ -85,7 +88,7 @@ export default function AccountInfoList({ accountInfos: initialAccountInfos }: {
       <CardContent>
         <div className="flex items-center justify-end gap-2 py-4">
           <Input
-            placeholder="Search records..."
+            placeholder="Search by name, account, phone..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="max-w-sm"
@@ -99,8 +102,6 @@ export default function AccountInfoList({ accountInfos: initialAccountInfos }: {
                 <TableHead><Button variant="ghost" onClick={() => requestSort('ACCOUNTNUMBER')} className="px-2">ACCOUNTNUMBER{getSortIndicator('ACCOUNTNUMBER')}</Button></TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('PHONENUMBER')} className="px-2">PHONENUMBER{getSortIndicator('PHONENUMBER')}</Button></TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('GENDER')} className="px-2">GENDER{getSortIndicator('GENDER')}</Button></TableHead>
-                <TableHead>VALUE1</TableHead>
-                <TableHead>VALUE2</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -111,13 +112,11 @@ export default function AccountInfoList({ accountInfos: initialAccountInfos }: {
                     <TableCell>{info.ACCOUNTNUMBER}</TableCell>
                     <TableCell>{info.PHONENUMBER}</TableCell>
                     <TableCell>{info.GENDER}</TableCell>
-                    <TableCell>{info.VALUE1 || 'N/A'}</TableCell>
-                    <TableCell>{info.VALUE2 || 'N/A'}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">No records found.</TableCell>
+                  <TableCell colSpan={4} className="h-24 text-center">No records found.</TableCell>
                 </TableRow>
               )}
             </TableBody>
