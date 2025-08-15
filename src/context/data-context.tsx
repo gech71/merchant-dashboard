@@ -60,7 +60,7 @@ type DataContextType = {
   addBranch: (branch: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE'>) => Promise<void>;
   updateBranch: (branch: Branch) => Promise<void>;
   addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord' | 'branchName'>) => Promise<void>;
-  updateAllowedCompany: (company: allowed_companies) => void;
+  updateAllowedCompany: (company: allowed_companies) => Promise<void>;
   updateMerchant: (merchant: Merchant_users) => Promise<void>;
   addBranchUser: (user: Omit<BranchUser, 'id' | 'status' | 'roleId' | 'DashBoardRoles' >) => Promise<void>;
   updateBranchUser: (user: BranchUser) => Promise<void>;
@@ -222,8 +222,22 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setAllowedCompanies(prev => [...prev, newCompany]);
   };
 
-  const updateAllowedCompany = (updatedCompany: allowed_companies) => {
-    setAllowedCompanies(prev => prev.map(c => c.Oid === updatedCompany.Oid ? {...updatedCompany, UPDATEDATE: new Date().toISOString(), UPDATEUSER: currentUser?.name || 'system'} : c));
+  const updateAllowedCompany = async (updatedCompany: allowed_companies) => {
+    const response = await fetch(`/api/allowed_companies/${updatedCompany.Oid}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            APPROVED: false, // Set to false to trigger re-approval
+            STATUS: false,
+            FIELDNAME: updatedCompany.FIELDNAME,
+            ACCOUNTNUMBER: updatedCompany.ACCOUNTNUMBER
+        })
+    });
+     if (!response.ok) {
+        throw new Error('Failed to update company');
+    }
+    const returnedCompany = await response.json();
+    setAllowedCompanies(prev => prev.map(c => c.Oid === returnedCompany.Oid ? returnedCompany : c));
   };
   
   const updateMerchant = async (updatedMerchant: Merchant_users) => {
@@ -357,9 +371,9 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
 
   const value = {
     branches: filteredBranches,
-    allowedCompanies: filteredAllowedCompanies,
-    merchants: filteredMerchants,
-    branchUsers: filteredBranchUsers,
+    allowedCompanies,
+    merchants,
+    branchUsers,
     dailyBalances,
     merchantTxns,
     arifRequests,

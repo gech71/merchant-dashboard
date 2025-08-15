@@ -22,30 +22,53 @@ export async function PUT(
     const { id } = context.params;
 
     const body = await request.json();
-    const { APPROVED, STATUS } = body;
+    const { APPROVED, STATUS, FIELDNAME, ACCOUNTNUMBER } = body;
 
-    if (typeof APPROVED !== 'boolean' || typeof STATUS !== 'boolean') {
-        return NextResponse.json({ message: 'Missing required approval fields' }, { status: 400 });
+    // This handles the case where we are just updating the approval status
+    if (typeof APPROVED === 'boolean' && typeof STATUS === 'boolean' && !FIELDNAME && !ACCOUNTNUMBER) {
+       const updatedCompany = await prisma.allowed_companies.update({
+        where: { Oid: id },
+        data: {
+          APPROVED,
+          STATUS,
+          APPROVEUSER: user.name,
+          UPDATEDATE: new Date(),
+          UPDATEUSER: user.name,
+        },
+      });
+      const updatedCompanySerializable = {
+          ...updatedCompany,
+          INSERTDATE: updatedCompany.INSERTDATE?.toISOString() ?? null,
+          UPDATEDATE: updatedCompany.UPDATEDATE?.toISOString() ?? null,
+      };
+      return NextResponse.json(updatedCompanySerializable, { status: 200 });
     }
 
-    const updatedCompany = await prisma.allowed_companies.update({
-      where: { Oid: id },
-      data: {
-        APPROVED,
-        STATUS,
-        APPROVEUSER: user.name,
-        UPDATEDATE: new Date(),
-        UPDATEUSER: user.name,
-      },
-    });
+    // This handles the case where we are editing the company details
+    if (FIELDNAME && ACCOUNTNUMBER) {
+         const updatedCompany = await prisma.allowed_companies.update({
+            where: { Oid: id },
+            data: {
+                FIELDNAME,
+                ACCOUNTNUMBER,
+                APPROVED: false, // Reset approval status on edit
+                STATUS: false,
+                APPROVEUSER: null, // Clear approver
+                UPDATEDATE: new Date(),
+                UPDATEUSER: user.name,
+            },
+        });
+        const updatedCompanySerializable = {
+            ...updatedCompany,
+            INSERTDATE: updatedCompany.INSERTDATE?.toISOString() ?? null,
+            UPDATEDATE: updatedCompany.UPDATEDATE?.toISOString() ?? null,
+        };
+        return NextResponse.json(updatedCompanySerializable, { status: 200 });
+    }
 
-    const updatedCompanySerializable = {
-        ...updatedCompany,
-        INSERTDATE: updatedCompany.INSERTDATE?.toISOString() ?? null,
-        UPDATEDATE: updatedCompany.UPDATEDATE?.toISOString() ?? null,
-    };
 
-    return NextResponse.json(updatedCompanySerializable, { status: 200 });
+    return NextResponse.json({ message: 'Invalid request body' }, { status: 400 });
+
   } catch (error) {
     console.error(`Error updating company:`, error);
     return NextResponse.json({ message: 'Something went wrong!' }, { status: 500 });

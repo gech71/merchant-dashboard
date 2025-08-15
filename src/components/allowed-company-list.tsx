@@ -1,9 +1,8 @@
-
 'use client';
 
 import * as React from 'react';
 import type { allowed_companies, EditableItem } from '@/types';
-import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowUpDown, PlusCircle, MoreHorizontal, CheckCircle, XCircle, Edit } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
@@ -42,10 +41,11 @@ import { useToast } from '@/hooks/use-toast';
 type SortableKeys = 'FIELDNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'APPROVEUSER' | 'APPROVED';
 const ITEMS_PER_PAGE = 15;
 
-export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowedCompanies: allowed_companies[], approvalView?: boolean }) {
-  const { allowedCompanies: contextCompanies, updateAllowedCompanyApproval, currentUser, branches, merchants, branchUsers } = useDataContext();
+export default function AllowedCompanyList({ allowedCompanies: initialCompanies, approvalView = false }: { allowed_companies[], approvalView?: boolean }) {
+  const { allowedCompanies: contextCompanies, updateAllowedCompanyApproval } = useDataContext();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchField, setSearchField] = React.useState('all');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
@@ -55,7 +55,6 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
   const [selectedCompany, setSelectedCompany] = React.useState<EditableItem>(null);
   const [activeTab, setActiveTab] = React.useState('all');
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [branchFilter, setBranchFilter] = React.useState('all');
 
   const handleApproval = async (companyId: string, isApproved: boolean) => {
     try {
@@ -95,12 +94,6 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
 
   const filteredAndSortedCompanies = React.useMemo(() => {
     let sortableItems = [...companiesSource];
-  
-    if (branchFilter !== 'all') {
-      const usersInBranch = branchUsers.filter(bu => bu.branch === branchFilter);
-      const accountsInBranch = new Set(merchants.filter(m => usersInBranch.some(u => u.email === m.PHONENUMBER)).map(m => m.ACCOUNTNUMBER));
-      sortableItems = sortableItems.filter(c => accountsInBranch.has(c.ACCOUNTNUMBER));
-    }
 
     if (!approvalView) {
       if (activeTab === 'active') {
@@ -114,9 +107,13 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
-      sortableItems = sortableItems.filter((company) =>
-        Object.values(company).some(val => String(val).toLowerCase().includes(lowercasedTerm))
-      );
+      sortableItems = sortableItems.filter((company) => {
+          if (searchField === 'all') {
+            return Object.values(company).some(val => String(val).toLowerCase().includes(lowercasedTerm))
+          }
+          const fieldValue = company[searchField as keyof allowed_companies] as string;
+          return fieldValue?.toLowerCase().includes(lowercasedTerm);
+      });
     }
 
     if (sortConfig !== null) {
@@ -137,7 +134,7 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     }
 
     return sortableItems;
-  }, [companiesSource, searchTerm, sortConfig, activeTab, approvalView, branchFilter, merchants, branchUsers]);
+  }, [companiesSource, searchTerm, searchField, sortConfig, activeTab, approvalView]);
   
   const paginatedCompanies = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -198,51 +195,31 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
                   <TableHeader>
                     <TableRow>
                       <TableHead>
-                        <Button
-                          variant="ghost"
-                          onClick={() => requestSort('FIELDNAME')}
-                          className="px-2"
-                        >
+                        <Button variant="ghost" onClick={() => requestSort('FIELDNAME')} className="px-2">
                           Company Name
                           {getSortIndicator('FIELDNAME')}
                         </Button>
                       </TableHead>
                       <TableHead>
-                        <Button
-                          variant="ghost"
-                          onClick={() => requestSort('ACCOUNTNUMBER')}
-                          className="px-2"
-                        >
+                        <Button variant="ghost" onClick={() => requestSort('ACCOUNTNUMBER')} className="px-2">
                           Account Number
                           {getSortIndicator('ACCOUNTNUMBER')}
                         </Button>
                       </TableHead>
                       <TableHead>
-                        <Button
-                          variant="ghost"
-                          onClick={() => requestSort('APPROVED')}
-                          className="px-2"
-                        >
+                        <Button variant="ghost" onClick={() => requestSort('APPROVED')} className="px-2">
                           Approved
                           {getSortIndicator('APPROVED')}
                         </Button>
                       </TableHead>
                        <TableHead>
-                        <Button
-                          variant="ghost"
-                          onClick={() => requestSort('STATUS')}
-                          className="px-2"
-                        >
+                        <Button variant="ghost" onClick={() => requestSort('STATUS')} className="px-2">
                           Status
                           {getSortIndicator('STATUS')}
                         </Button>
                       </TableHead>
                       <TableHead>
-                        <Button
-                          variant="ghost"
-                          onClick={() => requestSort('APPROVEUSER')}
-                          className="px-2"
-                        >
+                        <Button variant="ghost" onClick={() => requestSort('APPROVEUSER')} className="px-2">
                           Approved By
                           {getSortIndicator('APPROVEUSER')}
                         </Button>
@@ -277,7 +254,12 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                {!approvalView && <DropdownMenuItem onClick={() => handleEdit(company)}>Edit</DropdownMenuItem>}
+                                {!approvalView && !company.APPROVED && (
+                                  <DropdownMenuItem onClick={() => handleEdit(company)}>
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                )}
                                 {approvalView && !company.APPROVED && (
                                   <>
                                     <DropdownMenuItem onClick={() => handleApproval(company.Oid, true)}>
@@ -350,21 +332,18 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
             </TabsList>
           )}
           <div className="ml-auto flex items-center gap-2">
-            {!approvalView && (
-                <Select value={branchFilter} onValueChange={setBranchFilter}>
-                    <SelectTrigger className="h-8 w-[150px] lg:w-[200px]">
-                        <SelectValue placeholder="Filter by branch" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Branches</SelectItem>
-                        {branches.map(branch => (
-                            <SelectItem key={branch.id} value={branch.name}>{branch.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            )}
+            <Select value={searchField} onValueChange={setSearchField}>
+                <SelectTrigger className="h-8 w-[150px] lg:w-[180px]">
+                    <SelectValue placeholder="Search by" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Fields</SelectItem>
+                    <SelectItem value="FIELDNAME">Company Name</SelectItem>
+                    <SelectItem value="ACCOUNTNUMBER">Account Number</SelectItem>
+                </SelectContent>
+            </Select>
             <Input
-              placeholder="Search companies..."
+              placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-8 w-[150px] lg:w-[250px]"
@@ -405,5 +384,3 @@ export default function AllowedCompanyList({ allowedCompanies: initialCompanies,
     </Dialog>
     </>
   );
-
-    
