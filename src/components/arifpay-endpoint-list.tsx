@@ -23,12 +23,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import Image from 'next/image';
 
-type SortableKeys = 'BANK' | 'DISPLAYNAME' | 'ORDER' | 'TRANSACTIONTYPE';
-const ITEMS_PER_PAGE = 15;
+type SortableKeys = 'BANK' | 'DISPLAYNAME' | 'ORDER' | 'TRANSACTIONTYPE' | 'OTPLENGTH' | 'BENEFICIARYBANK';
+const ITEMS_PER_PAGE = 10;
 
 export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEndpoints }: { arifpayEndpoints: arifpay_endpoints[] }) {
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchField, setSearchField] = React.useState('all');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
@@ -48,9 +52,13 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
 
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
-      sortableItems = sortableItems.filter((endpoint) =>
-        Object.values(endpoint).some(val => String(val).toLowerCase().includes(lowercasedTerm))
-      );
+      sortableItems = sortableItems.filter((endpoint) => {
+         if (searchField === 'all') {
+             return Object.values(endpoint).some(val => String(val).toLowerCase().includes(lowercasedTerm))
+         }
+         const fieldValue = endpoint[searchField as keyof arifpay_endpoints] as string;
+         return fieldValue?.toLowerCase().includes(lowercasedTerm)
+      });
     }
 
     if (sortConfig !== null) {
@@ -64,7 +72,7 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
     }
 
     return sortableItems;
-  }, [initialArifpayEndpoints, searchTerm, sortConfig]);
+  }, [initialArifpayEndpoints, searchTerm, searchField, sortConfig]);
 
   const paginatedEndpoints = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -76,54 +84,98 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
     return <ArrowUpDown className="ml-2 h-4 w-4" />;
   };
 
+  const truncate = (str: string | null, num: number) => {
+    if (!str) return 'N/A';
+    if (str.length <= num) return str;
+    return str.slice(0, num) + '...';
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>ArifPay Endpoints</CardTitle>
-        <CardDescription>A list of all configured ArifPay endpoints.</CardDescription>
+        <CardDescription>A list of all configured ArifPay payment gateway endpoints.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-end gap-2 py-4">
-          <Input
-            placeholder="Search endpoints..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
+        <div className="flex items-center justify-between gap-2 py-4">
+           <Select value={searchField} onValueChange={setSearchField}>
+                <SelectTrigger className="h-9 w-[180px]">
+                    <SelectValue placeholder="Search by" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Fields</SelectItem>
+                    <SelectItem value="BANK">Bank</SelectItem>
+                    <SelectItem value="DISPLAYNAME">Display Name</SelectItem>
+                    <SelectItem value="TRANSACTIONTYPE">Transaction Type</SelectItem>
+                </SelectContent>
+            </Select>
+            <Input
+              placeholder="Search endpoints..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-9 max-w-sm"
+            />
         </div>
         <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('BANK')} className="px-2">Bank{getSortIndicator('BANK')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('DISPLAYNAME')} className="px-2">Display Name{getSortIndicator('DISPLAYNAME')}</Button></TableHead>
-                <TableHead>Two Step</TableHead>
-                <TableHead>OTP</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('TRANSACTIONTYPE')} className="px-2">Transaction Type{getSortIndicator('TRANSACTIONTYPE')}</Button></TableHead>
-                <TableHead>Beneficiary Account</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('ORDER')} className="px-2">Order{getSortIndicator('ORDER')}</Button></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedEndpoints.length > 0 ? (
-                paginatedEndpoints.map((endpoint) => (
-                  <TableRow key={endpoint.ID}>
-                    <TableCell className="font-medium">{endpoint.BANK}</TableCell>
-                    <TableCell>{endpoint.DISPLAYNAME}</TableCell>
-                    <TableCell><Badge variant={endpoint.ISTWOSTEP ? 'default' : 'secondary'}>{endpoint.ISTWOSTEP ? 'Yes' : 'No'}</Badge></TableCell>
-                    <TableCell><Badge variant={endpoint.ISOTP ? 'default' : 'secondary'}>{endpoint.ISOTP ? 'Yes' : 'No'}</Badge></TableCell>
-                    <TableCell>{endpoint.TRANSACTIONTYPE}</TableCell>
-                    <TableCell>{endpoint.BENEFICIARYACCOUNT}</TableCell>
-                    <TableCell>{endpoint.ORDER}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
+          <TooltipProvider>
+            <Table>
+                <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">No endpoints found.</TableCell>
+                    <TableHead className="w-[50px]">Logo</TableHead>
+                    <TableHead><Button variant="ghost" onClick={() => requestSort('BANK')} className="px-2">Bank{getSortIndicator('BANK')}</Button></TableHead>
+                    <TableHead><Button variant="ghost" onClick={() => requestSort('DISPLAYNAME')} className="px-2">Display Name{getSortIndicator('DISPLAYNAME')}</Button></TableHead>
+                    <TableHead>Two Step</TableHead>
+                    <TableHead>OTP</TableHead>
+                    <TableHead><Button variant="ghost" onClick={() => requestSort('OTPLENGTH')} className="px-2">OTP Length{getSortIndicator('OTPLENGTH')}</Button></TableHead>
+                    <TableHead><Button variant="ghost" onClick={() => requestSort('TRANSACTIONTYPE')} className="px-2">Txn Type{getSortIndicator('TRANSACTIONTYPE')}</Button></TableHead>
+                    <TableHead><Button variant="ghost" onClick={() => requestSort('BENEFICIARYBANK')} className="px-2">Beneficiary Bank{getSortIndicator('BENEFICIARYBANK')}</Button></TableHead>
+                    <TableHead>Beneficiary Acct</TableHead>
+                    <TableHead>Endpoint 1</TableHead>
+                    <TableHead>Endpoint 2</TableHead>
+                    <TableHead>Endpoint 3</TableHead>
+                    <TableHead>Success URL</TableHead>
+                    <TableHead>Error URL</TableHead>
+                    <TableHead>Cancel URL</TableHead>
+                    <TableHead>Notify URL</TableHead>
+                    <TableHead><Button variant="ghost" onClick={() => requestSort('ORDER')} className="px-2">Order{getSortIndicator('ORDER')}</Button></TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                </TableHeader>
+                <TableBody>
+                {paginatedEndpoints.length > 0 ? (
+                    paginatedEndpoints.map((endpoint) => (
+                    <TableRow key={endpoint.ID}>
+                        <TableCell>
+                            <div className="h-10 w-10 bg-muted rounded-full flex items-center justify-center overflow-hidden">
+                                <Image src={endpoint.IMAGEURL} alt={endpoint.BANK} width={40} height={40} className="object-cover" data-ai-hint="bank logo" />
+                            </div>
+                        </TableCell>
+                        <TableCell className="font-medium">{endpoint.BANK}</TableCell>
+                        <TableCell>{endpoint.DISPLAYNAME}</TableCell>
+                        <TableCell><Badge variant={endpoint.ISTWOSTEP ? 'default' : 'secondary'}>{endpoint.ISTWOSTEP ? 'Yes' : 'No'}</Badge></TableCell>
+                        <TableCell><Badge variant={endpoint.ISOTP ? 'default' : 'secondary'}>{endpoint.ISOTP ? 'Yes' : 'No'}</Badge></TableCell>
+                        <TableCell>{endpoint.OTPLENGTH}</TableCell>
+                        <TableCell>{endpoint.TRANSACTIONTYPE}</TableCell>
+                        <TableCell>{endpoint.BENEFICIARYBANK}</TableCell>
+                        <TableCell>{endpoint.BENEFICIARYACCOUNT}</TableCell>
+                        {[endpoint.ENDPOINT1, endpoint.ENDPOINT2, endpoint.ENDPOINT3, endpoint.SUCCESSURL, endpoint.ERRORURL, endpoint.CANCELURL, endpoint.NOTIFYURL].map((url, index) => (
+                          <TableCell key={index}>
+                              <Tooltip>
+                                <TooltipTrigger>{truncate(url, 20)}</TooltipTrigger>
+                                <TooltipContent><p>{url || 'N/A'}</p></TooltipContent>
+                              </Tooltip>
+                          </TableCell>
+                        ))}
+                        <TableCell>{endpoint.ORDER}</TableCell>
+                    </TableRow>
+                    ))
+                ) : (
+                    <TableRow>
+                    <TableCell colSpan={17} className="h-24 text-center">No endpoints found.</TableCell>
+                    </TableRow>
+                )}
+                </TableBody>
+            </Table>
+          </TooltipProvider>
         </div>
       </CardContent>
       <CardFooter>
@@ -152,3 +204,6 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
     </Card>
   );
 }
+
+
+    
