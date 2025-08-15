@@ -1,6 +1,8 @@
 
-import { prisma } from '../src/lib/prisma';
+import { PrismaClient } from '@prisma/client';
 import { randomUUID } from 'crypto';
+
+const prisma = new PrismaClient();
 
 const MOCK_BRANCHES = [
   { id: randomUUID(), name: 'Downtown Branch', code: 'DT001', address: '123 Main St, Anytown, USA', contact: '555-1234', status: 'Approved' },
@@ -55,7 +57,6 @@ const MOCK_MERCHANT_TXNS = [
 
 const MOCK_ARIF_REQUESTS = [
     { NONCEID: 'nonce1', SESSIONID: 'sess1', DEBITACCOUNT: 'D001', CREDITACCOUNT: 'C001', AMOUNT: 100, MERCHANTACCOUNT: 'ACC001', SALESPHONE: '666-777-8888', REQUEST1: '{}', RESPONSE1: '{}', REQUEST2: '{}', RESPONSE2: '{}', REQUEST3: '{}', RESPONSE3: '{}', WEBHOOKRESPONSE: '{}', ERROR1: '', MESSAGE1: '', ERROR2: '', MESSAGE2: '', ERROR3: '', MESSAGE3: '', DATESEND1: new Date('2023-06-01'), DATERECIVED1: new Date('2023-06-01'), DATESEND2: new Date('2023-06-01'), DATERECIVED2: new Date('2023-06-01'), DATESEND3: new Date('2023-06-01'), DATERECIVED3: new Date('2023-06-01'), WEBHOOKRECEIVEDDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system', ARIFPAYTRANSACTIONID: 'AP-TXN-1', ARIFPAYTRANSACTIONSTATUS: 'Success', T24TRANSACTIONID: 'T24-1', T24TRANSACTIONSTATUS: 'Success' },
-    { NONCEID: 'nonce2', SESSIONID: 'sess2', DEBITACCOUNT: 'D002', CREDITACCOUNT: 'C002', AMOUNT: 250, MERCHANTACCOUNT: 'ACC002', SALESPHONE: '777-888-9999', REQUEST1: '{}', RESPONSE1: '{}', REQUEST2: '{}', RESPONSE2: '{"status":"failed"}', REQUEST3: '{}', RESPONSE3: '{}', WEBHOOKRESPONSE: '{}', ERROR1: '', MESSAGE1: '', ERROR2: 'T24_FAIL', MESSAGE2: 'T24 Timeout', ERROR3: '', MESSAGE3: '', DATESEND1: new Date('2023-06-02'), DATERECIVED1: new Date('2023-06-02'), DATESEND2: new Date('2023-06-02'), DATERECIVED2: new Date('2023-06-02'), DATESEND3: null, DATERECIVED3: null, WEBHOOKRECEIVEDDATE: null, INSERTUSER: 'sys', UPDATEUSER: 'sys', ARIFPAYTRANSACTIONID: 'AP-TXN-2', ARIFPAYTRANSACTIONSTATUS: 'Failed', T24TRANSACTIONID: 'T24-2', T24TRANSACTIONSTATUS: 'Failed' },
 ]
 
 const MOCK_ARIFPAY_ENDPOINTS = [
@@ -130,12 +131,12 @@ async function main() {
     await prisma.arif_requests.deleteMany({});
     await prisma.merchant_txns.deleteMany({});
     await prisma.merchants_daily_balances.deleteMany({});
-    await prisma.BranchUser.deleteMany({});
-    await prisma.Merchant_users.deleteMany({});
+    await prisma.branchUser.deleteMany({});
+    await prisma.merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
-    await prisma.Branch.deleteMany({});
-    await prisma.DashBoardRoles.deleteMany({});
-    await prisma.Roles.deleteMany({});
+    await prisma.branch.deleteMany({});
+    await prisma.dashBoardRoles.deleteMany({});
+    await prisma.roles.deleteMany({});
 
 
     // Create default roles
@@ -151,7 +152,7 @@ async function main() {
         "/dashboard/role-management", "/dashboard/user-role-assignment"
     ];
 
-    const systemAdminRole = await prisma.DashBoardRoles.create({
+    const systemAdminRole = await prisma.dashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'System Admin',
@@ -160,7 +161,7 @@ async function main() {
         }
     });
 
-    const branchAdminRole = await prisma.DashBoardRoles.create({
+    const branchAdminRole = await prisma.dashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Branch Admin',
@@ -175,7 +176,7 @@ async function main() {
         }
     });
 
-    const branchUserRole = await prisma.DashBoardRoles.create({
+    const branchUserRole = await prisma.dashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Branch User',
@@ -189,7 +190,7 @@ async function main() {
         }
     });
 
-    const merchantAdminRole = await prisma.DashBoardRoles.create({
+    const merchantAdminRole = await prisma.dashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Merchant Admin',
@@ -204,7 +205,7 @@ async function main() {
         }
     });
 
-    const merchantSalesRole = await prisma.DashBoardRoles.create({
+    const merchantSalesRole = await prisma.dashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Merchant Sales',
@@ -219,13 +220,13 @@ async function main() {
     console.log('Seeded 5 default dashboard roles.');
 
     // Seed Application Roles
-    await prisma.Roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
-    await prisma.Roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
+    await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
+    await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
     console.log('Seeded 2 application roles (Admin, Sales).');
 
 
     // Seed "All Branches" first
-    await prisma.Branch.create({
+    await prisma.branch.create({
         data: {
             id: randomUUID(),
             name: 'All Branches',
@@ -237,7 +238,7 @@ async function main() {
     });
     console.log('Seeded "All Branches" for system users.');
 
-    await prisma.BranchUser.create({
+    await prisma.branchUser.create({
         data: {
             id: randomUUID(),
             name: 'System Admin',
@@ -252,7 +253,7 @@ async function main() {
 
 
     for (const b of MOCK_BRANCHES) {
-        await prisma.Branch.create({ data: b });
+        await prisma.branch.create({ data: b });
     }
     console.log(`Seeded ${MOCK_BRANCHES.length} branches.`);
 
@@ -268,7 +269,7 @@ async function main() {
         } else {
             roleId = merchantSalesRole.id;
         }
-        await prisma.Merchant_users.create({
+        await prisma.merchant_users.create({
             data: {
                 ...m,
                 roleId: roleId,
@@ -278,7 +279,7 @@ async function main() {
     console.log(`Seeded ${MOCK_MERCHANT_USERS.length} merchant users.`);
 
     for (const bu of MOCK_BRANCH_USERS) {
-        await prisma.BranchUser.create({ data: {
+        await prisma.branchUser.create({ data: {
             ...bu,
             password: 'password123', // This will be hashed in a real app
             // Assign roles based on name for mock purposes
@@ -349,7 +350,7 @@ async function main() {
 
     for (const rc of MOCK_ROLE_CAPABILITIES) {
         const { ROLEID, ...rest } = rc;
-        const role = await prisma.DashBoardRoles.findFirst({ where: { name: ROLEID } });
+        const role = await prisma.dashBoardRoles.findFirst({ where: { name: ROLEID } });
         if(role){
             await prisma.role_capablities.create({ data: {
                 ...rest,
