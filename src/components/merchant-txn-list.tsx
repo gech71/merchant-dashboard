@@ -40,7 +40,7 @@ type SortableKeys = 'MERCHANTACCOUNT' | 'AMOUNT' | 'STATUS' | 'T2TRANSACTIONDATE
 const ITEMS_PER_PAGE = 15;
 
 export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: { merchantTxns: merchant_txns[] }) {
-  const { allowedCompanies } = useDataContext();
+  const { allowedCompanies, merchants } = useDataContext();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
@@ -55,6 +55,12 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
     if (!accountNumber) return 'N/A';
     const company = allowedCompanies.find(c => c.ACCOUNTNUMBER === accountNumber);
     return company ? company.FIELDNAME : 'N/A';
+  }
+  
+  const getMerchantName = (phoneNumber: string | null) => {
+      if (!phoneNumber) return 'N/A';
+      const merchant = merchants.find(m => m.PHONENUMBER === phoneNumber);
+      return merchant ? merchant.FULLNAME : 'N/A';
   }
 
   const requestSort = (key: SortableKeys) => {
@@ -109,12 +115,17 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
         const lowercasedTerm = searchTerm.toLowerCase();
         sortableItems = sortableItems.filter((txn) => {
             const companyName = getCompanyName(txn.MERCHANTACCOUNT).toLowerCase();
+            const merchantName = getMerchantName(txn.MERCHANTPHONE).toLowerCase();
             if (searchField === 'all') {
                 return companyName.includes(lowercasedTerm) ||
+                       merchantName.includes(lowercasedTerm) ||
                        Object.values(txn).some(val => String(val).toLowerCase().includes(lowercasedTerm))
             }
              if (searchField === 'company') {
                 return companyName.includes(lowercasedTerm);
+            }
+             if (searchField === 'merchant') {
+                return merchantName.includes(lowercasedTerm);
             }
             const fieldValue = txn[searchField as keyof merchant_txns] as string;
             return fieldValue?.toLowerCase().includes(lowercasedTerm);
@@ -137,7 +148,7 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
     }
 
     return sortableItems;
-  }, [initialMerchantTxns, searchTerm, sortConfig, date, companyFilter, searchField, allowedCompanies]);
+  }, [initialMerchantTxns, searchTerm, sortConfig, date, companyFilter, searchField, allowedCompanies, merchants]);
 
   const paginatedTxns = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -223,7 +234,8 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Fields</SelectItem>
-                <SelectItem value="company">Company</SelectItem>
+                <SelectItem value="company">Company Name</SelectItem>
+                <SelectItem value="merchant">Merchant Name</SelectItem>
                 <SelectItem value="CUSTOMERNAME">Customer Name</SelectItem>
                 <SelectItem value="CUSTOMERACCOUNT">Customer Account</SelectItem>
                 <SelectItem value="TXNID">Transaction ID</SelectItem>
@@ -242,13 +254,8 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Company Name</TableHead>
                 <TableHead>Merchant Name</TableHead>
-                 <TableHead>
-                    <Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNT')} className="px-2">
-                        Merchant Account
-                        {getSortIndicator('MERCHANTACCOUNT')}
-                    </Button>
-                </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">
                     Amount
@@ -309,8 +316,8 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
               {paginatedTxns.length > 0 ? (
                 paginatedTxns.map((txn) => (
                   <TableRow key={txn.ID}>
-                    <TableCell className="font-medium">{getCompanyName(txn.MERCHANTACCOUNT)}</TableCell>
-                    <TableCell>{txn.MERCHANTACCOUNT}</TableCell>
+                    <TableCell className="font-medium whitespace-nowrap">{getCompanyName(txn.MERCHANTACCOUNT)}</TableCell>
+                    <TableCell className="font-medium whitespace-nowrap">{getMerchantName(txn.MERCHANTPHONE)}</TableCell>
                     <TableCell className="text-right">{txn.AMOUNT.toFixed(2)}</TableCell>
                     <TableCell>
                         <Badge variant={getStatusVariant(txn.STATUS)}>{txn.STATUS}</Badge>
@@ -326,7 +333,7 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={12} className="h-24 text-center">
+                  <TableCell colSpan={11} className="h-24 text-center">
                     No transactions found.
                   </TableCell>
                 </TableRow>
