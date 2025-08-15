@@ -265,18 +265,13 @@ async function main() {
         } else {
             roleId = merchantSalesRole.id;
         }
-        const { ROLE, ...rest } = m;
-        const appRole = await prisma.roles.findFirst({ where: { ROLENAME: ROLE }});
-
-        if (appRole) {
-            await prisma.merchant_users.create({
-                data: {
-                    ...rest,
-                    roleId: roleId,
-                    appRoleId: appRole.ID,
-                }
-            });
-        }
+       
+        await prisma.merchant_users.create({
+            data: {
+                ...m,
+                roleId: roleId
+            }
+        });
     }
     console.log(`Seeded ${MOCK_MERCHANT_USERS.length} merchant users.`);
 
@@ -371,5 +366,3 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-
-    
