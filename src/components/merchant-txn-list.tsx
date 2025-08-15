@@ -3,8 +3,11 @@
 
 import * as React from 'react';
 import type { merchant_txns } from '@/types';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, Calendar as CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
 
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -23,25 +26,35 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { useDataContext } from '@/context/data-context';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
-type SortableKeys = 'MERCHANTACCOUNT' | 'AMOUNT' | 'STATUS' | 'T2TRANSACTIONDATE' | 'CUSTOMERNAME' | 'CUSTOMERACCOUNT';
+type SortableKeys = 'MERCHANTACCOUNT' | 'AMOUNT' | 'STATUS' | 'T2TRANSACTIONDATE' | 'CUSTOMERNAME' | 'CUSTOMERACCOUNT' | 'TXNID' | 'T24USER' | 'TRANSACTIONCHANNEL' | 'TRANSACTIONSERVICE';
 const ITEMS_PER_PAGE = 15;
 
 export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: { merchantTxns: merchant_txns[] }) {
-  const { merchants } = useDataContext();
+  const { allowedCompanies } = useDataContext();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'T2TRANSACTIONDATE', direction: 'descending' });
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [date, setDate] = React.useState<DateRange | undefined>();
+  const [companyFilter, setCompanyFilter] = React.useState('all');
+  const [searchField, setSearchField] = React.useState('all');
 
-  const getMerchantName = (accountNumber: string | null) => {
+  const getCompanyName = (accountNumber: string | null) => {
     if (!accountNumber) return 'N/A';
-    const merchant = merchants.find(m => m.ACCOUNTNUMBER === accountNumber);
-    return merchant ? merchant.FULLNAME : 'N/A';
+    const company = allowedCompanies.find(c => c.ACCOUNTNUMBER === accountNumber);
+    return company ? company.FIELDNAME : 'N/A';
   }
 
   const requestSort = (key: SortableKeys) => {
@@ -71,13 +84,41 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
 
   const filteredAndSortedTxns = React.useMemo(() => {
     let sortableItems = [...initialMerchantTxns];
+    
+    if (date?.from) {
+      sortableItems = sortableItems.filter(txn => {
+          if (!txn.T2TRANSACTIONDATE) return false;
+          const txnDate = new Date(txn.T2TRANSACTIONDATE);
+          if (date.from && !date.to) {
+              return txnDate >= date.from;
+          }
+          if (date.from && date.to) {
+              const toDate = new Date(date.to);
+              toDate.setHours(23, 59, 59, 999);
+              return txnDate >= date.from && txnDate <= toDate;
+          }
+          return true;
+      });
+    }
+
+    if (companyFilter !== 'all') {
+        sortableItems = sortableItems.filter(txn => txn.MERCHANTACCOUNT === companyFilter);
+    }
 
     if (searchTerm) {
         const lowercasedTerm = searchTerm.toLowerCase();
-        sortableItems = sortableItems.filter((txn) =>
-            getMerchantName(txn.MERCHANTACCOUNT).toLowerCase().includes(lowercasedTerm) ||
-            Object.values(txn).some(val => String(val).toLowerCase().includes(lowercasedTerm))
-      );
+        sortableItems = sortableItems.filter((txn) => {
+            const companyName = getCompanyName(txn.MERCHANTACCOUNT).toLowerCase();
+            if (searchField === 'all') {
+                return companyName.includes(lowercasedTerm) ||
+                       Object.values(txn).some(val => String(val).toLowerCase().includes(lowercasedTerm))
+            }
+             if (searchField === 'company') {
+                return companyName.includes(lowercasedTerm);
+            }
+            const fieldValue = txn[searchField as keyof merchant_txns] as string;
+            return fieldValue?.toLowerCase().includes(lowercasedTerm);
+        });
     }
 
     if (sortConfig !== null) {
@@ -96,7 +137,7 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
     }
 
     return sortableItems;
-  }, [initialMerchantTxns, searchTerm, sortConfig]);
+  }, [initialMerchantTxns, searchTerm, sortConfig, date, companyFilter, searchField, allowedCompanies]);
 
   const paginatedTxns = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -124,13 +165,78 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-end gap-2 py-4">
-          <Input
-            placeholder="Search transactions..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
+        <div className="flex flex-wrap items-center justify-between gap-2 py-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  id="date"
+                  variant={"outline"}
+                  className={cn(
+                    "h-9 w-[240px] justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date?.from ? (
+                    date.to ? (
+                      <>
+                        {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                      </>
+                    ) : (
+                      format(date.from, "LLL dd, y")
+                    )
+                  ) : (
+                    <span>Pick a date range</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={date?.from}
+                  selected={date}
+                  onSelect={setDate}
+                  numberOfMonths={2}
+                />
+              </PopoverContent>
+            </Popover>
+            <Select value={companyFilter} onValueChange={setCompanyFilter}>
+              <SelectTrigger className="h-9 w-full sm:w-[180px] lg:w-[200px]">
+                <SelectValue placeholder="Filter by company" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Companies</SelectItem>
+                {allowedCompanies.map(company => (
+                  <SelectItem key={company.Oid} value={company.ACCOUNTNUMBER}>
+                    {company.FIELDNAME}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Select value={searchField} onValueChange={setSearchField}>
+              <SelectTrigger className="h-9 w-[150px]">
+                <SelectValue placeholder="Search by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Fields</SelectItem>
+                <SelectItem value="company">Company</SelectItem>
+                <SelectItem value="CUSTOMERNAME">Customer Name</SelectItem>
+                <SelectItem value="CUSTOMERACCOUNT">Customer Account</SelectItem>
+                <SelectItem value="TXNID">Transaction ID</SelectItem>
+                <SelectItem value="T24USER">T24 User</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-9 max-w-sm"
+            />
+          </div>
         </div>
         <div className="rounded-md border">
           <Table>
@@ -155,14 +261,42 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
                     {getSortIndicator('STATUS')}
                   </Button>
                 </TableHead>
-                <TableHead>Txn ID</TableHead>
+                <TableHead>
+                    <Button variant="ghost" onClick={() => requestSort('TXNID')} className="px-2">
+                        Transaction ID
+                        {getSortIndicator('TXNID')}
+                    </Button>
+                </TableHead>
                 <TableHead>
                      <Button variant="ghost" onClick={() => requestSort('CUSTOMERNAME')} className="px-2">
                         Customer Name
                         {getSortIndicator('CUSTOMERNAME')}
                     </Button>
                 </TableHead>
-                 <TableHead>Customer Account</TableHead>
+                 <TableHead>
+                    <Button variant="ghost" onClick={() => requestSort('CUSTOMERACCOUNT')} className="px-2">
+                        Customer Account
+                        {getSortIndicator('CUSTOMERACCOUNT')}
+                    </Button>
+                 </TableHead>
+                 <TableHead>
+                    <Button variant="ghost" onClick={() => requestSort('T24USER')} className="px-2">
+                        T24 User
+                        {getSortIndicator('T24USER')}
+                    </Button>
+                 </TableHead>
+                 <TableHead>
+                    <Button variant="ghost" onClick={() => requestSort('TRANSACTIONCHANNEL')} className="px-2">
+                        Channel
+                        {getSortIndicator('TRANSACTIONCHANNEL')}
+                    </Button>
+                 </TableHead>
+                  <TableHead>
+                    <Button variant="ghost" onClick={() => requestSort('TRANSACTIONSERVICE')} className="px-2">
+                        Service
+                        {getSortIndicator('TRANSACTIONSERVICE')}
+                    </Button>
+                 </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('T2TRANSACTIONDATE')} className="px-2">
                     Transaction Date
@@ -175,7 +309,7 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
               {paginatedTxns.length > 0 ? (
                 paginatedTxns.map((txn) => (
                   <TableRow key={txn.ID}>
-                    <TableCell className="font-medium">{getMerchantName(txn.MERCHANTACCOUNT)}</TableCell>
+                    <TableCell className="font-medium">{getCompanyName(txn.MERCHANTACCOUNT)}</TableCell>
                     <TableCell>{txn.MERCHANTACCOUNT}</TableCell>
                     <TableCell className="text-right">{txn.AMOUNT.toFixed(2)}</TableCell>
                     <TableCell>
@@ -184,12 +318,15 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
                     <TableCell>{txn.TXNID}</TableCell>
                     <TableCell>{txn.CUSTOMERNAME}</TableCell>
                     <TableCell>{txn.CUSTOMERACCOUNT}</TableCell>
+                    <TableCell>{txn.T24USER}</TableCell>
+                    <TableCell>{txn.TRANSACTIONCHANNEL}</TableCell>
+                    <TableCell>{txn.TRANSACTIONSERVICE}</TableCell>
                     <TableCell>{txn.T2TRANSACTIONDATE ? new Date(txn.T2TRANSACTIONDATE).toLocaleString() : 'N/A'}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-24 text-center">
+                  <TableCell colSpan={12} className="h-24 text-center">
                     No transactions found.
                   </TableCell>
                 </TableRow>
