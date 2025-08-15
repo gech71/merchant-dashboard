@@ -118,11 +118,6 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
 
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        const roleA = a.DashBoardRoles?.name || '';
-        const roleB = b.DashBoardRoles?.name || '';
-        if (roleA === 'Admin' && roleB !== 'Admin') return -1;
-        if (roleA !== 'Admin' && roleB === 'Admin') return 1;
-        
         const valA = a[sortConfig.key] ?? '';
         const valB = b[sortConfig.key] ?? '';
 
@@ -137,8 +132,8 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
     } else {
         // Default sort: Admin first
         sortableItems.sort((a, b) => {
-            if (a.DashBoardRoles?.name === 'Admin' && b.DashBoardRoles?.name !== 'Admin') return -1;
-            if (a.DashBoardRoles?.name !== 'Admin' && b.DashBoardRoles?.name === 'Admin') return 1;
+            if (a.ROLE === 'Admin' && b.ROLE !== 'Admin') return -1;
+            if (a.ROLE !== 'Admin' && b.ROLE === 'Admin') return 1;
             return 0;
         });
     }
@@ -217,18 +212,20 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                           {getSortIndicator('FULLNAME')}
                         </Button>
                       </TableHead>
+                      <TableHead>Company</TableHead>
                       <TableHead>
-                        Company
+                        <Button variant="ghost" onClick={() => requestSort('ACCOUNTNUMBER')} className="px-2">
+                          Account Number
+                          {getSortIndicator('ACCOUNTNUMBER')}
+                        </Button>
                       </TableHead>
-                       <TableHead>
+                      <TableHead>
                         <Button variant="ghost" onClick={() => requestSort('ROLE')} className="px-2">
                           Role
                           {getSortIndicator('ROLE')}
                         </Button>
                       </TableHead>
-                      <TableHead>
-                        PHONENUMBER
-                      </TableHead>
+                      <TableHead>Phone Number</TableHead>
                       <TableHead>
                         <Button variant="ghost" onClick={() => requestSort('STATUS')} className="px-2">
                           Status
@@ -246,8 +243,9 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                         <TableRow key={merchantUser.ID}>
                           <TableCell className="font-medium">{merchantUser.FULLNAME}</TableCell>
                           <TableCell>{getCompanyName(merchantUser.ACCOUNTNUMBER)}</TableCell>
+                          <TableCell>{merchantUser.ACCOUNTNUMBER}</TableCell>
                           <TableCell>
-                             <Badge variant={merchantUser.DashBoardRoles?.name === 'Admin' ? 'default' : 'secondary'}>{merchantUser.DashBoardRoles?.name || 'Unassigned'}</Badge>
+                             <Badge variant={merchantUser.ROLE === 'Admin' ? 'default' : 'secondary'}>{merchantUser.ROLE}</Badge>
                           </TableCell>
                           <TableCell className="hidden md:table-cell">{merchantUser.PHONENUMBER}</TableCell>
                           <TableCell>
@@ -282,7 +280,7 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="h-24 text-center">
+                        <TableCell colSpan={7} className="h-24 text-center">
                           No users found.
                         </TableCell>
                       </TableRow>
