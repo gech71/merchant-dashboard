@@ -1,4 +1,3 @@
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -9,16 +8,15 @@ generator client {
 }
 
 model Branch {
-  id          String       @id @default(uuid())
-  name        String       @unique
-  code        String       @unique
-  address     String
-  contact     String
-  status      String
-  INSERTDATE  DateTime?    @default(now()) @db.Timestamp(3)
-  UPDATEDATE  DateTime?    @updatedAt @db.Timestamp(3)
-  BranchUser  BranchUser[]
-  allowed_companies allowed_companies[]
+  id         String       @id @default(uuid())
+  name       String       @unique
+  code       String       @unique
+  address    String
+  contact    String
+  status     String
+  INSERTDATE DateTime?    @default(now()) @db.Timestamp(3)
+  UPDATEDATE DateTime?    @updatedAt @db.Timestamp(3)
+  users      BranchUser[]
 
   @@map("Branch")
 }
@@ -32,8 +30,8 @@ model BranchUser {
   status         String
   roleId         String?
   branchId       String?
+  branch_relation Branch?        @relation(fields: [branchId], references: [id])
   DashBoardRoles DashBoardRoles? @relation(fields: [roleId], references: [id])
-  Branch         Branch?         @relation(fields: [branchId], references: [id])
 
   @@map("BranchUser")
 }
@@ -47,7 +45,6 @@ model DashBoardRoles {
   updatedAt    DateTime       @updatedAt
   BranchUser   BranchUser[]
   Merchant_users Merchant_users[]
-  role_capablities role_capablities[]
 
   @@map("DashBoardRoles")
 }
@@ -57,7 +54,7 @@ model Merchant_users {
   ACCOUNTNUMBER     String          @db.VarChar(20)
   FULLNAME          String?         @db.VarChar(100)
   ACCOUNTTYPE       String?         @db.VarChar(20)
-  PHONENUMBER       String?         @db.VarChar(15)
+  PHONENUMBER       String?         @unique @db.VarChar(15)
   ROLE              String?         @db.VarChar(20)
   DEVICENAME        String?         @db.VarChar(100)
   ENCRYPTIONKEY     String?
@@ -74,49 +71,31 @@ model Merchant_users {
   UPDATEUSERID      String?         @default("system")
   INSERTDATE        DateTime?       @default(now()) @db.Timestamp()
   UPDATEDATE        DateTime?       @default(now()) @db.Timestamp()
-  roleId            String?         @db.VarChar(150)
+  roleId            String?
   DashBoardRoles    DashBoardRoles? @relation(fields: [roleId], references: [id])
   ApplicationRole   Roles?          @relation(fields: [ROLE], references: [ROLENAME])
 
   @@map("Merchant_users")
 }
 
-model Manage_otps {
-  ID              String    @id @default(uuid()) @db.Uuid
-  ACCOUNTNUMBER   String    @db.VarChar(50)
-  PHONENUMBER     String    @db.VarChar(15)
-  FULLNAME        String?   @db.VarChar(100)
-  OTPSENT         DateTime  @db.Timestamp()
-  OTPEXPIRE       DateTime  @db.Timestamp()
-  SENTCHANNEL     String?   @db.VarChar(10)
-  OTPCODE         String    @default("")
-  VALUE2          String?
-  VALUE3          String?
-  INSERTDATE      DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE      DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER      String?   @default("system")
-  UPDATEUSER      String?   @default("system")
-
-  @@map("Manage_otps")
-}
-
 model Roles {
-  ID           String      @id @default(uuid()) @db.Uuid
-  ROLENAME     String      @unique @db.VarChar(100)
+  id           String        @id @default(uuid()) @db.Uuid
+  ROLENAME     String        @unique @db.VarChar(100)
   VALUE1       String?
   VALUE2       String?
   VALUE3       String?
   INSERTUSERID String?
   UPDATEUSERID String?
-  INSERTDATE   DateTime?   @default(now()) @db.Timestamp()
-  UPDATEDATE   DateTime?   @default(now()) @db.Timestamp()
+  INSERTDATE   DateTime?     @default(now()) @db.Timestamp()
+  UPDATEDATE   DateTime?     @updatedAt @db.Timestamp()
   Merchant_users Merchant_users[]
+  role_capablities role_capablities[]
 
   @@map("Roles")
 }
 
 model account_infos {
-  ID            String    @id @default(uuid()) @db.Uuid
+  ID            String    @id @default(uuid())
   ACCOUNTNUMBER String    @db.VarChar(50)
   PHONENUMBER   String    @db.VarChar(15)
   FULLNAME      String?   @db.VarChar(100)
@@ -124,7 +103,7 @@ model account_infos {
   VALUE1        String?
   VALUE2        String?
   INSERTDATE    DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE    DateTime? @updatedAt @db.Timestamp()
   INSERTUSER    String?
   UPDATEUSER    String?
 
@@ -132,46 +111,30 @@ model account_infos {
 }
 
 model allowed_companies {
-  Oid                 String    @id @default(uuid()) @db.Uuid
-  ID                  String    @default(uuid()) @db.Uuid
+  Oid                 String    @id @default(uuid())
+  ID                  String    @default(uuid())
   ACCOUNTNUMBER       String    @db.VarChar(50)
   FIELDNAME           String?   @db.VarChar(100)
   APPROVEUSER         String?   @db.VarChar(100)
   APPROVED            Boolean   @default(false)
   STATUS              Boolean   @default(true)
   INSERTDATE          DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE          DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE          DateTime? @updatedAt @db.Timestamp()
   INSERTUSER          String?
   UPDATEUSER          String?
   OptimisticLockField Int?
   GCRecord            Int?
   branchName          String?   @db.VarChar(200)
-  Branch              Branch?   @relation(fields: [branchName], references: [name])
-
 
   @@map("allowed_companies")
 }
 
-model app_updates {
-  ID               String    @id @default(uuid()) @db.Uuid
-  COMPARINGVERSION Float
-  LATESTVERSION    Float
-  DESCRIPTION      String?   @db.VarChar(2000)
-  ISFORCED         Boolean?
-  INSERTDATE       DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE       DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER       String?
-  UPDATEUSER       String?
-
-  @@map("app_updates")
-}
-
 model arif_requests {
-  NONCEID                  String    @id @db.Uuid
+  NONCEID                  String    @id @default(uuid())
   SESSIONID                String?   @db.VarChar(500)
   DEBITACCOUNT             String    @db.VarChar(30)
   CREDITACCOUNT            String    @db.VarChar(30)
-  AMOUNT                   Decimal   @db.Decimal
+  AMOUNT                   Decimal
   MERCHANTACCOUNT          String    @db.VarChar(30)
   SALESPHONE               String    @db.VarChar(20)
   ARIFPAYTRANSACTIONID     String?   @db.VarChar(100)
@@ -205,7 +168,7 @@ model arif_requests {
 }
 
 model arifpay_endpoints {
-  ID                 String    @id @db.Uuid
+  ID                 String    @id @default(uuid())
   BANK               String
   DISPLAYNAME        String    @db.VarChar(100)
   OTPLENGTH          Int
@@ -224,7 +187,7 @@ model arifpay_endpoints {
   BENEFICIARYBANK    String    @db.VarChar(100)
   IMAGEURL           String?
   INSERTDATE         DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE         DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE         DateTime? @updatedAt @db.Timestamp()
   INSERTUSER         String?
   UPDATEUSER         String?
 
@@ -232,25 +195,25 @@ model arifpay_endpoints {
 }
 
 model controllersconfigs {
-  ID            String    @id @default(uuid()) @db.Uuid
+  ID           String    @id @default(uuid())
   CONTROLLERKEY String
-  APIKEY        String?
-  INSERTDATE    DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER    String?
-  UPDATEUSER    String?
+  APIKEY       String?
+  INSERTDATE   DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE   DateTime? @updatedAt @db.Timestamp()
+  INSERTUSER   String?
+  UPDATEUSER   String?
 
   @@map("controllersconfigs")
 }
 
 model core_integration_settings {
-  ID         String    @id @default(uuid()) @db.Uuid
+  ID         String    @id @default(uuid())
   UNIQUEKEY  String?   @db.VarChar(100)
   ADDRESS    String
   USERNAME   String    @db.VarChar(200)
   PASSWORD   String?   @db.VarChar(500)
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE DateTime? @updatedAt @db.Timestamp()
   INSERTUSER String?
   UPDATEUSER String?
 
@@ -258,10 +221,10 @@ model core_integration_settings {
 }
 
 model merchant_txns {
-  ID                 String    @id @default(uuid()) @db.Uuid
+  ID                 String    @id @default(uuid())
   MERCHANTACCOUNT    String    @db.VarChar(20)
   MERCHANTPHONE      String    @db.VarChar(15)
-  AMOUNT             Decimal?  @db.Decimal
+  AMOUNT             Decimal?
   TXNID              String?   @db.VarChar(200)
   CUSTOMERNAME       String?   @db.VarChar(100)
   CUSTOMERACCOUNT    String?   @db.VarChar(50)
@@ -274,7 +237,7 @@ model merchant_txns {
   VALUE2             String?
   VALUE3             String?
   INSERTDATE         DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE         DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE         DateTime? @updatedAt @db.Timestamp()
   INSERTUSER         String?
   UPDATEUSER         String?
 
@@ -282,14 +245,14 @@ model merchant_txns {
 }
 
 model merchants_daily_balances {
-  ID              String    @id @default(uuid()) @db.Uuid
+  ID              String    @id @default(uuid())
   MERCHANTACCOUNT String    @db.VarChar(50)
   MERCHANTPHONE   String    @db.VarChar(15)
-  DAILYBALANCE    Decimal?  @db.Decimal
+  DAILYBALANCE    Decimal?
   DAILYTXNCOUNT   BigInt    @default(0)
   BALANCEDATE     DateTime? @db.Timestamp()
   INSERTDATE      DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE      DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE      DateTime? @updatedAt @db.Timestamp()
   INSERTUSER      String?   @default("system")
   UPDATEUSER      String?   @default("system")
 
@@ -297,7 +260,7 @@ model merchants_daily_balances {
 }
 
 model paystream_txns {
-  ID                    String    @id @default(uuid()) @db.Uuid
+  ID                    String    @id @default(uuid())
   MERCHANTACCOUNTNUMBER String    @db.VarChar(50)
   SALERPHONENUMBER      String    @db.VarChar(15)
   TICKET                String?   @db.VarChar(500)
@@ -305,7 +268,7 @@ model paystream_txns {
   AMOUNT                String?
   PAYERACCOUNT          String?   @db.VarChar(50)
   INSERTDATE            DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE            DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE            DateTime? @updatedAt @db.Timestamp()
   INSERTUSER            String?   @default("system")
   UPDATEUSER            String?   @default("system")
 
@@ -313,7 +276,7 @@ model paystream_txns {
 }
 
 model promo_adds {
-  ID           String    @id @default(uuid()) @db.Uuid
+  ID           String    @id @default(uuid())
   ADDTITLE     String    @db.VarChar(100)
   ADDSUBTITLE  String?
   ADDADDRESS   String?
@@ -322,22 +285,22 @@ model promo_adds {
   INSERTUSERID String?   @default("system")
   UPDATEUSERID String?   @default("system")
   INSERTDATE   DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE   DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE   DateTime? @updatedAt @db.Timestamp()
 
   @@map("promo_adds")
 }
 
 model qr_payments {
-  ID               String    @id @default(uuid()) @db.Uuid
+  ID               String    @id @default(uuid())
   DEBITACCOUNT     String    @db.VarChar(50)
   CREDITACCOUNT    String?   @db.VarChar(50)
   SALERPHONENUMBER String?   @db.VarChar(15)
-  AMOUNT           Decimal   @db.Decimal
+  AMOUNT           Decimal
   EXPIRETIME       DateTime  @db.Timestamp()
   QRCODE           String
   ISUSED           Boolean   @default(false)
   INSERTDATE       DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE       DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE       DateTime? @updatedAt @db.Timestamp()
   INSERTUSER       String?   @default("system")
   UPDATEUSER       String?   @default("system")
 
@@ -358,15 +321,14 @@ model role_capablities {
   INSERTUSERID String?   @default("system")
   UPDATEUSERID String?   @default("system")
   INSERTDATE   DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE   DateTime? @default(now()) @db.Timestamp()
-  DashBoardRoles DashBoardRoles? @relation(fields: [ROLEID], references: [id])
-
+  UPDATEDATE   DateTime? @updatedAt @db.Timestamp()
+  Role         Roles     @relation(fields: [ROLEID], references: [id])
 
   @@map("role_capablities")
 }
 
 model stream_pay_settings {
-  ID         String    @id @default(uuid()) @db.Uuid
+  ID         String    @id @default(uuid())
   ADDRESS    String
   IV         String
   KEY        String
@@ -374,7 +336,7 @@ model stream_pay_settings {
   USERNAME   String?
   PASSWORD   String?
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE DateTime? @updatedAt @db.Timestamp()
   INSERTUSER String?   @default("system")
   UPDATEUSER String?   @default("system")
 
@@ -382,36 +344,17 @@ model stream_pay_settings {
 }
 
 model ussd_push_settings {
-  ID         String    @id @default(uuid()) @db.Uuid
+  ID         String    @id @default(uuid())
   ADDRESS    String
   RESULTURL  String?
   USERNAME   String?
   PASSWORD   String?
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE DateTime? @updatedAt @db.Timestamp()
   INSERTUSER String?   @default("system")
   UPDATEUSER String?   @default("system")
 
   @@map("ussd_push_settings")
-}
-
-model voucher_codess {
-  ID                    String    @id @db.Uuid
-  MERCHANTACCOUNTNUMBER String    @db.VarChar(50)
-  SALERPHONENUMBER      String    @db.VarChar(15)
-  PAYERACCOUNTNUMBER    String    @db.VarChar(50)
-  PAYERNAME             String    @db.VarChar(200)
-  PAYERPHONENUMBER      String    @db.VarChar(15)
-  AMOUNT                Decimal   @default(0.0) @db.Decimal
-  VOCHERCODE            String
-  ISUSED                Boolean   @default(false)
-  EXPIRETIME            DateTime  @default(now()) @db.Timestamp()
-  INSERTDATE            DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE            DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER            String?   @default("system")
-  UPDATEUSER            String?   @default("system")
-
-  @@map("voucher_codess")
 }
 
     
