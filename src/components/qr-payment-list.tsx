@@ -123,14 +123,14 @@ export default function QrPaymentList({ qrPayments: initialQrPayments }: { qrPay
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('DEBITACCOUNT')} className="px-2">DEBITACCOUNT{getSortIndicator('DEBITACCOUNT')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('CREDITACCOUNT')} className="px-2">CREDITACCOUNT{getSortIndicator('CREDITACCOUNT')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('DEBITACCOUNT')} className="px-2">Debit Account{getSortIndicator('DEBITACCOUNT')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('CREDITACCOUNT')} className="px-2">Credit Account{getSortIndicator('CREDITACCOUNT')}</Button></TableHead>
                 <TableHead>Saler</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('SALERPHONENUMBER')} className="px-2">SALERPHONENUMBER{getSortIndicator('SALERPHONENUMBER')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">AMOUNT{getSortIndicator('AMOUNT')}</Button></TableHead>
-                <TableHead>QRCODE</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('ISUSED')} className="px-2">ISUSED{getSortIndicator('ISUSED')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('EXPIRETIME')} className="px-2">EXPIRETIME{getSortIndicator('EXPIRETIME')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('SALERPHONENUMBER')} className="px-2">Saler Phone{getSortIndicator('SALERPHONENUMBER')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">Amount{getSortIndicator('AMOUNT')}</Button></TableHead>
+                <TableHead>QR Code</TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('ISUSED')} className="px-2">Is Used{getSortIndicator('ISUSED')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('EXPIRETIME')} className="px-2">Expire Time{getSortIndicator('EXPIRETIME')}</Button></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

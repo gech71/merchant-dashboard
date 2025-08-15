@@ -139,33 +139,33 @@ export default function MerchantTxnList({ merchantTxns: initialMerchantTxns }: {
                 <TableHead>Merchant Name</TableHead>
                  <TableHead>
                     <Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNT')} className="px-2">
-                        MERCHANTACCOUNT
+                        Merchant Account
                         {getSortIndicator('MERCHANTACCOUNT')}
                     </Button>
                 </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">
-                    AMOUNT
+                    Amount
                     {getSortIndicator('AMOUNT')}
                   </Button>
                 </TableHead>
                  <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('STATUS')} className="px-2">
-                    STATUS
+                    Status
                     {getSortIndicator('STATUS')}
                   </Button>
                 </TableHead>
-                <TableHead>TXNID</TableHead>
+                <TableHead>Txn ID</TableHead>
                 <TableHead>
                      <Button variant="ghost" onClick={() => requestSort('CUSTOMERNAME')} className="px-2">
-                        CUSTOMERNAME
+                        Customer Name
                         {getSortIndicator('CUSTOMERNAME')}
                     </Button>
                 </TableHead>
-                 <TableHead>CUSTOMERACCOUNT</TableHead>
+                 <TableHead>Customer Account</TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('T2TRANSACTIONDATE')} className="px-2">
-                    TRANSACTIONDATE
+                    Transaction Date
                     {getSortIndicator('T2TRANSACTIONDATE')}
                   </Button>
                 </TableHead>

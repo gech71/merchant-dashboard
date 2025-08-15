@@ -139,44 +139,44 @@ export default function ArifRequestList({ arifRequests: initialArifRequests }: {
                 <TableHead>Merchant Name</TableHead>
                  <TableHead>
                     <Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNT')} className="px-2">
-                        MERCHANTACCOUNT
+                        Merchant Account
                         {getSortIndicator('MERCHANTACCOUNT')}
                     </Button>
                 </TableHead>
                  <TableHead>
                     <Button variant="ghost" onClick={() => requestSort('DEBITACCOUNT')} className="px-2">
-                        DEBITACCOUNT
+                        Debit Account
                         {getSortIndicator('DEBITACCOUNT')}
                     </Button>
                 </TableHead>
                  <TableHead>
                     <Button variant="ghost" onClick={() => requestSort('CREDITACCOUNT')} className="px-2">
-                        CREDITACCOUNT
+                        Credit Account
                         {getSortIndicator('CREDITACCOUNT')}
                     </Button>
                 </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">
-                    AMOUNT
+                    Amount
                     {getSortIndicator('AMOUNT')}
                   </Button>
                 </TableHead>
-                <TableHead>ARIFPAYTRANSACTIONID</TableHead>
+                <TableHead>ArifPay Txn ID</TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('ARIFPAYTRANSACTIONSTATUS')} className="px-2">
-                    ARIFPAY STATUS
+                    ArifPay Status
                     {getSortIndicator('ARIFPAYTRANSACTIONSTATUS')}
                   </Button>
                 </TableHead>
                 <TableHead>
                     <Button variant="ghost" onClick={() => requestSort('T24TRANSACTIONID')} className="px-2">
-                        T24TRANSACTIONID
+                        T24 Txn ID
                         {getSortIndicator('T24TRANSACTIONID')}
                     </Button>
                 </TableHead>
                 <TableHead>
                     <Button variant="ghost" onClick={() => requestSort('T24TRANSACTIONSTATUS')} className="px-2">
-                        T24 STATUS
+                        T24 Status
                         {getSortIndicator('T24TRANSACTIONSTATUS')}
                     </Button>
                 </TableHead>

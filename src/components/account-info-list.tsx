@@ -141,10 +141,10 @@ export default function AccountInfoList({ accountInfos: initialAccountInfos }: {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('FULLNAME')} className="px-2">FULLNAME{getSortIndicator('FULLNAME')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('ACCOUNTNUMBER')} className="px-2">ACCOUNTNUMBER{getSortIndicator('ACCOUNTNUMBER')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('PHONENUMBER')} className="px-2">PHONENUMBER{getSortIndicator('PHONENUMBER')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('GENDER')} className="px-2">GENDER{getSortIndicator('GENDER')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('FULLNAME')} className="px-2">Full Name{getSortIndicator('FULLNAME')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('ACCOUNTNUMBER')} className="px-2">Account Number{getSortIndicator('ACCOUNTNUMBER')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('PHONENUMBER')} className="px-2">Phone Number{getSortIndicator('PHONENUMBER')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('GENDER')} className="px-2">Gender{getSortIndicator('GENDER')}</Button></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

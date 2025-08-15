@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useDataContext } from '@/context/data-context';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type SortableKeys = 'MERCHANTACCOUNTNUMBER' | 'SALERPHONENUMBER' | 'TICKET' | 'AMOUNT' | 'INSERTDATE';
 const ITEMS_PER_PAGE = 15;
@@ -37,8 +38,10 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
     direction: 'ascending' | 'descending';
   } | null>({ key: 'INSERTDATE', direction: 'descending' });
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [companyFilter, setCompanyFilter] = React.useState('all');
+  const [searchField, setSearchField] = React.useState('all');
 
-  const getMerchantName = (accountNumber: string | null) => {
+  const getCompanyName = (accountNumber: string | null) => {
     if (!accountNumber) return 'N/A';
     const company = allowedCompanies.find(c => c.ACCOUNTNUMBER === accountNumber);
     return company ? company.FIELDNAME : 'N/A';
@@ -64,14 +67,28 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
 
   const filteredAndSortedTxns = React.useMemo(() => {
     let sortableItems = [...initialPaystreamTxns];
+    
+    if (companyFilter !== 'all') {
+        sortableItems = sortableItems.filter(txn => txn.MERCHANTACCOUNTNUMBER === companyFilter);
+    }
 
     if (searchTerm) {
         const lowercasedTerm = searchTerm.toLowerCase();
-        sortableItems = sortableItems.filter((txn) =>
-            Object.values(txn).some(val => String(val).toLowerCase().includes(lowercasedTerm)) ||
-            getMerchantName(txn.MERCHANTACCOUNTNUMBER).toLowerCase().includes(lowercasedTerm) ||
-            getSalerName(txn.SALERPHONENUMBER).toLowerCase().includes(lowercasedTerm)
-      );
+        sortableItems = sortableItems.filter((txn) => {
+          if (searchField === 'all') {
+            return getCompanyName(txn.MERCHANTACCOUNTNUMBER).toLowerCase().includes(lowercasedTerm) ||
+                   getSalerName(txn.SALERPHONENUMBER).toLowerCase().includes(lowercasedTerm) ||
+                   Object.values(txn).some(val => String(val).toLowerCase().includes(lowercasedTerm));
+          }
+          if (searchField === 'company') {
+            return getCompanyName(txn.MERCHANTACCOUNTNUMBER).toLowerCase().includes(lowercasedTerm);
+          }
+          if (searchField === 'saler') {
+            return getSalerName(txn.SALERPHONENUMBER).toLowerCase().includes(lowercasedTerm);
+          }
+           const fieldValue = txn[searchField as keyof paystream_txns] as string;
+           return fieldValue?.toLowerCase().includes(lowercasedTerm);
+        });
     }
 
     if (sortConfig !== null) {
@@ -90,7 +107,7 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
     }
 
     return sortableItems;
-  }, [initialPaystreamTxns, searchTerm, sortConfig, allowedCompanies, merchants]);
+  }, [initialPaystreamTxns, searchTerm, sortConfig, allowedCompanies, merchants, companyFilter, searchField]);
 
   const paginatedTxns = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -114,13 +131,38 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-end gap-2 py-4">
-          <Input
-            placeholder="Search transactions..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
+        <div className="flex items-center justify-between gap-2 py-4">
+           <Select value={companyFilter} onValueChange={setCompanyFilter}>
+              <SelectTrigger className="h-9 w-[180px]">
+                  <SelectValue placeholder="Filter by company" />
+              </SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="all">All Companies</SelectItem>
+                  {allowedCompanies.map(company => (
+                      <SelectItem key={company.Oid} value={company.ACCOUNTNUMBER}>{company.FIELDNAME}</SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+            <div className="flex items-center gap-2">
+                <Select value={searchField} onValueChange={setSearchField}>
+                    <SelectTrigger className="h-9 w-[150px]">
+                        <SelectValue placeholder="Search by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Fields</SelectItem>
+                        <SelectItem value="company">Company</SelectItem>
+                        <SelectItem value="saler">Saler</SelectItem>
+                        <SelectItem value="TICKET">Ticket</SelectItem>
+                        <SelectItem value="PAYERACCOUNT">Payer Account</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Input
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="h-9 max-w-sm"
+                />
+            </div>
         </div>
         <div className="rounded-md border">
           <Table>
@@ -128,10 +170,10 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
               <TableRow>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNTNUMBER')} className="px-2">Company{getSortIndicator('MERCHANTACCOUNTNUMBER')}</Button></TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('SALERPHONENUMBER')} className="px-2">Saler{getSortIndicator('SALERPHONENUMBER')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('TICKET')} className="px-2">TICKET{getSortIndicator('TICKET')}</Button></TableHead>
-                <TableHead>ISCOMPLETED</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">AMOUNT{getSortIndicator('AMOUNT')}</Button></TableHead>
-                <TableHead>PAYERACCOUNT</TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('TICKET')} className="px-2">Ticket{getSortIndicator('TICKET')}</Button></TableHead>
+                <TableHead>Is Completed</TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">Amount{getSortIndicator('AMOUNT')}</Button></TableHead>
+                <TableHead>Payer Account</TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('INSERTDATE')} className="px-2">Date{getSortIndicator('INSERTDATE')}</Button></TableHead>
               </TableRow>
             </TableHeader>
@@ -139,11 +181,11 @@ export default function PaystreamTxnList({ paystreamTxns: initialPaystreamTxns }
               {paginatedTxns.length > 0 ? (
                 paginatedTxns.map((txn) => (
                   <TableRow key={txn.ID}>
-                    <TableCell className="font-medium">{getMerchantName(txn.MERCHANTACCOUNTNUMBER)}</TableCell>
+                    <TableCell className="font-medium">{getCompanyName(txn.MERCHANTACCOUNTNUMBER)}</TableCell>
                     <TableCell>{getSalerName(txn.SALERPHONENUMBER)}</TableCell>
                     <TableCell>{txn.TICKET}</TableCell>
                     <TableCell><Badge variant={txn.ISCOMPLETED ? 'default' : 'secondary'}>{txn.ISCOMPLETED ? 'Yes' : 'No'}</Badge></TableCell>
-                    <TableCell className="text-right">{txn.AMOUNT.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">{txn.AMOUNT}</TableCell>
                     <TableCell>{txn.PAYERACCOUNT || 'N/A'}</TableCell>
                     <TableCell>{txn.INSERTDATE ? new Date(txn.INSERTDATE).toLocaleString() : 'N/A'}</TableCell>
                   </TableRow>

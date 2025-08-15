@@ -231,31 +231,31 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
                 <TableHead>Company</TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNT')} className="px-2">
-                    Merchantaccount
+                    Merchant Account
                     {getSortIndicator('MERCHANTACCOUNT')}
                   </Button>
                 </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('MERCHANTPHONE')} className="px-2">
-                    Merchantphone
+                    Merchant Phone
                     {getSortIndicator('MERCHANTPHONE')}
                   </Button>
                 </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('DAILYBALANCE')} className="px-2">
-                    Dailybalance
+                    Daily Balance
                     {getSortIndicator('DAILYBALANCE')}
                   </Button>
                 </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('DAILYTXNCOUNT')} className="px-2">
-                    Dailytxncount
+                    Daily Txn Count
                     {getSortIndicator('DAILYTXNCOUNT')}
                   </Button>
                 </TableHead>
                 <TableHead>
                   <Button variant="ghost" onClick={() => requestSort('BALANCEDATE')} className="px-2">
-                    Balancedate
+                    Balance Date
                     {getSortIndicator('BALANCEDATE')}
                   </Button>
                 </TableHead>
@@ -310,5 +310,3 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
     </Card>
   );
 }
-
-    
