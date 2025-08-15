@@ -232,9 +232,6 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                           {getSortIndicator('STATUS')}
                         </Button>
                       </TableHead>
-                      <TableHead>
-                        <span className="sr-only">Actions</span>
-                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -251,36 +248,11 @@ export default function MerchantList({ merchants: initialMerchants, approvalView
                           <TableCell>
                             <Badge variant={getStatusVariant(merchantUser.STATUS)}>{merchantUser.STATUS}</Badge>
                           </TableCell>
-                          <TableCell>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button aria-haspopup="true" size="icon" variant="ghost">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                  <span className="sr-only">Toggle menu</span>
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                {approvalView && merchantUser.STATUS === 'Pending' && (
-                                  <>
-                                    <DropdownMenuItem onClick={() => handleStatusChange(merchantUser.ID, 'Active')}>
-                                      <CheckCircle className="mr-2 h-4 w-4" />
-                                      Approve
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleStatusChange(merchantUser.ID, 'Disabled')}>
-                                      <XCircle className="mr-2 h-4 w-4" />
-                                      Reject
-                                    </DropdownMenuItem>
-                                  </>
-                                )}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={7} className="h-24 text-center">
+                        <TableCell colSpan={6} className="h-24 text-center">
                           No users found.
                         </TableCell>
                       </TableRow>
