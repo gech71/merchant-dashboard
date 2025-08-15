@@ -165,41 +165,41 @@ export default function ArifRequestList({ arifRequests: initialArifRequests }: {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Merchant Name</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('DEBITACCOUNT')} className="px-2">Debit Account{getSortIndicator('DEBITACCOUNT')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('CREDITACCOUNT')} className="px-2">Credit Account{getSortIndicator('CREDITACCOUNT')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">Amount{getSortIndicator('AMOUNT')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('ARIFPAYTRANSACTIONID')} className="px-2">ArifPay Txn ID{getSortIndicator('ARIFPAYTRANSACTIONID')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('T24TRANSACTIONID')} className="px-2">T24 Txn ID{getSortIndicator('T24TRANSACTIONID')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('ARIFPAYTRANSACTIONSTATUS')} className="px-2">ArifPay Status{getSortIndicator('ARIFPAYTRANSACTIONSTATUS')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('T24TRANSACTIONSTATUS')} className="px-2">T24 Status{getSortIndicator('T24TRANSACTIONSTATUS')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('DATESEND1')} className="px-2">Initial Request Date{getSortIndicator('DATESEND1')}</Button></TableHead>
-                <TableHead>Nonce ID</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('SESSIONID')} className="px-2">Session ID{getSortIndicator('SESSIONID')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNT')} className="px-2">Merchant Account{getSortIndicator('MERCHANTACCOUNT')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('SALESPHONE')} className="px-2">Sales Phone{getSortIndicator('SALESPHONE')}</Button></TableHead>
-                <TableHead>Webhook Response</TableHead>
-                <TableHead>Request 1</TableHead>
-                <TableHead>Response 1</TableHead>
-                <TableHead>Request 2</TableHead>
-                <TableHead>Response 2</TableHead>
-                <TableHead>Request 3</TableHead>
-                <TableHead>Response 3</TableHead>
-                <TableHead>Error 1</TableHead>
-                <TableHead>Message 1</TableHead>
-                <TableHead>Error 2</TableHead>
-                <TableHead>Message 2</TableHead>
-                <TableHead>Error 3</TableHead>
-                <TableHead>Message 3</TableHead>
-                <TableHead>Date Sent 1</TableHead>
-                <TableHead>Date Received 1</TableHead>
-                <TableHead>Date Sent 2</TableHead>
-                <TableHead>Date Received 2</TableHead>
-                <TableHead>Date Sent 3</TableHead>
-                <TableHead>Date Received 3</TableHead>
-                <TableHead>Webhook Date</TableHead>
-                <TableHead>Insert User</TableHead>
-                <TableHead>Update User</TableHead>
+                <TableHead className="whitespace-nowrap">Merchant Name</TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('DEBITACCOUNT')} className="px-2">Debit Account{getSortIndicator('DEBITACCOUNT')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('CREDITACCOUNT')} className="px-2">Credit Account{getSortIndicator('CREDITACCOUNT')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">Amount{getSortIndicator('AMOUNT')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('ARIFPAYTRANSACTIONID')} className="px-2">ArifPay Txn ID{getSortIndicator('ARIFPAYTRANSACTIONID')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('T24TRANSACTIONID')} className="px-2">T24 Txn ID{getSortIndicator('T24TRANSACTIONID')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('ARIFPAYTRANSACTIONSTATUS')} className="px-2">ArifPay Status{getSortIndicator('ARIFPAYTRANSACTIONSTATUS')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('T24TRANSACTIONSTATUS')} className="px-2">T24 Status{getSortIndicator('T24TRANSACTIONSTATUS')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('DATESEND1')} className="px-2">Initial Request Date{getSortIndicator('DATESEND1')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap">Nonce ID</TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('SESSIONID')} className="px-2">Session ID{getSortIndicator('SESSIONID')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('MERCHANTACCOUNT')} className="px-2">Merchant Account{getSortIndicator('MERCHANTACCOUNT')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('SALESPHONE')} className="px-2">Sales Phone{getSortIndicator('SALESPHONE')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap">Webhook Response</TableHead>
+                <TableHead className="whitespace-nowrap">Request 1</TableHead>
+                <TableHead className="whitespace-nowrap">Response 1</TableHead>
+                <TableHead className="whitespace-nowrap">Request 2</TableHead>
+                <TableHead className="whitespace-nowrap">Response 2</TableHead>
+                <TableHead className="whitespace-nowrap">Request 3</TableHead>
+                <TableHead className="whitespace-nowrap">Response 3</TableHead>
+                <TableHead className="whitespace-nowrap">Error 1</TableHead>
+                <TableHead className="whitespace-nowrap">Message 1</TableHead>
+                <TableHead className="whitespace-nowrap">Error 2</TableHead>
+                <TableHead className="whitespace-nowrap">Message 2</TableHead>
+                <TableHead className="whitespace-nowrap">Error 3</TableHead>
+                <TableHead className="whitespace-nowrap">Message 3</TableHead>
+                <TableHead className="whitespace-nowrap">Date Sent 1</TableHead>
+                <TableHead className="whitespace-nowrap">Date Received 1</TableHead>
+                <TableHead className="whitespace-nowrap">Date Sent 2</TableHead>
+                <TableHead className="whitespace-nowrap">Date Received 2</TableHead>
+                <TableHead className="whitespace-nowrap">Date Sent 3</TableHead>
+                <TableHead className="whitespace-nowrap">Date Received 3</TableHead>
+                <TableHead className="whitespace-nowrap">Webhook Date</TableHead>
+                <TableHead className="whitespace-nowrap">Insert User</TableHead>
+                <TableHead className="whitespace-nowrap">Update User</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
