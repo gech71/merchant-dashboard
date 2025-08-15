@@ -21,7 +21,7 @@ import { useDataContext } from '@/context/data-context';
 
 const allowedCompanyFormSchema = z.object({
   ACCOUNTNUMBER: z.string().min(4, 'Account number must be at least 4 characters.'),
-  FIELDNAME: z.string().min(2, 'Field name must be at least 2 characters.'),
+  FIELDNAME: z.string().min(2, 'Field name must be generated.'),
 });
 
 type AllowedCompanyFormValues = z.infer<typeof allowedCompanyFormSchema>;
@@ -45,37 +45,38 @@ export function AddAllowedCompanyForm({
     },
   });
 
-  const handleAccountBlur = () => {
+  const handleGenerateName = () => {
     const accountNumber = form.getValues('ACCOUNTNUMBER');
-    if (accountNumber && accountNumber.length >= 4) {
-        // Check for duplicates before generating name
-        const alreadyExists = allowedCompanies.some(c => c.ACCOUNTNUMBER === accountNumber);
-        if (alreadyExists) {
-            form.setError('ACCOUNTNUMBER', {
-                type: 'manual',
-                message: 'Company with this account number already exists.',
-            });
-            form.setValue('FIELDNAME', '');
-            setFieldNameIsSet(false);
-            return;
-        }
-
-        // Generate a random field name
-        const randomName = `NewCo-${Math.floor(Math.random() * 10000)}`;
-        form.setValue('FIELDNAME', randomName);
-        setFieldNameIsSet(true);
-        // Clear previous error if any
-        form.clearErrors('ACCOUNTNUMBER');
-    } else {
+    // Trigger validation for ACCOUNTNUMBER field
+    form.trigger('ACCOUNTNUMBER');
+    
+    // Check if the account number field has errors
+    if (form.formState.errors.ACCOUNTNUMBER) {
         form.setValue('FIELDNAME', '');
         setFieldNameIsSet(false);
+        return;
     }
+    
+    const alreadyExists = allowedCompanies.some(c => c.ACCOUNTNUMBER === accountNumber);
+    if (alreadyExists) {
+        form.setError('ACCOUNTNUMBER', {
+            type: 'manual',
+            message: 'Company with this account number already exists.',
+        });
+        form.setValue('FIELDNAME', '');
+        setFieldNameIsSet(false);
+        return;
+    }
+
+    const randomName = `NewCo-${Math.floor(Math.random() * 10000)}`;
+    form.setValue('FIELDNAME', randomName, { shouldValidate: true });
+    setFieldNameIsSet(true);
+    form.clearErrors('ACCOUNTNUMBER');
   }
 
   async function onSubmit(data: AllowedCompanyFormValues) {
     setIsLoading(true);
     
-    // Final check for duplicates before submission
     const alreadyExists = allowedCompanies.some(c => c.ACCOUNTNUMBER === data.ACCOUNTNUMBER);
     if (alreadyExists) {
         form.setError('ACCOUNTNUMBER', {
@@ -113,9 +114,12 @@ export function AddAllowedCompanyForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>ACCOUNTNUMBER</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter account number to generate a name" {...field} onBlur={handleAccountBlur} />
-              </FormControl>
+              <div className="flex gap-2">
+                <FormControl>
+                  <Input placeholder="Enter account number" {...field} />
+                </FormControl>
+                 <Button type="button" variant="outline" onClick={handleGenerateName}>Get Company Name</Button>
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -125,9 +129,9 @@ export function AddAllowedCompanyForm({
           name="FIELDNAME"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>FIELDNAME (Auto-generated)</FormLabel>
+              <FormLabel>FIELDNAME</FormLabel>
               <FormControl>
-                <Input placeholder="Will be auto-filled" {...field} readOnly />
+                <Input placeholder="Company Name" {...field} readOnly />
               </FormControl>
               <FormMessage />
             </FormItem>
