@@ -23,12 +23,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type SortableKeys = 'CONTROLLERKEY' | 'APIKEY';
 const ITEMS_PER_PAGE = 15;
 
 export default function ControllersConfigList({ controllersConfigs: initialControllersConfigs }: { controllersConfigs: controllersconfigs[] }) {
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchField, setSearchField] = React.useState('all');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
@@ -48,9 +50,13 @@ export default function ControllersConfigList({ controllersConfigs: initialContr
 
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
-      sortableItems = sortableItems.filter((config) =>
-        Object.values(config).some(val => String(val).toLowerCase().includes(lowercasedTerm))
-      );
+      sortableItems = sortableItems.filter((config) => {
+        if (searchField === 'all') {
+          return Object.values(config).some(val => String(val).toLowerCase().includes(lowercasedTerm));
+        }
+        const fieldValue = config[searchField as keyof controllersconfigs] as string;
+        return fieldValue?.toLowerCase().includes(lowercasedTerm);
+      });
     }
 
     if (sortConfig !== null) {
@@ -64,7 +70,7 @@ export default function ControllersConfigList({ controllersConfigs: initialContr
     }
 
     return sortableItems;
-  }, [initialControllersConfigs, searchTerm, sortConfig]);
+  }, [initialControllersConfigs, searchTerm, searchField, sortConfig]);
 
   const paginatedConfigs = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -84,19 +90,31 @@ export default function ControllersConfigList({ controllersConfigs: initialContr
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-end gap-2 py-4">
-          <Input
-            placeholder="Search configurations..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
+           <div className="flex items-center gap-2">
+            <Select value={searchField} onValueChange={setSearchField}>
+                <SelectTrigger className="h-9 w-[150px]">
+                    <SelectValue placeholder="Search by" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Fields</SelectItem>
+                    <SelectItem value="CONTROLLERKEY">Controller Key</SelectItem>
+                    <SelectItem value="APIKEY">API Key</SelectItem>
+                </SelectContent>
+            </Select>
+            <Input
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-9 max-w-sm"
+            />
+          </div>
         </div>
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('CONTROLLERKEY')} className="px-2">CONTROLLERKEY{getSortIndicator('CONTROLLERKEY')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('APIKEY')} className="px-2">APIKEY{getSortIndicator('APIKEY')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('CONTROLLERKEY')} className="px-2">Controller Key{getSortIndicator('CONTROLLERKEY')}</Button></TableHead>
+                <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('APIKEY')} className="px-2">API Key{getSortIndicator('APIKEY')}</Button></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
