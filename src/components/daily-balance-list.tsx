@@ -3,10 +3,14 @@
 
 import * as React from 'react';
 import type { merchants_daily_balances } from '@/types';
-import { ArrowUpDown } from 'lucide-react';
+import { Calendar as CalendarIcon, ArrowUpDown } from 'lucide-react';
+import { format } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
 
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Table,
   TableBody,
@@ -15,6 +19,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   Card,
   CardContent,
@@ -39,6 +48,7 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
   const [currentPage, setCurrentPage] = React.useState(1);
   const [companyFilter, setCompanyFilter] = React.useState('all');
   const [searchField, setSearchField] = React.useState('all');
+  const [date, setDate] = React.useState<DateRange | undefined>();
 
   const getCompanyName = (accountNumber: string | null) => {
     if (!accountNumber) return 'N/A';
@@ -60,6 +70,22 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
 
   const filteredAndSortedBalances = React.useMemo(() => {
     let sortableItems = [...initialDailyBalances];
+
+    if (date?.from) {
+      sortableItems = sortableItems.filter(balance => {
+          if (!balance.BALANCEDATE) return false;
+          const balanceDate = new Date(balance.BALANCEDATE);
+          if (date.from && !date.to) {
+              return balanceDate >= date.from;
+          }
+          if (date.from && date.to) {
+              const toDate = new Date(date.to);
+              toDate.setHours(23, 59, 59, 999);
+              return balanceDate >= date.from && balanceDate <= toDate;
+          }
+          return true;
+      });
+    }
 
     if (companyFilter !== 'all') {
         sortableItems = sortableItems.filter(balance => balance.MERCHANTACCOUNT === companyFilter);
@@ -98,7 +124,7 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
     }
 
     return sortableItems;
-  }, [initialDailyBalances, searchTerm, sortConfig, companyFilter, searchField, allowedCompanies]);
+  }, [initialDailyBalances, searchTerm, sortConfig, companyFilter, searchField, allowedCompanies, date]);
 
   const paginatedBalances = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -126,20 +152,58 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-between gap-2 py-4">
-             <Select value={companyFilter} onValueChange={setCompanyFilter}>
-                <SelectTrigger className="h-9 w-[180px] lg:w-[200px]">
-                    <SelectValue placeholder="Filter by company" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">All Companies</SelectItem>
-                    {allowedCompanies.map(company => (
-                        <SelectItem key={company.Oid} value={company.ACCOUNTNUMBER}>
-                            {company.FIELDNAME}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+        <div className="flex flex-wrap items-center justify-between gap-2 py-4">
+            <div className="flex flex-wrap items-center gap-2">
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                        id="date"
+                        variant={"outline"}
+                        className={cn(
+                            "h-9 w-[240px] justify-start text-left font-normal",
+                            !date && "text-muted-foreground"
+                        )}
+                        >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {date?.from ? (
+                            date.to ? (
+                            <>
+                                {format(date.from, "LLL dd, y")} -{" "}
+                                {format(date.to, "LLL dd, y")}
+                            </>
+                            ) : (
+                            format(date.from, "LLL dd, y")
+                            )
+                        ) : (
+                            <span>Pick a date range</span>
+                        )}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                        initialFocus
+                        mode="range"
+                        defaultMonth={date?.from}
+                        selected={date}
+                        onSelect={setDate}
+                        numberOfMonths={2}
+                        />
+                    </PopoverContent>
+                </Popover>
+                <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                    <SelectTrigger className="h-9 w-full sm:w-[180px] lg:w-[200px]">
+                        <SelectValue placeholder="Filter by company" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Companies</SelectItem>
+                        {allowedCompanies.map(company => (
+                            <SelectItem key={company.Oid} value={company.ACCOUNTNUMBER}>
+                                {company.FIELDNAME}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
             <div className="flex items-center gap-2">
                  <Select value={searchField} onValueChange={setSearchField}>
                     <SelectTrigger className="h-9 w-[150px]">
@@ -246,3 +310,5 @@ export default function DailyBalanceList({ dailyBalances: initialDailyBalances }
     </Card>
   );
 }
+
+    
