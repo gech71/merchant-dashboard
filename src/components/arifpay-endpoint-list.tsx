@@ -122,22 +122,22 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
                 <TableHeader>
                 <TableRow>
                     <TableHead className="w-[50px]">Logo</TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('BANK')} className="px-2">Bank{getSortIndicator('BANK')}</Button></TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('DISPLAYNAME')} className="px-2">Display Name{getSortIndicator('DISPLAYNAME')}</Button></TableHead>
-                    <TableHead>Two Step</TableHead>
-                    <TableHead>OTP</TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('OTPLENGTH')} className="px-2">OTP Length{getSortIndicator('OTPLENGTH')}</Button></TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('TRANSACTIONTYPE')} className="px-2">Txn Type{getSortIndicator('TRANSACTIONTYPE')}</Button></TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('BENEFICIARYBANK')} className="px-2">Beneficiary Bank{getSortIndicator('BENEFICIARYBANK')}</Button></TableHead>
-                    <TableHead>Beneficiary Acct</TableHead>
-                    <TableHead>Endpoint 1</TableHead>
-                    <TableHead>Endpoint 2</TableHead>
-                    <TableHead>Endpoint 3</TableHead>
-                    <TableHead>Success URL</TableHead>
-                    <TableHead>Error URL</TableHead>
-                    <TableHead>Cancel URL</TableHead>
-                    <TableHead>Notify URL</TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('ORDER')} className="px-2">Order{getSortIndicator('ORDER')}</Button></TableHead>
+                    <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('BANK')} className="px-2">Bank{getSortIndicator('BANK')}</Button></TableHead>
+                    <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('DISPLAYNAME')} className="px-2">Display Name{getSortIndicator('DISPLAYNAME')}</Button></TableHead>
+                    <TableHead className="whitespace-nowrap">Two Step</TableHead>
+                    <TableHead className="whitespace-nowrap">OTP</TableHead>
+                    <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('OTPLENGTH')} className="px-2">OTP Length{getSortIndicator('OTPLENGTH')}</Button></TableHead>
+                    <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('TRANSACTIONTYPE')} className="px-2">Txn Type{getSortIndicator('TRANSACTIONTYPE')}</Button></TableHead>
+                    <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('BENEFICIARYBANK')} className="px-2">Beneficiary Bank{getSortIndicator('BENEFICIARYBANK')}</Button></TableHead>
+                    <TableHead className="whitespace-nowrap">Beneficiary Acct</TableHead>
+                    <TableHead className="whitespace-nowrap">Endpoint 1</TableHead>
+                    <TableHead className="whitespace-nowrap">Endpoint 2</TableHead>
+                    <TableHead className="whitespace-nowrap">Endpoint 3</TableHead>
+                    <TableHead className="whitespace-nowrap">Success URL</TableHead>
+                    <TableHead className="whitespace-nowrap">Error URL</TableHead>
+                    <TableHead className="whitespace-nowrap">Cancel URL</TableHead>
+                    <TableHead className="whitespace-nowrap">Notify URL</TableHead>
+                    <TableHead className="whitespace-nowrap"><Button variant="ghost" onClick={() => requestSort('ORDER')} className="px-2">Order{getSortIndicator('ORDER')}</Button></TableHead>
                 </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -204,6 +204,3 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
     </Card>
   );
 }
-
-
-    
