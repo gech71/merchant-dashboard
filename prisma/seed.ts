@@ -13,11 +13,11 @@ const MOCK_BRANCHES = [
 ];
 
 const MOCK_ALLOWED_COMPANIES = [
-  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC001', FIELDNAME: 'Innovate Inc.', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Downtown Branch' },
-  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC002', FIELDNAME: 'Apex Solutions', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Uptown Branch' },
-  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC003', FIELDNAME: 'Quantum Corp', APPROVEUSER: null, APPROVED: false, STATUS: false, INSERTDATE: new Date('2023-03-10'), UPDATEDATE: new Date('2023-03-10'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Downtown Branch' },
-  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC004', FIELDNAME: 'Synergy Systems', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Westside Branch' },
-  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC005', FIELDNAME: 'Pioneer Ltd.', APPROVEUSER: 'admin', APPROVED: false, STATUS: false, INSERTDATE: new Date('2023-05-12'), UPDATEDATE: new Date('2023-05-12'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: null },
+  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC001', FIELDNAME: 'Innovate Inc.', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchId: null },
+  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC002', FIELDNAME: 'Apex Solutions', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchId: null },
+  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC003', FIELDNAME: 'Quantum Corp', APPROVEUSER: null, APPROVED: false, STATUS: false, INSERTDATE: new Date('2023-03-10'), UPDATEDATE: new Date('2023-03-10'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchId: null },
+  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC004', FIELDNAME: 'Synergy Systems', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchId: null },
+  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC005', FIELDNAME: 'Pioneer Ltd.', APPROVEUSER: 'admin', APPROVED: false, STATUS: false, INSERTDATE: new Date('2023-05-12'), UPDATEDATE: new Date('2023-05-12'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchId: null },
 ];
 
 const MOCK_MERCHANT_USERS = [
@@ -216,8 +216,8 @@ async function main() {
     console.log('Seeded 5 default dashboard roles.');
 
     // Seed Application Roles
-    await prisma.roles.create({ data: { id: randomUUID(), ROLENAME: 'Admin' }});
-    await prisma.roles.create({ data: { id: randomUUID(), ROLENAME: 'Sales' }});
+    await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
+    await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
     console.log('Seeded 2 application roles (Admin, Sales).');
 
 
@@ -345,8 +345,9 @@ async function main() {
         if(role){
             await prisma.role_capablities.create({ data: {
                 ...rest,
-                ROLEID: role.id,
-                PARENT: rc.PARENT === true
+                ROLEID: role.ID,
+                PARENT: rc.PARENT === true,
+                PARENTID: rc.PARENTID === '0' ? null : rc.PARENTID
             } });
         }
     }
