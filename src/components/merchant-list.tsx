@@ -4,8 +4,10 @@
 import * as React from 'react';
 import type { Merchant_users, allowed_companies } from '@/types';
 import { ArrowUpDown } from 'lucide-react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
 
-import { Badge, badgeVariants } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -31,7 +33,6 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { useDataContext } from '@/context/data-context';
-import type { VariantProps } from 'class-variance-authority';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type SortableKeys = 'FULLNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'ROLE';
