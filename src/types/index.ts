@@ -2,7 +2,7 @@
 import { Prisma } from '@prisma/client';
 
 export type arif_requests = Omit<Prisma.arif_requestsGetPayload<{}>, 'AMOUNT' | 'DATESEND1' | 'DATERECIVED1' | 'DATESEND2' | 'DATERECIVED2' | 'DATESEND3' | 'DATERECIVED3' | 'WEBHOOKRECEIVEDDATE'> & {
-  AMOUNT: Prisma.Decimal;
+  AMOUNT: number;
   DATESEND1: string;
   DATERECIVED1: string;
   DATESEND2: string;
@@ -29,13 +29,15 @@ export type Merchant_users = Omit<Prisma.Merchant_usersGetPayload<{ include: { D
   UPDATEDATE: string | null;
 };
 
-export type merchants_daily_balances = Omit<Prisma.merchants_daily_balancesGetPayload<{}>, 'BALANCEDATE' | 'INSERTDATE' | 'UPDATEDATE'> & {
+export type merchants_daily_balances = Omit<Prisma.merchants_daily_balancesGetPayload<{}>, 'DAILYBALANCE' |'BALANCEDATE' | 'INSERTDATE' | 'UPDATEDATE'> & {
+  DAILYBALANCE: number;
   BALANCEDATE: string | null;
   INSERTDATE: string | null;
   UPDATEDATE: string | null;
 };
 
-export type merchant_txns = Omit<Prisma.merchant_txnsGetPayload<{}>, 'T2TRANSACTIONDATE' | 'INSERTDATE' | 'UPDATEDATE'> & {
+export type merchant_txns = Omit<Prisma.merchant_txnsGetPayload<{}>, 'AMOUNT' | 'T2TRANSACTIONDATE' | 'INSERTDATE' | 'UPDATEDATE'> & {
+    AMOUNT: number;
     T2TRANSACTIONDATE: string | null;
     INSERTDATE: string | null;
     UPDATEDATE: string | null;
@@ -58,7 +60,8 @@ export type core_integration_settings = Omit<Prisma.core_integration_settingsGet
   UPDATEDATE: string | null;
 };
 
-export type paystream_txns = Omit<Prisma.paystream_txnsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
+export type paystream_txns = Omit<Prisma.paystream_txnsGetPayload<{}>, 'AMOUNT' | 'INSERTDATE' | 'UPDATEDATE'> & {
+    AMOUNT: number;
     INSERTDATE: string | null;
     UPDATEDATE: string | null;
 };
@@ -73,7 +76,8 @@ export type ussd_push_settings = Omit<Prisma.ussd_push_settingsGetPayload<{}>, '
     UPDATEDATE: string | null;
 };
 
-export type qr_payments = Omit<Prisma.qr_paymentsGetPayload<{}>, 'EXPIRETIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
+export type qr_payments = Omit<Prisma.qr_paymentsGetPayload<{}>, 'AMOUNT' | 'EXPIRETIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
+    AMOUNT: number;
     EXPIRETIME: string | null;
     INSERTDATE: string | null;
     UPDATEDATE: string | null;
