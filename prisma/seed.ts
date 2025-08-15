@@ -55,10 +55,6 @@ const MOCK_MERCHANT_TXNS = [
     { ID: randomUUID(), MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', AMOUNT: 500.00, TXNID: 'TXN005', CUSTOMERNAME: 'Customer E', CUSTOMERACCOUNT: 'CUST005', T24USER: 't24user2', T2TRANSACTIONDATE: new Date('2023-06-02T09:00:00Z'), STATUS: 'Completed', TRANSACTIONCHANNEL: 'Online', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-06-02'), UPDATEDATE: new Date('2023-06-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
-const MOCK_ARIF_REQUESTS = [
-    { NONCEID: 'nonce1', SESSIONID: 'sess1', DEBITACCOUNT: 'D001', CREDITACCOUNT: 'C001', AMOUNT: 100, MERCHANTACCOUNT: 'ACC001', SALESPHONE: '666-777-8888', REQUEST1: '{}', RESPONSE1: '{}', REQUEST2: '{}', RESPONSE2: '{}', REQUEST3: '{}', RESPONSE3: '{}', WEBHOOKRESPONSE: '{}', ERROR1: '', MESSAGE1: '', ERROR2: '', MESSAGE2: '', ERROR3: '', MESSAGE3: '', DATESEND1: new Date('2023-06-01'), DATERECIVED1: new Date('2023-06-01'), DATESEND2: new Date('2023-06-01'), DATERECIVED2: new Date('2023-06-01'), DATESEND3: new Date('2023-06-01'), DATERECIVED3: new Date('2023-06-01'), WEBHOOKRECEIVEDDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system', ARIFPAYTRANSACTIONID: 'AP-TXN-1', ARIFPAYTRANSACTIONSTATUS: 'Success', T24TRANSACTIONID: 'T24-1', T24TRANSACTIONSTATUS: 'Success' },
-]
-
 const MOCK_ARIFPAY_ENDPOINTS = [
     { ID: randomUUID(), BANK: 'Bank of Abyssina', DISPLAYNAME: 'BoA', OTPLENGTH: 6, ORDER: 1, ENDPOINT1: 'https://api.boa.com/v1/pay', ENDPOINT2: 'https://api.boa.com/v1/confirm', ENDPOINT3: '', CANCELURL: 'https://boa.com/cancel', ERRORURL: 'https://boa.com/error', SUCCESSURL: 'https://boa.com/success', NOTIFYURL: 'https://api.myapp.com/notify/boa', ISTWOSTEP: true, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '987654321', BENEFICIARYBANK: 'BoA', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), BANK: 'Awash Bank', DISPLAYNAME: 'Awash', OTPLENGTH: 4, ORDER: 2, ENDPOINT1: 'https://api.awashbank.com/execute', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://awashbank.com/cancel', ERRORURL: 'https://awashbank.com/error', SUCCESSURL: 'https://awashbank.com/success', NOTIFYURL: 'https://api.myapp.com/notify/awash', ISTWOSTEP: false, ISOTP: false, TRANSACTIONTYPE: 'B2B', BENEFICIARYACCOUNT: '123456789', BENEFICIARYBANK: 'Awash', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-02'), UPDATEDATE: new Date('2023-01-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
@@ -220,8 +216,8 @@ async function main() {
     console.log('Seeded 5 default dashboard roles.');
 
     // Seed Application Roles
-    await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
-    await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
+    await prisma.roles.create({ data: { id: randomUUID(), ROLENAME: 'Admin' }});
+    await prisma.roles.create({ data: { id: randomUUID(), ROLENAME: 'Sales' }});
     console.log('Seeded 2 application roles (Admin, Sales).');
 
 
@@ -298,11 +294,6 @@ async function main() {
     }
     console.log(`Seeded ${MOCK_MERCHANT_TXNS.length} merchant txns.`);
 
-    for (const ar of MOCK_ARIF_REQUESTS) {
-        await prisma.arif_requests.create({ data: ar });
-    }
-    console.log(`Seeded ${MOCK_ARIF_REQUESTS.length} arif requests.`);
-
     for (const ae of MOCK_ARIFPAY_ENDPOINTS) {
         await prisma.arifpay_endpoints.create({ data: ae });
     }
@@ -350,7 +341,7 @@ async function main() {
 
     for (const rc of MOCK_ROLE_CAPABILITIES) {
         const { ROLEID, ...rest } = rc;
-        const role = await prisma.dashBoardRoles.findFirst({ where: { name: ROLEID } });
+        const role = await prisma.roles.findFirst({ where: { ROLENAME: ROLEID } });
         if(role){
             await prisma.role_capablities.create({ data: {
                 ...rest,
