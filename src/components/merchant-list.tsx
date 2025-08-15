@@ -5,7 +5,7 @@ import * as React from 'react';
 import type { Merchant_users, allowed_companies } from '@/types';
 import { ArrowUpDown } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
+import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -32,18 +32,35 @@ import {
 } from '@/components/ui/tabs';
 import { useDataContext } from '@/context/data-context';
 import type { VariantProps } from 'class-variance-authority';
-import { badgeVariants } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type SortableKeys = 'FULLNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'ROLE';
 const ITEMS_PER_PAGE = 15;
 
+const statusBadgeVariants = cva(
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        success: "border-transparent bg-green-500 text-primary-foreground hover:bg-green-500/80",
+        secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "outline",
+    },
+  }
+)
+
 const StatusBadge = ({ status }: { status: string }) => {
-    let variant: VariantProps<typeof badgeVariants>["variant"] = 'outline';
+    let variant: VariantProps<typeof statusBadgeVariants>["variant"] = 'outline';
     let text = 'Unknown';
 
     switch (status?.toUpperCase()) {
         case 'A':
-            variant = 'default';
+            variant = 'success';
             text = 'Active';
             break;
         case 'P':
@@ -58,7 +75,7 @@ const StatusBadge = ({ status }: { status: string }) => {
             text = status;
             break;
     }
-    return <Badge variant={variant}>{text}</Badge>;
+    return <div className={cn(statusBadgeVariants({ variant }))}>{text}</div>;
 };
 
 
@@ -70,6 +87,7 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
     direction: 'ascending' | 'descending';
   } | null>({ key: 'FULLNAME', direction: 'ascending' });
   const [activeTab, setActiveTab] = React.useState('all');
+  const [companyFilter, setCompanyFilter] = React.useState('all');
   const [currentPage, setCurrentPage] = React.useState(1);
   
 
@@ -98,6 +116,10 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
       sortableItems = sortableItems.filter(
         (merchant) => merchant.STATUS.toUpperCase() === activeTab
       );
+    }
+    
+    if (companyFilter !== 'all') {
+        sortableItems = sortableItems.filter(merchant => merchant.ACCOUNTNUMBER === companyFilter);
     }
 
     if (searchTerm) {
@@ -133,7 +155,7 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
     }
 
     return sortableItems;
-  }, [contextMerchants, searchTerm, sortConfig, activeTab, allowedCompanies]);
+  }, [contextMerchants, searchTerm, sortConfig, activeTab, companyFilter, allowedCompanies]);
   
   const paginatedMerchants = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -163,6 +185,19 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
               <TabsTrigger value="B">Blocked</TabsTrigger>
             </TabsList>
           <div className="ml-auto flex items-center gap-2">
+            <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                <SelectTrigger className="h-8 w-[150px] lg:w-[250px]">
+                    <SelectValue placeholder="Filter by company" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Companies</SelectItem>
+                    {allowedCompanies.map(company => (
+                        <SelectItem key={company.Oid} value={company.ACCOUNTNUMBER}>
+                            {company.FIELDNAME}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
             <Input
               placeholder="Search users..."
               value={searchTerm}
