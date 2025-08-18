@@ -207,11 +207,11 @@ async function main() {
     console.log(`Seeded ${MOCK_ALLOWED_COMPANIES.length} allowed companies.`);
 
     for (const m of MOCK_MERCHANT_USERS) {
-       
+        const { ROLENAME, ...merchantData } = m;
         await prisma.merchant_users.create({
             data: {
-                ...m,
-                ROLE: m.ROLENAME === 'Admin' ? adminRole.ROLENAME : salesRole.ROLENAME
+                ...merchantData,
+                ROLE: ROLENAME === 'Admin' ? adminRole.ROLENAME : salesRole.ROLENAME
             }
         });
     }
