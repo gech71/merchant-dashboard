@@ -48,10 +48,11 @@ model Merchant_users {
   UPDATEUSERID      String?   @default("system") @db.Text
   INSERTDATE        DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE        DateTime? @default(now()) @db.Timestamp()
-  roleId            String?   @db.VarChar(150)
+  roleId            String?   @db.Uuid
   ApplicationRole   Roles?    @relation(fields: [roleId], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_merchant_users_roles")
 
   @@map("Merchant_users")
+  @@index([roleId], map: "IX_Merchant_users_roleId")
 }
 
 model Roles {
@@ -65,6 +66,7 @@ model Roles {
   INSERTDATE   DateTime?        @default(now()) @db.Timestamp()
   UPDATEDATE   DateTime?        @default(now()) @db.Timestamp()
   Merchant_users Merchant_users[]
+  capabilities role_capablities[]
 
   @@map("Roles")
 }
@@ -259,7 +261,7 @@ model paystream_txns {
   INSERTDATE            DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE            DateTime? @default(now()) @db.Timestamp()
   INSERTUSER            String?   @default("system") @db.Text
-  UPDATEUSER            String?   @default("system") @db.Text
+  UPDATEUSER            String?   @db.Text
 
   @@map("paystream_txns")
 }
@@ -291,7 +293,7 @@ model qr_payments {
   INSERTDATE       DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE       DateTime? @default(now()) @db.Timestamp()
   INSERTUSER       String?   @default("system") @db.Text
-  UPDATEUSER       String?   @default("system") @db.Text
+  UPDATEUSER       String?   @db.Text
 
   @@map("qr_payments")
 }
@@ -311,8 +313,10 @@ model role_capablities {
   UPDATEUSERID String?   @default("system") @db.Text
   INSERTDATE   DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE   DateTime? @default(now()) @db.Timestamp()
+  Role         Roles     @relation(fields: [ROLEID], references: [ID])
 
   @@map("role_capablities")
+  @@index([ROLEID], map: "IX_role_capablities_ROLEID")
 }
 
 model stream_pay_settings {
@@ -325,8 +329,8 @@ model stream_pay_settings {
   PASSWORD   String?   @db.Text
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER String?   @default("system") @db.Text
-  UPDATEUSER String?   @default("system") @db.Text
+  INSERTUSER String?   @db.Text
+  UPDATEUSER String?   @db.Text
 
   @@map("stream_pay_settings")
 }
@@ -339,8 +343,8 @@ model ussd_push_settings {
   PASSWORD   String?   @db.Text
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER String?   @default("system") @db.Text
-  UPDATEUSER String?   @default("system") @db.Text
+  INSERTUSER String?   @db.Text
+  UPDATEUSER String?   @db.Text
 
   @@map("ussd_push_settings")
 }
