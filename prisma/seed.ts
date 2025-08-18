@@ -32,11 +32,11 @@ const MOCK_MERCHANT_USERS = [
 ];
 
 const MOCK_BRANCH_USERS = [
-  { id: randomUUID(), name: 'John Doe', email: 'john.d@branch.com', branchName: 'Downtown Branch', status: 'Active' },
-  { id: randomUUID(), name: 'Jane Smith', email: 'jane.s@branch.com', branchName: 'Uptown Branch', status: 'Active' },
-  { id: randomUUID(), name: 'Peter Jones', email: 'peter.j@branch.com', branchName: 'Downtown Branch', status: 'Inactive' },
-  { id: randomUUID(), name: 'Mary Johnson', email: 'mary.j@branch.com', branchName: 'Westside Branch', status: 'Pending' },
-  { id: randomUUID(), name: 'David Williams', email: 'david.w@branch.com', branchName: 'Uptown Branch', status: 'Active' },
+  { id: randomUUID(), name: 'John Doe', email: 'john.d@branch.com', branch: 'Downtown Branch', status: 'Active' },
+  { id: randomUUID(), name: 'Jane Smith', email: 'jane.s@branch.com', branch: 'Uptown Branch', status: 'Active' },
+  { id: randomUUID(), name: 'Peter Jones', email: 'peter.j@branch.com', branch: 'Downtown Branch', status: 'Inactive' },
+  { id: randomUUID(), name: 'Mary Johnson', email: 'mary.j@branch.com', branch: 'Westside Branch', status: 'Pending' },
+  { id: randomUUID(), name: 'David Williams', email: 'david.w@branch.com', branch: 'Uptown Branch', status: 'Active' },
 ];
 
 const MOCK_DAILY_BALANCES = [
@@ -239,7 +239,7 @@ async function main() {
             id: randomUUID(),
             name: 'System Admin',
             email: 'systemadmin@gmail.com',
-            branchName: 'All Branches', // System admin is not tied to a specific branch
+            branch: 'All Branches', // System admin is not tied to a specific branch
             status: 'Active',
             password: 'password@1232', // This will be hashed in a real app
             roleId: systemAdminRole.id
@@ -366,5 +366,7 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
+    
 
     
