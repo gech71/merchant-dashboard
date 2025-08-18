@@ -12,21 +12,25 @@ export async function PUT(
     const { id } = params;
     
     const body = await request.json();
-    const { roleId, STATUS } = body;
+    const { roleId, STATUS, ROLE } = body;
 
-    const dataToUpdate: { roleId?: string; STATUS?: string } = {};
+    const dataToUpdate: { roleId?: string; STATUS?: string, ROLE?: string } = {};
     if (roleId) {
         dataToUpdate.roleId = roleId;
     }
     if (STATUS) {
         dataToUpdate.STATUS = STATUS;
     }
+    if (ROLE) {
+        dataToUpdate.ROLE = ROLE;
+    }
+
 
     if (Object.keys(dataToUpdate).length === 0) {
         return NextResponse.json({ message: 'No fields to update' }, { status: 400 });
     }
 
-    const updatedUser = await prisma.Merchant_users.update({
+    const updatedUser = await prisma.merchant_users.update({
       where: { ID: id },
       data: dataToUpdate,
     });
@@ -46,3 +50,5 @@ export async function PUT(
     return NextResponse.json({ message: 'Something went wrong!' }, { status: 500 });
   }
 }
+
+    

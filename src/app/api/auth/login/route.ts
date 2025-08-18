@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     if (userType === 'merchant') {
       const merchantUser = await prisma.merchant_users.findFirst({
         where: { PHONENUMBER: loginType === 'merchantSales' ? identifier : password },
-        include: { DashBoardRoles: true },
+        include: { DashBoardRoles: true, ApplicationRole: true },
       });
 
       if (!merchantUser) {
@@ -34,14 +34,14 @@ export async function POST(request: Request) {
       }
 
       if (loginType === 'merchantAdmin') {
-        if (merchantUser.ROLE !== 'Admin') {
+        if (merchantUser.ApplicationRole?.ROLENAME !== 'Admin') {
             return NextResponse.json({ isSuccess: false, message: 'This user is not an Admin. Please use the Sales login.' }, { status: 403 });
         }
         if (merchantUser.ACCOUNTNUMBER !== identifier) {
             return NextResponse.json({ isSuccess: false, message: 'Invalid Account Number for the given Phone Number.' }, { status: 401 });
         }
       } else if (loginType === 'merchantSales') {
-          if (merchantUser.ROLE !== 'Sales') {
+          if (merchantUser.ApplicationRole?.ROLENAME !== 'Sales') {
               return NextResponse.json({ isSuccess: false, message: 'This user is not a Sales user. Please use the Admin login.' }, { status: 403 });
           }
       } else {
@@ -54,6 +54,7 @@ export async function POST(request: Request) {
           userId: user.ID,
           userType: 'merchant',
           role: user.DashBoardRoles?.name || 'No Role',
+          applicationRole: user.ApplicationRole?.ROLENAME,
           name: user.FULLNAME,
           email: user.PHONENUMBER,
           accountNumber: user.ACCOUNTNUMBER,
@@ -64,16 +65,16 @@ export async function POST(request: Request) {
     } else if (userType === 'branch') {
         const branchUser = await prisma.branchUser.findUnique({
             where: { email: identifier },
-            include: { dashBoardRoles: true },
+            include: { DashBoardRoles: true },
         });
         
         if (branchUser && password && branchUser.password === password) {
             user = branchUser;
-            const permissions = (user.dashBoardRoles?.permissions as {pages: string[]})?.pages || [];
+            const permissions = (user.DashBoardRoles?.permissions as {pages: string[]})?.pages || [];
             userPayload = {
                 userId: user.id.toString(),
                 userType: 'branch',
-                role: user.dashBoardRoles?.name || 'No Role',
+                role: user.DashBoardRoles?.name || 'No Role',
                 name: user.name,
                 email: user.email,
                 accountNumber: null,
@@ -118,3 +119,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ isSuccess: false, message: 'Something went wrong!' }, { status: 500 });
   }
 }
+
+    

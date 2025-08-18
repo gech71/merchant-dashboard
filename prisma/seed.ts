@@ -279,22 +279,21 @@ async function main() {
     console.log(`Seeded ${MOCK_ALLOWED_COMPANIES.length} allowed companies.`);
 
     for (const m of MOCK_MERCHANT_USERS) {
-        let roleId;
+        let roleIdToAssign;
         let dashboardRoleId;
         if (m.ROLENAME === 'Admin') {
-            roleId = adminRole.ID;
+            roleIdToAssign = adminRole.ID;
             dashboardRoleId = merchantAdminRole.id;
         } else {
-            roleId = salesRole.ID;
+            roleIdToAssign = salesRole.ID;
             dashboardRoleId = merchantSalesRole.id;
         }
        
         await prisma.merchant_users.create({
             data: {
                 ...m,
-                ROLE: m.ROLENAME,
-                roleId: roleId,
-                dashboardRoleId: dashboardRoleId
+                ROLE: roleIdToAssign,
+                roleId: dashboardRoleId
             }
         });
     }
@@ -366,11 +365,10 @@ async function main() {
     console.log(`Seeded ${MOCK_PROMO_ADDS.length} promo adds.`);
 
     for (const rc of MOCK_ROLE_CAPABILITIES) {
-        const { ROLENAME: ROLEID, ...rest } = rc;
-        const role = await prisma.roles.findFirst({ where: { ROLENAME: ROLEID } });
+        const role = await prisma.roles.findFirst({ where: { ROLENAME: rc.ROLEID } });
         if(role){
             await prisma.role_capablities.create({ data: {
-                ...rest,
+                ...rc,
                 ROLEID: role.ID,
                 PARENT: rc.PARENT === true,
                 PARENTID: rc.PARENTID === '0' ? null : rc.PARENTID

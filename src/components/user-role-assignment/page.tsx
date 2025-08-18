@@ -37,7 +37,7 @@ export default function UserRoleAssignmentPage() {
         }
     };
 
-    const filteredMerchants = merchants.filter(user => user.FULLNAME.toLowerCase().includes(searchTerm.toLowerCase()));
+    const filteredMerchants = merchants.filter(user => user.FULLNAME?.toLowerCase().includes(searchTerm.toLowerCase()));
     const filteredBranchUsers = branchUsers.filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const merchantRoles = roles.filter(r => r.name.startsWith('Merchant'));
@@ -140,3 +140,5 @@ export default function UserRoleAssignmentPage() {
         </Card>
     );
 }
+
+    

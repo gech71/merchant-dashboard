@@ -36,7 +36,7 @@ export function EditMerchantForm({
   setOpen: (open: boolean) => void;
 }) {
   const { toast } = useToast();
-  const { roles, merchants, updateUserRole } = useDataContext();
+  const { roles, merchants, updateMerchant } = useDataContext();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<MerchantFormValues>({
@@ -65,7 +65,7 @@ export function EditMerchantForm({
     }
 
     try {
-        await updateUserRole(merchantUser.ID, data.roleId, 'merchant');
+        await updateMerchant({ ...merchantUser, roleId: data.roleId });
         toast({
             title: 'Merchant User Updated',
             description: `${merchantUser.FULLNAME}'s role has been successfully updated.`,
@@ -88,7 +88,7 @@ export function EditMerchantForm({
         <FormItem>
             <FormLabel>FULLNAME</FormLabel>
             <FormControl>
-                <Input placeholder="John Doe" value={merchantUser.FULLNAME} disabled />
+                <Input placeholder="John Doe" value={merchantUser.FULLNAME ?? ""} disabled />
             </FormControl>
         </FormItem>
         
@@ -125,7 +125,7 @@ export function EditMerchantForm({
         <FormItem>
             <FormLabel>PHONENUMBER</FormLabel>
             <FormControl>
-                <Input placeholder="user@company.com" value={merchantUser.PHONENUMBER} disabled/>
+                <Input placeholder="user@company.com" value={merchantUser.PHONENUMBER ?? ""} disabled/>
             </FormControl>
         </FormItem>
 
@@ -144,3 +144,5 @@ export function EditMerchantForm({
     </Form>
   );
 }
+
+    

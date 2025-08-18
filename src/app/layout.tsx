@@ -18,7 +18,7 @@ export default async function RootLayout({
 }>) {
   const branches = await prisma.branch.findMany();
   const allowedCompanies = await prisma.allowed_companies.findMany();
-  const merchants = await prisma.merchant_users.findMany({ include: { DashBoardRoles: true }});
+  const merchants = await prisma.merchant_users.findMany({ include: { DashBoardRoles: true, ApplicationRole: true }});
   const branchUsers = await prisma.branchUser.findMany({ include: { DashBoardRoles: true }});
   const dailyBalances = await prisma.merchants_daily_balances.findMany();
   const merchantTxns = await prisma.merchant_txns.findMany();
@@ -38,15 +38,15 @@ export default async function RootLayout({
   const initialData = {
     branches: branches.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     allowedCompanies: allowedCompanies.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
-    merchants: merchants.map(item => ({ ...item, DashBoardRoles: item.DashBoardRoles ? { ...item.DashBoardRoles, createdAt: item.DashBoardRoles.createdAt.toISOString(), updatedAt: item.DashBoardRoles.updatedAt.toISOString() } : null, LASTLOGINATTEMPT: item.LASTLOGINATTEMPT?.toISOString() ?? null, UNLOCKEDTIME: item.UNLOCKEDTIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    merchants: merchants.map(item => ({ ...item, ApplicationRole: item.ApplicationRole ? { ...item.ApplicationRole, INSERTDATE: item.ApplicationRole.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.ApplicationRole.UPDATEDATE?.toISOString() ?? null} : null, DashBoardRoles: item.DashBoardRoles ? { ...item.DashBoardRoles, createdAt: item.DashBoardRoles.createdAt.toISOString(), updatedAt: item.DashBoardRoles.updatedAt.toISOString() } : null, LASTLOGINATTEMPT: item.LASTLOGINATTEMPT?.toISOString() ?? null, UNLOCKEDTIME: item.UNLOCKEDTIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     branchUsers: branchUsers.map(user => ({...user, password: '', DashBoardRoles: user.DashBoardRoles ? { ...user.DashBoardRoles, createdAt: user.DashBoardRoles.createdAt.toISOString(), updatedAt: user.DashBoardRoles.updatedAt.toISOString() } : null })),
-    dailyBalances: dailyBalances.map(item => ({ ...item, DAILYBALANCE: item.DAILYBALANCE.toNumber(), BALANCEDATE: item.BALANCEDATE?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
-    merchantTxns: merchantTxns.map(item => ({ ...item, AMOUNT: item.AMOUNT.toNumber(), T2TRANSACTIONDATE: item.T2TRANSACTIONDATE?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    dailyBalances: dailyBalances.map(item => ({ ...item, DAILYBALANCE: item.DAILYBALANCE ? item.DAILYBALANCE.toNumber() : 0, BALANCEDATE: item.BALANCEDATE?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    merchantTxns: merchantTxns.map(item => ({ ...item, AMOUNT: item.AMOUNT ? item.AMOUNT.toNumber() : 0, T2TRANSACTIONDATE: item.T2TRANSACTIONDATE?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     arifRequests: arifRequests.map(item => ({...item, AMOUNT: item.AMOUNT.toNumber(), DATESEND1: item.DATESEND1?.toISOString() ?? null, DATERECIVED1: item.DATERECIVED1?.toISOString() ?? null, DATESEND2: item.DATESEND2?.toISOString() ?? null, DATERECIVED2: item.DATERECIVED2?.toISOString() ?? null, DATESEND3: item.DATESEND3?.toISOString() ?? null, DATERECIVED3: item.DATERECIVED3?.toISOString() ?? null, WEBHOOKRECEIVEDDATE: item.WEBHOOKRECEIVEDDATE?.toISOString() ?? null })),
     arifpayEndpoints: arifpayEndpoints.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     controllersConfigs: controllersConfigs.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     coreIntegrationSettings: coreIntegrationSettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
-    paystreamTxns: paystreamTxns.map(item => ({ ...item, AMOUNT: parseFloat(item.AMOUNT), INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    paystreamTxns: paystreamTxns.map(item => ({ ...item, AMOUNT: parseFloat(item.AMOUNT || '0'), INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     streamPaySettings: streamPaySettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     ussdPushSettings: ussdPushSettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     qrPayments: qrPayments.map(item => ({ ...item, AMOUNT: item.AMOUNT.toNumber(), EXPIRETIME: item.EXPIRETIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
@@ -74,3 +74,5 @@ export default async function RootLayout({
     </html>
   );
 }
+
+    
