@@ -111,43 +111,55 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const isSystemAdmin = currentUser?.role === 'System Admin';
   const isBranchUser = currentUser?.userType === 'branch';
   const userAccountNumber = currentUser?.accountNumber;
+  const isMerchantAdmin = currentUser?.role === 'Merchant Admin';
+  const isMerchantSales = currentUser?.role === 'Merchant Sales';
 
-  const filteredBranches = React.useMemo(() => isSystemAdmin ? branches : [], [isSystemAdmin, branches]);
+
+  const filteredBranches = React.useMemo(() => branches.filter(b => isSystemAdmin || (isBranchUser && b.name === currentUser?.branch)), [isSystemAdmin, isBranchUser, currentUser, branches]);
   
   const filteredAllowedCompanies = React.useMemo(() => {
-    if (isSystemAdmin) return allowedCompanies;
-    if (currentUser?.userType === 'branch') {
-        return allowedCompanies.filter(c => c.branchName === currentUser.branch);
-    }
+    if (isSystemAdmin || isBranchUser) return allowedCompanies;
     if (userAccountNumber) return allowedCompanies.filter(c => c.ACCOUNTNUMBER === userAccountNumber);
     return [];
-  }, [isSystemAdmin, userAccountNumber, currentUser, allowedCompanies]);
+  }, [isSystemAdmin, isBranchUser, userAccountNumber, allowedCompanies]);
 
   const filteredMerchants = React.useMemo(() => {
-    if (isSystemAdmin) return merchants;
-    if (userAccountNumber) return merchants.filter(m => m.ACCOUNTNUMBER === userAccountNumber);
+    if (isSystemAdmin || isBranchUser) return merchants;
+    if (isMerchantAdmin) {
+        return merchants.filter(m => m.ACCOUNTNUMBER === userAccountNumber);
+    }
+    if (isMerchantSales) {
+        return merchants.filter(m => m.ID === currentUser?.userId);
+    }
     return [];
-  }, [isSystemAdmin, userAccountNumber, merchants]);
+  }, [isSystemAdmin, isBranchUser, isMerchantAdmin, isMerchantSales, userAccountNumber, currentUser, merchants]);
 
-  const filteredBranchUsers = React.useMemo(() => isSystemAdmin ? branchUsers : [], [isSystemAdmin, branchUsers]);
+  const filteredBranchUsers = React.useMemo(() => {
+      if (isSystemAdmin) return branchUsers;
+      if (isBranchUser) {
+          return branchUsers.filter(bu => bu.branch === currentUser?.branch);
+      }
+      return [];
+  }, [isSystemAdmin, isBranchUser, currentUser, branchUsers]);
 
   const dailyBalances = React.useMemo(() => {
-    if (isSystemAdmin) return initialData.dailyBalances;
-    if (userAccountNumber) return initialData.dailyBalances.filter(db => db.MERCHANTACCOUNT === userAccountNumber);
+    if (isSystemAdmin || isBranchUser) return initialData.dailyBalances;
+    if (isMerchantAdmin) return initialData.dailyBalances.filter(db => db.MERCHANTACCOUNT === userAccountNumber);
     return [];
-  }, [isSystemAdmin, userAccountNumber, initialData.dailyBalances]);
+  }, [isSystemAdmin, isBranchUser, isMerchantAdmin, userAccountNumber, initialData.dailyBalances]);
 
   const merchantTxns = React.useMemo(() => {
-    if (isSystemAdmin) return initialData.merchantTxns;
-    if (userAccountNumber) return initialData.merchantTxns.filter(txn => txn.MERCHANTACCOUNT === userAccountNumber);
+    if (isSystemAdmin || isBranchUser) return initialData.merchantTxns;
+    if (isMerchantAdmin) return initialData.merchantTxns.filter(txn => txn.MERCHANTACCOUNT === userAccountNumber);
+    if (isMerchantSales) return initialData.merchantTxns.filter(txn => txn.MERCHANTPHONE === currentUser?.email);
     return [];
-  }, [isSystemAdmin, userAccountNumber, initialData.merchantTxns]);
+  }, [isSystemAdmin, isBranchUser, isMerchantAdmin, isMerchantSales, userAccountNumber, currentUser, initialData.merchantTxns]);
 
   const arifRequests = React.useMemo(() => {
-     if (isSystemAdmin) return initialData.arifRequests;
+     if (isSystemAdmin || isBranchUser) return initialData.arifRequests;
     if (userAccountNumber) return initialData.arifRequests.filter(ar => ar.MERCHANTACCOUNT === userAccountNumber);
     return [];
-  }, [isSystemAdmin, userAccountNumber, initialData.arifRequests]);
+  }, [isSystemAdmin, isBranchUser, userAccountNumber, initialData.arifRequests]);
   
   // These are system-level and should probably only be visible to system admins
   const arifpayEndpoints = React.useMemo(() => isSystemAdmin ? initialData.arifpayEndpoints : [], [isSystemAdmin, initialData.arifpayEndpoints]);
@@ -158,26 +170,26 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const roleCapabilities = React.useMemo(() => isSystemAdmin ? initialData.roleCapabilities : [], [isSystemAdmin, initialData.roleCapabilities]);
   
   const paystreamTxns = React.useMemo(() => {
-    if (isSystemAdmin) return initialData.paystreamTxns;
+    if (isSystemAdmin || isBranchUser) return initialData.paystreamTxns;
     if (userAccountNumber) return initialData.paystreamTxns.filter(pt => pt.MERCHANTACCOUNTNUMBER === userAccountNumber);
     return [];
-  }, [isSystemAdmin, userAccountNumber, initialData.paystreamTxns]);
+  }, [isSystemAdmin, isBranchUser, userAccountNumber, initialData.paystreamTxns]);
 
   const qrPayments = React.useMemo(() => {
-    if (isSystemAdmin) return initialData.qrPayments;
+    if (isSystemAdmin || isBranchUser) return initialData.qrPayments;
     // QR payments don't have a direct company link, filtering by sales phone
     const companySalesPhones = new Set(merchants.map(m => m.PHONENUMBER));
     return initialData.qrPayments.filter(qp => qp.SALERPHONENUMBER ? companySalesPhones.has(qp.SALERPHONENUMBER) : false);
-  }, [isSystemAdmin, merchants, initialData.qrPayments]);
+  }, [isSystemAdmin, isBranchUser, merchants, initialData.qrPayments]);
 
   const accountInfos = React.useMemo(() => {
-    if (isSystemAdmin) return initialData.accountInfos;
+    if (isSystemAdmin || isBranchUser) return initialData.accountInfos;
     if (userAccountNumber) {
         const relatedAccounts = new Set([userAccountNumber, ...merchants.map(m => m.ACCOUNTNUMBER)]);
         return initialData.accountInfos.filter(ai => relatedAccounts.has(ai.ACCOUNTNUMBER));
     }
     return [];
-  }, [isSystemAdmin, userAccountNumber, merchants, initialData.accountInfos]);
+  }, [isSystemAdmin, isBranchUser, userAccountNumber, merchants, initialData.accountInfos]);
   
   // Promo adds are likely global
   const promoAdds = initialData.promoAdds;
@@ -371,9 +383,9 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
 
   const value = {
     branches: filteredBranches,
-    allowedCompanies,
-    merchants,
-    branchUsers,
+    allowedCompanies: filteredAllowedCompanies,
+    merchants: filteredMerchants,
+    branchUsers: filteredBranchUsers,
     dailyBalances,
     merchantTxns,
     arifRequests,

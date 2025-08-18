@@ -60,17 +60,17 @@ const StatusBadge = ({ status }: { status: string }) => {
     let text = 'Unknown';
 
     switch (status?.toUpperCase()) {
-        case 'A':
+        case 'ACTIVE':
             variant = 'success';
             text = 'Active';
             break;
-        case 'P':
+        case 'PENDING':
             variant = 'secondary';
             text = 'Pending';
             break;
-        case 'B':
+        case 'DISABLED':
             variant = 'destructive';
-            text = 'Blocked';
+            text = 'Disabled';
             break;
         default:
             text = status;
@@ -81,12 +81,12 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 
 export default function MerchantList({ merchants: initialMerchants }: { merchants: Merchant_users[] }) {
-  const { merchants: contextMerchants, allowedCompanies } = useDataContext();
+  const { merchants: contextMerchants, allowedCompanies, currentUser } = useDataContext();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
-  } | null>({ key: 'FULLNAME', direction: 'ascending' });
+  } | null>(null);
   const [activeTab, setActiveTab] = React.useState('all');
   const [companyFilter, setCompanyFilter] = React.useState('all');
   const [searchField, setSearchField] = React.useState('all');
@@ -157,14 +157,16 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
       });
     } else {
         sortableItems.sort((a, b) => {
+            if (currentUser && a.ID === currentUser.userId) return -1;
+            if (currentUser && b.ID === currentUser.userId) return 1;
             if (a.ROLE === 'Admin' && b.ROLE !== 'Admin') return -1;
             if (a.ROLE !== 'Admin' && b.ROLE === 'Admin') return 1;
-            return 0;
+            return a.FULLNAME.localeCompare(b.FULLNAME);
         });
     }
 
     return sortableItems;
-  }, [contextMerchants, searchTerm, sortConfig, activeTab, companyFilter, searchField, allowedCompanies]);
+  }, [contextMerchants, searchTerm, sortConfig, activeTab, companyFilter, searchField, allowedCompanies, currentUser]);
   
   const paginatedMerchants = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -189,9 +191,9 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
         <div className="flex items-center">
             <TabsList>
               <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="A">Active</TabsTrigger>
-              <TabsTrigger value="P">Pending</TabsTrigger>
-              <TabsTrigger value="B">Blocked</TabsTrigger>
+              <TabsTrigger value="Active">Active</TabsTrigger>
+              <TabsTrigger value="Pending">Pending</TabsTrigger>
+              <TabsTrigger value="Disabled">Disabled</TabsTrigger>
             </TabsList>
           <div className="ml-auto flex items-center gap-2">
             <Select value={companyFilter} onValueChange={setCompanyFilter}>
