@@ -1,7 +1,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import { randomUUID } from 'crypto';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '../src/lib/prisma';
 
 
 const MOCK_ALLOWED_COMPANIES = [
@@ -111,6 +111,33 @@ const MOCK_PROMO_ADDS = [
     { ID: randomUUID(), ADDTITLE: 'Clearance Event', ADDSUBTITLE: 'Everything must go!', ADDADDRESS: 'https://example.com/clearance', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 5, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-20'), UPDATEDATE: new Date('2023-11-20') },
 ];
 
+const ADMIN_PAGES = [
+  '/dashboard',
+  '/dashboard/allowed_companies',
+  '/dashboard/merchant_users',
+  '/dashboard/account-infos',
+  '/dashboard/promo-adds',
+  '/dashboard/daily-balances',
+  '/dashboard/merchant-txns',
+  '/dashboard/arif-requests',
+  '/dashboard/paystream-txns',
+  '/dashboard/qr-payments',
+  '/dashboard/arifpay-endpoints',
+  '/dashboard/controllers-configs',
+  '/dashboard/core-integration-settings',
+  '/dashboard/stream-pay-settings',
+  '/dashboard/ussd-push-settings',
+  '/dashboard/role-capabilities',
+  '/dashboard/approvals/allowed_companies',
+  '/dashboard/role-management',
+];
+
+const SALES_PAGES = [
+  '/dashboard',
+  '/dashboard/merchant-txns',
+  '/dashboard/daily-balances',
+];
+
 async function main() {
     console.log(`Start seeding ...`);
 
@@ -129,7 +156,7 @@ async function main() {
     await prisma.arif_requests.deleteMany({});
     await prisma.merchant_txns.deleteMany({});
     await prisma.merchants_daily_balances.deleteMany({});
-    await prisma.Merchant_users.deleteMany({});
+    await prisma.merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
     await prisma.Roles.deleteMany({});
 
@@ -140,6 +167,22 @@ async function main() {
     
     console.log('Seeded 2 default roles.');
 
+    // Seed permissions for roles
+    for (const page of ADMIN_PAGES) {
+      await prisma.dashboard_permissions.create({
+        data: { page, roleId: adminRole.ID }
+      });
+    }
+    console.log(`Seeded ${ADMIN_PAGES.length} permissions for Admin role.`);
+
+    for (const page of SALES_PAGES) {
+      await prisma.dashboard_permissions.create({
+        data: { page, roleId: salesRole.ID }
+      });
+    }
+    console.log(`Seeded ${SALES_PAGES.length} permissions for Sales role.`);
+
+
     for (const c of MOCK_ALLOWED_COMPANIES) {
         await prisma.allowed_companies.create({ data: c });
     }
@@ -147,7 +190,7 @@ async function main() {
 
     for (const m of MOCK_MERCHANT_USERS) {
         const { ROLENAME, ...merchantData } = m;
-        await prisma.Merchant_users.create({
+        await prisma.merchant_users.create({
             data: {
                 ...merchantData,
                 ROLE: ROLENAME,
@@ -224,3 +267,5 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
+    
