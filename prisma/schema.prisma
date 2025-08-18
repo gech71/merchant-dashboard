@@ -8,20 +8,20 @@ datasource db {
 }
 
 model Manage_otps {
-  ID          String    @id @db.Uuid
-  ACCOUNTNUMBER String  @db.VarChar(50)
-  PHONENUMBER String    @db.VarChar(15)
-  FULLNAME    String?   @db.VarChar(100)
-  OTPSENT     DateTime  @db.Timestamp()
-  OTPEXPIRE   DateTime  @db.Timestamp()
-  SENTCHANNEL String?   @db.VarChar(10)
-  OTPCODE     String    @default("") @db.Text
-  VALUE2      String?   @db.Text
-  VALUE3      String?   @db.Text
-  INSERTDATE  DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE  DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER  String?   @default("system") @db.Text
-  UPDATEUSER  String?   @default("system") @db.Text
+  ID            String    @id @db.Uuid
+  ACCOUNTNUMBER String    @db.VarChar(50)
+  PHONENUMBER   String    @db.VarChar(15)
+  FULLNAME      String?   @db.VarChar(100)
+  OTPSENT       DateTime  @db.Timestamp()
+  OTPEXPIRE     DateTime  @db.Timestamp()
+  SENTCHANNEL   String?   @db.VarChar(10)
+  OTPCODE       String    @default("") @db.Text
+  VALUE2        String?   @db.Text
+  VALUE3        String?   @db.Text
+  INSERTDATE    DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER    String?   @default("system") @db.Text
+  UPDATEUSER    String?   @default("system") @db.Text
 
   @@map("Manage_otps")
 }
@@ -52,24 +52,38 @@ model Merchant_users {
   ApplicationRole   Roles?    @relation(fields: [roleId], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_merchant_users_roles")
 
   @@map("Merchant_users")
-  @@index([roleId], map: "IX_Merchant_users_roleId")
 }
 
 model Roles {
-  ID           String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ROLENAME     String           @db.VarChar(100)
-  VALUE1       String?          @db.Text
-  VALUE2       String?          @db.Text
-  VALUE3       String?          @db.Text
-  INSERTUSERID String?          @db.Text
-  UPDATEUSERID String?          @db.Text
-  INSERTDATE   DateTime?        @default(now()) @db.Timestamp()
-  UPDATEDATE   DateTime?        @default(now()) @db.Timestamp()
+  ID           String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ROLENAME     String                  @db.VarChar(100)
+  description  String?                 @db.Text
+  VALUE1       String?                 @db.Text
+  VALUE2       String?                 @db.Text
+  VALUE3       String?                 @db.Text
+  INSERTUSERID String?                 @db.Text
+  UPDATEUSERID String?                 @db.Text
+  INSERTDATE   DateTime?               @default(now()) @db.Timestamp()
+  UPDATEDATE   DateTime?               @default(now()) @db.Timestamp()
   Merchant_users Merchant_users[]
   capabilities role_capablities[]
+  permissions  dashboard_permissions[]
 
   @@map("Roles")
 }
+
+model dashboard_permissions {
+  id     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  page   String
+  roleId String   @db.Uuid
+  role   Roles    @relation(fields: [roleId], references: [ID], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([roleId, page])
+  @@map("dashboard_permissions")
+}
+
 
 model account_infos {
   ID            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -186,13 +200,13 @@ model arifpay_endpoints {
 }
 
 model controllersconfigs {
-  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  CONTROLLERKEY String @db.Text
-  APIKEY     String?   @db.Text
-  INSERTDATE DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER String?   @db.Text
-  UPDATEUSER String?   @db.Text
+  ID            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  CONTROLLERKEY String    @db.Text
+  APIKEY        String?   @db.Text
+  INSERTDATE    DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER    String?   @db.Text
+  UPDATEUSER    String?   @db.Text
 
   @@map("controllersconfigs")
 }
@@ -212,25 +226,25 @@ model core_integration_settings {
 }
 
 model merchant_txns {
-  ID                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  MERCHANTACCOUNT      String    @db.VarChar(20)
-  MERCHANTPHONE        String    @db.VarChar(15)
-  AMOUNT               Decimal?  @db.Decimal
-  TXNID                String?   @db.VarChar(200)
-  CUSTOMERNAME         String?   @db.VarChar(100)
-  CUSTOMERACCOUNT      String?   @db.VarChar(50)
-  T24USER              String?   @db.VarChar(20)
-  T2TRANSACTIONDATE    DateTime? @db.Timestamp()
-  STATUS               String?   @db.VarChar(15)
-  TRANSACTIONCHANNEL   String?   @db.VarChar(50)
-  TRANSACTIONSERVICE   String?   @db.VarChar(50)
-  VALUE1               String?   @db.Text
-  VALUE2               String?   @db.Text
-  VALUE3               String?   @db.Text
-  INSERTDATE           DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE           DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER           String?   @db.Text
-  UPDATEUSER           String?   @db.Text
+  ID                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  MERCHANTACCOUNT    String    @db.VarChar(20)
+  MERCHANTPHONE      String    @db.VarChar(15)
+  AMOUNT             Decimal?  @db.Decimal
+  TXNID              String?   @db.VarChar(200)
+  CUSTOMERNAME       String?   @db.VarChar(100)
+  CUSTOMERACCOUNT    String?   @db.VarChar(50)
+  T24USER            String?   @db.VarChar(20)
+  T2TRANSACTIONDATE  DateTime? @db.Timestamp()
+  STATUS             String?   @db.VarChar(15)
+  TRANSACTIONCHANNEL String?   @db.VarChar(50)
+  TRANSACTIONSERVICE String?   @db.VarChar(50)
+  VALUE1             String?   @db.Text
+  VALUE2             String?   @db.Text
+  VALUE3             String?   @db.Text
+  INSERTDATE         DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE         DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER         String?   @db.Text
+  UPDATEUSER         String?   @db.Text
 
   @@map("merchant_txns")
 }
@@ -261,7 +275,7 @@ model paystream_txns {
   INSERTDATE            DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE            DateTime? @default(now()) @db.Timestamp()
   INSERTUSER            String?   @default("system") @db.Text
-  UPDATEUSER            String?   @db.Text
+  UPDATEUSER            String?   @default("system") @db.Text
 
   @@map("paystream_txns")
 }
@@ -293,7 +307,7 @@ model qr_payments {
   INSERTDATE       DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE       DateTime? @default(now()) @db.Timestamp()
   INSERTUSER       String?   @default("system") @db.Text
-  UPDATEUSER       String?   @db.Text
+  UPDATEUSER       String?   @default("system") @db.Text
 
   @@map("qr_payments")
 }
@@ -313,10 +327,10 @@ model role_capablities {
   UPDATEUSERID String?   @default("system") @db.Text
   INSERTDATE   DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE   DateTime? @default(now()) @db.Timestamp()
-  Role         Roles     @relation(fields: [ROLEID], references: [ID])
+  role         Roles     @relation(fields: [ROLEID], references: [ID], onDelete: Cascade)
+
 
   @@map("role_capablities")
-  @@index([ROLEID], map: "IX_role_capablities_ROLEID")
 }
 
 model stream_pay_settings {
@@ -329,8 +343,8 @@ model stream_pay_settings {
   PASSWORD   String?   @db.Text
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER String?   @db.Text
-  UPDATEUSER String?   @db.Text
+  INSERTUSER String?   @default("system") @db.Text
+  UPDATEUSER String?   @default("system") @db.Text
 
   @@map("stream_pay_settings")
 }
@@ -343,8 +357,8 @@ model ussd_push_settings {
   PASSWORD   String?   @db.Text
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER String?   @db.Text
-  UPDATEUSER String?   @db.Text
+  INSERTUSER String?   @default("system") @db.Text
+  UPDATEUSER String?   @default("system") @db.Text
 
   @@map("ussd_push_settings")
 }

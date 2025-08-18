@@ -8,25 +8,44 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   try {
     const { id } = params;
     const body = await request.json();
-    const { name, description, permissions } = body;
+    const { ROLENAME, description, pages } = body;
 
-    if (!name || !permissions) {
+    if (!ROLENAME || !pages) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    const updatedRole = await prisma.role.update({
-      where: { id },
-      data: {
-        name,
-        description,
-        permissions,
-      },
-    });
+    // Use a transaction to update role and its permissions
+    const [, updatedRole] = await prisma.$transaction([
+        // Delete old permissions
+        prisma.dashboard_permissions.deleteMany({
+            where: { roleId: id }
+        }),
+        // Create new permissions
+        prisma.dashboard_permissions.createMany({
+            data: pages.map((page: string) => ({
+                page: page,
+                roleId: id,
+            }))
+        }),
+        // Update the role details
+        prisma.Roles.update({
+            where: { ID: id },
+            data: {
+                ROLENAME,
+                description,
+            },
+            include: {
+                permissions: true,
+            }
+        })
+    ]);
+
 
      const updatedRoleSerializable = {
         ...updatedRole,
-        createdAt: updatedRole.createdAt.toISOString(),
-        updatedAt: updatedRole.updatedAt.toISOString(),
+        INSERTDATE: updatedRole.INSERTDATE?.toISOString() ?? null,
+        UPDATEDATE: updatedRole.UPDATEDATE?.toISOString() ?? null,
+        permissions: updatedRole.permissions.map(p => ({...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString()}))
     }
 
     return NextResponse.json(updatedRoleSerializable, { status: 200 });
@@ -39,7 +58,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
-    await prisma.role.delete({ where: { id } });
+    
+    // Deleting a role will also delete its permissions due to cascading delete
+    await prisma.Roles.delete({ where: { ID: id } });
     return NextResponse.json({ message: 'Role deleted successfully' }, { status: 200 });
   } catch (error) {
     console.error(`Error deleting role ${params.id}:`, error);

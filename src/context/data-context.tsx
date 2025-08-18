@@ -33,9 +33,13 @@ type InitialData = {
     roleCapabilities: role_capablities[];
 }
 
-type DataContextType = InitialData & {
+type DataContextType = Omit<InitialData, 'roles'> & {
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
+  roles: Roles[];
+  addRole: (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions'> & { pages: string[] }) => Promise<void>;
+  updateRole: (role: { id: string; ROLENAME: string; description?: string | null; pages: string[] }) => Promise<void>;
+  deleteRole: (roleId: string) => Promise<void>;
   addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord' | 'branchName'>) => Promise<void>;
   updateAllowedCompany: (company: allowed_companies) => Promise<void>;
   updateMerchant: (merchant: Merchant_users) => Promise<void>;
@@ -252,6 +256,36 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? returnedUser : m));
   };
 
+  const addRole = async (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions'> & { pages: string[] }) => {
+    const response = await fetch('/api/roles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(role),
+    });
+    if (!response.ok) throw new Error('Failed to create role');
+    const newRole = await response.json();
+    setRoles(prev => [...prev, newRole]);
+  };
+
+  const updateRole = async (role: { id: string; ROLENAME: string; description?: string | null; pages: string[] }) => {
+    const response = await fetch(`/api/roles/${role.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(role),
+    });
+    if (!response.ok) throw new Error('Failed to update role');
+    const updatedRole = await response.json();
+    setRoles(prev => prev.map(r => r.ID === updatedRole.ID ? updatedRole : r));
+  };
+
+  const deleteRole = async (roleId: string) => {
+    const response = await fetch(`/api/roles/${roleId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete role');
+    setRoles(prev => prev.filter(r => r.ID !== roleId));
+  };
+
   const value: DataContextType = {
     ...initialData,
     allowedCompanies: filteredAllowedCompanies,
@@ -277,6 +311,9 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     updateMerchant,
     updateAllowedCompanyApproval,
     updateMerchantStatus,
+    addRole,
+    updateRole,
+    deleteRole,
   };
 
   if (loading) {
@@ -297,5 +334,3 @@ export function useDataContext() {
   }
   return context;
 }
-
-    

@@ -31,9 +31,9 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
     let user: any = null;
     let role: any = null;
     
-    user = await prisma.merchant_users.findUnique({
+    user = await prisma.Merchant_users.findUnique({
         where: { ID: userId },
-        include: { ApplicationRole: { include: { capabilities: true } } },
+        include: { ApplicationRole: { include: { permissions: true } } },
     });
     role = user?.ApplicationRole;
     
@@ -41,7 +41,7 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
       return null;
     }
     
-    const permissions = role.capabilities.map((cap: { ADDRESS: string }) => cap.ADDRESS);
+    const permissions = role.permissions.map((p: { page: string }) => p.page);
     
     return {
         userId: user.ID,
@@ -68,5 +68,3 @@ export async function getMe() {
     }
     return new NextResponse(JSON.stringify(user));
 }
-
-    

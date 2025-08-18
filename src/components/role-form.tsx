@@ -1,7 +1,7 @@
 
 'use client';
 import * as React from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -11,15 +11,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useDataContext } from '@/context/data-context';
 import { useToast } from '@/hooks/use-toast';
-import type { DashBoardRoles } from '@/types';
+import type { Roles } from '@/types';
 import { ScrollArea } from './ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 
 const PAGE_GROUPS = {
   Management: [
     { id: '/dashboard/allowed_companies', label: 'Allowed Companies' },
-    { id: '/dashboard/branches', label: 'Branches' },
-    { id: '/dashboard/branch-users', label: 'Branch Users' },
     { id: '/dashboard/merchant_users', label: 'Merchant Users' },
     { id: '/dashboard/account-infos', label: 'Account Infos' },
     { id: '/dashboard/promo-adds', label: 'Promo Ads' },
@@ -32,8 +30,7 @@ const PAGE_GROUPS = {
     { id: '/dashboard/qr-payments', label: 'QR Payments' },
   ],
   Approvals: [
-    { id: '/dashboard/approvals/allowed_companies', label: 'Allowed Companies' },
-    { id: '/dashboard/approvals/branch_users', label: 'Branch Users' },
+    { id: '/dashboard/approvals/allowed_companies', label: 'Allowed Companies Approvals' },
   ],
   "System Settings": [
     { id: '/dashboard/arifpay-endpoints', label: 'ArifPay Endpoints' },
@@ -46,7 +43,6 @@ const PAGE_GROUPS = {
   "Administration": [
      { id: '/dashboard', label: 'Dashboard' },
      { id: '/dashboard/role-management', label: 'Role Management' },
-     { id: '/dashboard/user-role-assignment', label: 'User Role Assignment' },
   ]
 };
 
@@ -54,28 +50,24 @@ const ALL_PAGES = Object.values(PAGE_GROUPS).flat();
 
 
 const roleFormSchema = z.object({
-    name: z.string().min(2, 'Role name is required.'),
+    ROLENAME: z.string().min(2, 'Role name is required.'),
     description: z.string().optional(),
-    permissions: z.object({
-        pages: z.array(z.string()).refine(value => value.some(item => item), {
-            message: "You have to select at least one page.",
-        }),
-    })
+    pages: z.array(z.string()).refine(value => value.some(item => item), {
+        message: "You have to select at least one page.",
+    }),
 });
 
 type RoleFormValues = z.infer<typeof roleFormSchema>;
 
-export function RoleForm({ setOpen, role }: { setOpen: (open: boolean) => void, role: DashBoardRoles | null }) {
+export function RoleForm({ setOpen, role }: { setOpen: (open: boolean) => void, role: Roles | null }) {
     const { addRole, updateRole } = useDataContext();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = React.useState(false);
 
     const defaultValues = {
-        name: role?.name || '',
+        ROLENAME: role?.ROLENAME || '',
         description: role?.description || '',
-        permissions: {
-            pages: (role?.permissions as { pages: string[] })?.pages || []
-        }
+        pages: role?.permissions?.map(p => p.page) || []
     };
 
     const form = useForm<RoleFormValues>({
@@ -83,16 +75,11 @@ export function RoleForm({ setOpen, role }: { setOpen: (open: boolean) => void, 
         defaultValues,
     });
     
-    const { fields, append, remove } = useFieldArray({
-        control: form.control,
-        name: "permissions.pages"
-    });
-
     async function onSubmit(data: RoleFormValues) {
         setIsLoading(true);
         try {
             if (role) {
-                await updateRole({ ...role, ...data });
+                await updateRole({ id: role.ID, ...data });
                 toast({ title: "Role Updated", description: "The role has been successfully updated." });
             } else {
                 await addRole(data);
@@ -111,7 +98,7 @@ export function RoleForm({ setOpen, role }: { setOpen: (open: boolean) => void, 
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                     control={form.control}
-                    name="name"
+                    name="ROLENAME"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Role Name</FormLabel>
@@ -133,7 +120,7 @@ export function RoleForm({ setOpen, role }: { setOpen: (open: boolean) => void, 
                 />
                  <FormField
                     control={form.control}
-                    name="permissions.pages"
+                    name="pages"
                     render={() => (
                         <FormItem>
                              <div>
@@ -151,7 +138,7 @@ export function RoleForm({ setOpen, role }: { setOpen: (open: boolean) => void, 
                                                     <FormField
                                                         key={item.id}
                                                         control={form.control}
-                                                        name="permissions.pages"
+                                                        name="pages"
                                                         render={({ field }) => (
                                                             <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
                                                                 <FormControl>
@@ -159,7 +146,7 @@ export function RoleForm({ setOpen, role }: { setOpen: (open: boolean) => void, 
                                                                         checked={field.value?.includes(item.id)}
                                                                         onCheckedChange={(checked) => (
                                                                             checked
-                                                                                ? field.onChange([...field.value, item.id])
+                                                                                ? field.onChange([...(field.value || []), item.id])
                                                                                 : field.onChange(field.value?.filter(value => value !== item.id))
                                                                         )}
                                                                     />

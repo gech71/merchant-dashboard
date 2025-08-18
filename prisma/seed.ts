@@ -10,11 +10,6 @@ const MOCK_ALLOWED_COMPANIES = [
   { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC003', FIELDNAME: 'Quantum Corp', APPROVEUSER: null, APPROVED: false, STATUS: false, INSERTDATE: new Date('2023-03-10'), UPDATEDATE: new Date('2023-03-10'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Downtown Branch' },
   { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC004', FIELDNAME: 'Synergy Systems', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Westside Branch' },
   { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC005', FIELDNAME: 'Pioneer Ltd.', APPROVEUSER: 'admin', APPROVED: false, STATUS: false, INSERTDATE: new Date('2023-05-12'), UPDATEDATE: new Date('2023-05-12'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'South Branch' },
-  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC006', FIELDNAME: 'Future Gadgets', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-06-15'), UPDATEDATE: new Date('2023-06-15'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Northside Branch' },
-  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC007', FIELDNAME: 'Evergreen Market', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-07-20'), UPDATEDATE: new Date('2023-07-20'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Northside Branch' },
-  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC008', FIELDNAME: 'Starlight Books', APPROVEUSER: null, APPROVED: false, STATUS: false, INSERTDATE: new Date('2023-08-10'), UPDATEDATE: new Date('2023-08-10'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Central Hub' },
-  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC009', FIELDNAME: 'Velocity Motors', APPROVEUSER: 'admin', APPROVED: true, STATUS: false, INSERTDATE: new Date('2023-09-05'), UPDATEDATE: new Date('2023-09-05'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Uptown Branch' },
-  { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC010', FIELDNAME: 'Zenith Bank', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-10-12'), UPDATEDATE: new Date('2023-10-12'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Downtown Branch' },
 ];
 
 const MOCK_MERCHANT_USERS = [
@@ -23,14 +18,9 @@ const MOCK_MERCHANT_USERS = [
   { ID: randomUUID(), FULLNAME: 'Gadget Hub Admin', ROLENAME: 'Admin', STATUS: 'Pending', ACCOUNTNUMBER: 'ACC003', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '333-444-5555', DEVICENAME: 'Device3', ENCRYPTIONKEY: 'key3', iV: 'iv3', ISLOGGEDIN: false, authenticationkey: 'auth3', FAILEDATTMEPTS: 2, LASTLOGINATTEMPT: new Date('2023-05-28'), ISLOCKED: true, UNLOCKEDTIME: new Date('2023-06-01T10:00:00Z'), VALUE3: 'v3_3', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-03-10'), UPDATEDATE: new Date('2023-03-10') },
   { ID: randomUUID(), FULLNAME: 'Style Central Admin', ROLENAME: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC004', ACCOUNTTYPE: 'TypeC', PHONENUMBER: '444-555-6666', DEVICENAME: 'Device4', ENCRYPTIONKEY: 'key4', iV: 'iv4', ISLOGGEDIN: true, authenticationkey: 'auth4', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_4', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05') },
   { ID: randomUUID(), FULLNAME: 'Bookworm Haven Admin', ROLENAME: 'Admin', STATUS: 'Disabled', ACCOUNTNUMBER: 'ACC005', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '555-666-7777', DEVICENAME: 'Device5', ENCRYPTIONKEY: 'key5', iV: 'iv5', ISLOGGEDIN: false, authenticationkey: 'auth5', FAILEDATTMEPTS: 5, LASTLOGINATTEMPT: new Date('2023-05-20'), ISLOCKED: true, UNLOCKEDTIME: null, VALUE3: 'v3_5', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-05-12'), UPDATEDATE: new Date('2023-05-12') },
-  { ID: randomUUID(), FULLNAME: 'Future Gadgets Admin', ROLENAME: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC006', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '111-000-1111', DEVICENAME: 'Device10', ENCRYPTIONKEY: 'key10', iV: 'iv10', ISLOGGEDIN: true, authenticationkey: 'auth10', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_10', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-06-15'), UPDATEDATE: new Date('2023-06-15') },
-  { ID: randomUUID(), FULLNAME: 'Evergreen Market Admin', ROLENAME: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC007', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '222-111-2222', DEVICENAME: 'Device11', ENCRYPTIONKEY: 'key11', iV: 'iv11', ISLOGGEDIN: false, authenticationkey: 'auth11', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_11', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-07-20'), UPDATEDATE: new Date('2023-07-20') },
   { ID: randomUUID(), FULLNAME: 'Alice Johnson', ROLENAME: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '666-777-8888', DEVICENAME: 'Device6', ENCRYPTIONKEY: 'key6', iV: 'iv6', ISLOGGEDIN: false, authenticationkey: 'auth6', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_6', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15') },
   { ID: randomUUID(), FULLNAME: 'Bob Williams', ROLENAME: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC002', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '777-888-9999', DEVICENAME: 'Device7', ENCRYPTIONKEY: 'key7', iV: 'iv7', ISLOGGEDIN: true, authenticationkey: 'auth7', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_7', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20') },
   { ID: randomUUID(), FULLNAME: 'Charlie Brown', ROLENAME: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '888-777-6666', DEVICENAME: 'Device12', ENCRYPTIONKEY: 'key12', iV: 'iv12', ISLOGGEDIN: true, authenticationkey: 'auth12', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_12', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-01-16'), UPDATEDATE: new Date('2023-01-16') },
-  { ID: randomUUID(), FULLNAME: 'Diana Prince', ROLENAME: 'Sales', STATUS: 'Pending', ACCOUNTNUMBER: 'ACC004', ACCOUNTTYPE: 'TypeC', PHONENUMBER: '888-999-0000', DEVICENAME: 'Device8', ENCRYPTIONKEY: 'key8', iV: 'iv8', ISLOGGEDIN: false, authenticationkey: 'auth8', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_8', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05') },
-  { ID: randomUUID(), FULLNAME: 'Ethan Hunt', ROLENAME: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC006', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '333-222-1111', DEVICENAME: 'Device13', ENCRYPTIONKEY: 'key13', iV: 'iv13', ISLOGGEDIN: false, authenticationkey: 'auth13', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-02'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_13', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-06-16'), UPDATEDATE: new Date('2023-06-16') },
-  { ID: randomUUID(), FULLNAME: 'Fiona Glenanne', ROLENAME: 'Sales', STATUS: 'Disabled', ACCOUNTNUMBER: 'ACC007', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '444-333-2222', DEVICENAME: 'Device14', ENCRYPTIONKEY: 'key14', iV: 'iv14', ISLOGGEDIN: false, authenticationkey: 'auth14', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-21'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_14', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-07-21'), UPDATEDATE: new Date('2023-07-21') },
 ];
 
 const MOCK_DAILY_BALANCES = [
@@ -39,9 +29,6 @@ const MOCK_DAILY_BALANCES = [
   { ID: randomUUID(), MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', DAILYBALANCE: 3200.00, DAILYTXNCOUNT: 50, BALANCEDATE: new Date('2023-06-01'), INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
   { ID: randomUUID(), MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', DAILYBALANCE: 2950.25, DAILYTXNCOUNT: 45, BALANCEDATE: new Date('2023-06-02'), INSERTDATE: new Date('2023-06-02'), UPDATEDATE: new Date('2023-06-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
   { ID: randomUUID(), MERCHANTACCOUNT: 'ACC004', MERCHANTPHONE: '444-555-6666', DAILYBALANCE: 500.00, DAILYTXNCOUNT: 10, BALANCEDATE: new Date('2023-06-01'), INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-  { ID: randomUUID(), MERCHANTACCOUNT: 'ACC006', MERCHANTPHONE: '111-000-1111', DAILYBALANCE: 7500.00, DAILYTXNCOUNT: 80, BALANCEDATE: new Date('2023-07-01'), INSERTDATE: new Date('2023-07-01'), UPDATEDATE: new Date('2023-07-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-  { ID: randomUUID(), MERCHANTACCOUNT: 'ACC007', MERCHANTPHONE: '222-111-2222', DAILYBALANCE: 1200.00, DAILYTXNCOUNT: 15, BALANCEDATE: new Date('2023-07-21'), INSERTDATE: new Date('2023-07-21'), UPDATEDATE: new Date('2023-07-21'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-  { ID: randomUUID(), MERCHANTACCOUNT: 'ACC010', MERCHANTPHONE: '999-888-7777', DAILYBALANCE: 9800.50, DAILYTXNCOUNT: 120, BALANCEDATE: new Date('2023-10-13'), INSERTDATE: new Date('2023-10-13'), UPDATEDATE: new Date('2023-10-13'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_MERCHANT_TXNS = [
@@ -50,9 +37,6 @@ const MOCK_MERCHANT_TXNS = [
     { ID: randomUUID(), MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '222-333-4444', AMOUNT: 200.00, TXNID: 'TXN003', CUSTOMERNAME: 'Customer C', CUSTOMERACCOUNT: 'CUST003', T24USER: 't24user2', T2TRANSACTIONDATE: new Date('2023-06-01T12:00:00Z'), STATUS: 'Pending', TRANSACTIONCHANNEL: 'Online', TRANSACTIONSERVICE: 'Transfer', VALUE1: 'Note A', VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), MERCHANTACCOUNT: 'ACC004', MERCHANTPHONE: '444-555-6666', AMOUNT: 75.50, TXNID: 'TXN004', CUSTOMERNAME: 'Customer D', CUSTOMERACCOUNT: 'CUST004', T24USER: 't24user3', T2TRANSACTIONDATE: new Date('2023-06-01T14:00:00Z'), STATUS: 'Failed', TRANSACTIONCHANNEL: 'POS', TRANSACTIONSERVICE: 'Purchase', VALUE1: 'Error X', VALUE2: 'Retry 1', VALUE3: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), MERCHANTACCOUNT: 'ACC002', MERCHANTPHONE: '777-888-9999', AMOUNT: 500.00, TXNID: 'TXN005', CUSTOMERNAME: 'Customer E', CUSTOMERACCOUNT: 'CUST005', T24USER: 't24user2', T2TRANSACTIONDATE: new Date('2023-06-02T09:00:00Z'), STATUS: 'Completed', TRANSACTIONCHANNEL: 'Online', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-06-02'), UPDATEDATE: new Date('2023-06-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: randomUUID(), MERCHANTACCOUNT: 'ACC006', MERCHANTPHONE: '111-000-1111', AMOUNT: 120.00, TXNID: 'TXN006', CUSTOMERNAME: 'Customer F', CUSTOMERACCOUNT: 'CUST006', T24USER: 't24user4', T2TRANSACTIONDATE: new Date('2023-07-01T10:00:00Z'), STATUS: 'Completed', TRANSACTIONCHANNEL: 'Mobile', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-07-01'), UPDATEDATE: new Date('2023-07-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: randomUUID(), MERCHANTACCOUNT: 'ACC006', MERCHANTPHONE: '333-222-1111', AMOUNT: 85.50, TXNID: 'TXN007', CUSTOMERNAME: 'Customer G', CUSTOMERACCOUNT: 'CUST007', T24USER: 't24user4', T2TRANSACTIONDATE: new Date('2023-07-02T11:00:00Z'), STATUS: 'Completed', TRANSACTIONCHANNEL: 'POS', TRANSACTIONSERVICE: 'Purchase', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-07-02'), UPDATEDATE: new Date('2023-07-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: randomUUID(), MERCHANTACCOUNT: 'ACC001', MERCHANTPHONE: '888-777-6666', AMOUNT: 25.00, TXNID: 'TXN008', CUSTOMERNAME: 'Customer H', CUSTOMERACCOUNT: 'CUST008', T24USER: 't24user1', T2TRANSACTIONDATE: new Date('2023-06-03T15:00:00Z'), STATUS: 'Completed', TRANSACTIONCHANNEL: 'Mobile', TRANSACTIONSERVICE: 'Payment', VALUE1: null, VALUE2: null, VALUE3: null, INSERTDATE: new Date('2023-06-03'), UPDATEDATE: new Date('2023-06-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
 const MOCK_ARIFPAY_ENDPOINTS = [
@@ -131,6 +115,7 @@ async function main() {
     console.log(`Start seeding ...`);
 
     // Deleting data
+    await prisma.dashboard_permissions.deleteMany({});
     await prisma.role_capablities.deleteMany({});
     await prisma.promo_adds.deleteMany({});
     await prisma.account_infos.deleteMany({});
@@ -144,14 +129,14 @@ async function main() {
     await prisma.arif_requests.deleteMany({});
     await prisma.merchant_txns.deleteMany({});
     await prisma.merchants_daily_balances.deleteMany({});
-    await prisma.merchant_users.deleteMany({});
+    await prisma.Merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
-    await prisma.roles.deleteMany({});
+    await prisma.Roles.deleteMany({});
 
 
     // Create default roles
-    const adminRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
-    const salesRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
+    const adminRole = await prisma.Roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
+    const salesRole = await prisma.Roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
     
     console.log('Seeded 2 default roles.');
 
@@ -162,7 +147,7 @@ async function main() {
 
     for (const m of MOCK_MERCHANT_USERS) {
         const { ROLENAME, ...merchantData } = m;
-        await prisma.merchant_users.create({
+        await prisma.Merchant_users.create({
             data: {
                 ...merchantData,
                 ROLE: ROLENAME,
@@ -239,7 +224,3 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-
-    
-
-    

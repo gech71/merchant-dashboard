@@ -17,7 +17,7 @@ export type allowed_companies = Omit<Prisma.allowed_companiesGetPayload<{}>, 'IN
   UPDATEDATE: string | null;
 };
 
-export type Merchant_users = Omit<Prisma.merchant_usersGetPayload<{ include: { ApplicationRole: true } }>, 'LASTLOGINATTEMPT' | 'UNLOCKEDTIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
+export type Merchant_users = Omit<Prisma.Merchant_usersGetPayload<{ include: { ApplicationRole: { include: { permissions: true } } } }>, 'LASTLOGINATTEMPT' | 'UNLOCKEDTIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
   LASTLOGINATTEMPT: string | null;
   UNLOCKEDTIME: string | null;
   INSERTDATE: string | null;
@@ -93,11 +93,11 @@ export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSE
   PARENTID: string | null;
 };
 
-export type Roles = Omit<Prisma.RolesGetPayload<{ include: { capabilities: true } }>, 'INSERTDATE' | 'UPDATEDATE'> & {
+export type dashboard_permissions = Prisma.dashboard_permissionsGetPayload<{}>;
+
+export type Roles = Omit<Prisma.RolesGetPayload<{ include: { capabilities: true, permissions: true } }>, 'INSERTDATE' | 'UPDATEDATE'> & {
     INSERTDATE: string | null;
     UPDATEDATE: string | null;
 };
 
 export type EditableItem = allowed_companies | Merchant_users | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | Roles | null;
-
-    
