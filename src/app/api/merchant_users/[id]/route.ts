@@ -12,11 +12,11 @@ export async function PUT(
     const { id } = params;
     
     const body = await request.json();
-    const { ROLE, STATUS } = body;
+    const { roleId, STATUS } = body;
 
-    const dataToUpdate: { ROLE?: string; STATUS?: string } = {};
-    if (ROLE) {
-        dataToUpdate.ROLE = ROLE;
+    const dataToUpdate: { roleId?: string; STATUS?: string } = {};
+    if (roleId) {
+        dataToUpdate.roleId = roleId;
     }
     if (STATUS) {
         dataToUpdate.STATUS = STATUS;

@@ -28,19 +28,19 @@ const MOCK_ALLOWED_COMPANIES = [
 ];
 
 const MOCK_MERCHANT_USERS = [
-  { ID: randomUUID(),  FULLNAME: 'The Corner Cafe Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '111-222-3333', DEVICENAME: 'Device1', ENCRYPTIONKEY: 'key1', iV: 'iv1', ISLOGGEDIN: true, authenticationkey: 'auth1', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_1', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15') },
-  { ID: randomUUID(),  FULLNAME: 'QuickMart Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC002', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '222-333-4444', DEVICENAME: 'Device2', ENCRYPTIONKEY: 'key2', iV: 'iv2', ISLOGGEDIN: false, authenticationkey: 'auth2', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_2', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20') },
-  { ID: randomUUID(),  FULLNAME: 'Gadget Hub Admin', ROLE: 'Admin', STATUS: 'Pending', ACCOUNTNUMBER: 'ACC003', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '333-444-5555', DEVICENAME: 'Device3', ENCRYPTIONKEY: 'key3', iV: 'iv3', ISLOGGEDIN: false, authenticationkey: 'auth3', FAILEDATTMEPTS: 2, LASTLOGINATTEMPT: new Date('2023-05-28'), ISLOCKED: true, UNLOCKEDTIME: new Date('2023-06-01T10:00:00Z'), VALUE3: 'v3_3', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-03-10'), UPDATEDATE: new Date('2023-03-10') },
-  { ID: randomUUID(),  FULLNAME: 'Style Central Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC004', ACCOUNTTYPE: 'TypeC', PHONENUMBER: '444-555-6666', DEVICENAME: 'Device4', ENCRYPTIONKEY: 'key4', iV: 'iv4', ISLOGGEDIN: true, authenticationkey: 'auth4', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_4', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05') },
-  { ID: randomUUID(),  FULLNAME: 'Bookworm Haven Admin', ROLE: 'Admin', STATUS: 'Disabled', ACCOUNTNUMBER: 'ACC005', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '555-666-7777', DEVICENAME: 'Device5', ENCRYPTIONKEY: 'key5', iV: 'iv5', ISLOGGEDIN: false, authenticationkey: 'auth5', FAILEDATTMEPTS: 5, LASTLOGINATTEMPT: new Date('2023-05-20'), ISLOCKED: true, UNLOCKEDTIME: null, VALUE3: 'v3_5', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-05-12'), UPDATEDATE: new Date('2023-05-12') },
-  { ID: randomUUID(),  FULLNAME: 'Future Gadgets Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC006', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '111-000-1111', DEVICENAME: 'Device10', ENCRYPTIONKEY: 'key10', iV: 'iv10', ISLOGGEDIN: true, authenticationkey: 'auth10', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_10', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-06-15'), UPDATEDATE: new Date('2023-06-15') },
-  { ID: randomUUID(),  FULLNAME: 'Evergreen Market Admin', ROLE: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC007', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '222-111-2222', DEVICENAME: 'Device11', ENCRYPTIONKEY: 'key11', iV: 'iv11', ISLOGGEDIN: false, authenticationkey: 'auth11', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_11', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-07-20'), UPDATEDATE: new Date('2023-07-20') },
-  { ID: randomUUID(),  FULLNAME: 'Alice Johnson', ROLE: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '666-777-8888', DEVICENAME: 'Device6', ENCRYPTIONKEY: 'key6', iV: 'iv6', ISLOGGEDIN: false, authenticationkey: 'auth6', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_6', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15') },
-  { ID: randomUUID(),  FULLNAME: 'Bob Williams', ROLE: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC002', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '777-888-9999', DEVICENAME: 'Device7', ENCRYPTIONKEY: 'key7', iV: 'iv7', ISLOGGEDIN: true, authenticationkey: 'auth7', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_7', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20') },
-  { ID: randomUUID(),  FULLNAME: 'Charlie Brown', ROLE: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '888-777-6666', DEVICENAME: 'Device12', ENCRYPTIONKEY: 'key12', iV: 'iv12', ISLOGGEDIN: true, authenticationkey: 'auth12', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_12', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-01-16'), UPDATEDATE: new Date('2023-01-16') },
-  { ID: randomUUID(),  FULLNAME: 'Diana Prince', ROLE: 'Sales', STATUS: 'Pending', ACCOUNTNUMBER: 'ACC004', ACCOUNTTYPE: 'TypeC', PHONENUMBER: '888-999-0000', DEVICENAME: 'Device8', ENCRYPTIONKEY: 'key8', iV: 'iv8', ISLOGGEDIN: false, authenticationkey: 'auth8', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_8', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05') },
-  { ID: randomUUID(),  FULLNAME: 'Ethan Hunt', ROLE: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC006', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '333-222-1111', DEVICENAME: 'Device13', ENCRYPTIONKEY: 'key13', iV: 'iv13', ISLOGGEDIN: false, authenticationkey: 'auth13', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-02'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_13', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-06-16'), UPDATEDATE: new Date('2023-06-16') },
-  { ID: randomUUID(),  FULLNAME: 'Fiona Glenanne', ROLE: 'Sales', STATUS: 'Disabled', ACCOUNTNUMBER: 'ACC007', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '444-333-2222', DEVICENAME: 'Device14', ENCRYPTIONKEY: 'key14', iV: 'iv14', ISLOGGEDIN: false, authenticationkey: 'auth14', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-21'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_14', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-07-21'), UPDATEDATE: new Date('2023-07-21') },
+  { ID: randomUUID(),  FULLNAME: 'The Corner Cafe Admin', ROLENAME: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '111-222-3333', DEVICENAME: 'Device1', ENCRYPTIONKEY: 'key1', iV: 'iv1', ISLOGGEDIN: true, authenticationkey: 'auth1', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_1', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15') },
+  { ID: randomUUID(),  FULLNAME: 'QuickMart Admin', ROLENAME: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC002', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '222-333-4444', DEVICENAME: 'Device2', ENCRYPTIONKEY: 'key2', iV: 'iv2', ISLOGGEDIN: false, authenticationkey: 'auth2', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_2', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20') },
+  { ID: randomUUID(),  FULLNAME: 'Gadget Hub Admin', ROLENAME: 'Admin', STATUS: 'Pending', ACCOUNTNUMBER: 'ACC003', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '333-444-5555', DEVICENAME: 'Device3', ENCRYPTIONKEY: 'key3', iV: 'iv3', ISLOGGEDIN: false, authenticationkey: 'auth3', FAILEDATTMEPTS: 2, LASTLOGINATTEMPT: new Date('2023-05-28'), ISLOCKED: true, UNLOCKEDTIME: new Date('2023-06-01T10:00:00Z'), VALUE3: 'v3_3', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-03-10'), UPDATEDATE: new Date('2023-03-10') },
+  { ID: randomUUID(),  FULLNAME: 'Style Central Admin', ROLENAME: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC004', ACCOUNTTYPE: 'TypeC', PHONENUMBER: '444-555-6666', DEVICENAME: 'Device4', ENCRYPTIONKEY: 'key4', iV: 'iv4', ISLOGGEDIN: true, authenticationkey: 'auth4', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_4', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05') },
+  { ID: randomUUID(),  FULLNAME: 'Bookworm Haven Admin', ROLENAME: 'Admin', STATUS: 'Disabled', ACCOUNTNUMBER: 'ACC005', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '555-666-7777', DEVICENAME: 'Device5', ENCRYPTIONKEY: 'key5', iV: 'iv5', ISLOGGEDIN: false, authenticationkey: 'auth5', FAILEDATTMEPTS: 5, LASTLOGINATTEMPT: new Date('2023-05-20'), ISLOCKED: true, UNLOCKEDTIME: null, VALUE3: 'v3_5', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-05-12'), UPDATEDATE: new Date('2023-05-12') },
+  { ID: randomUUID(),  FULLNAME: 'Future Gadgets Admin', ROLENAME: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC006', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '111-000-1111', DEVICENAME: 'Device10', ENCRYPTIONKEY: 'key10', iV: 'iv10', ISLOGGEDIN: true, authenticationkey: 'auth10', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_10', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-06-15'), UPDATEDATE: new Date('2023-06-15') },
+  { ID: randomUUID(),  FULLNAME: 'Evergreen Market Admin', ROLENAME: 'Admin', STATUS: 'Active', ACCOUNTNUMBER: 'ACC007', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '222-111-2222', DEVICENAME: 'Device11', ENCRYPTIONKEY: 'key11', iV: 'iv11', ISLOGGEDIN: false, authenticationkey: 'auth11', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_11', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-07-20'), UPDATEDATE: new Date('2023-07-20') },
+  { ID: randomUUID(),  FULLNAME: 'Alice Johnson', ROLENAME: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '666-777-8888', DEVICENAME: 'Device6', ENCRYPTIONKEY: 'key6', iV: 'iv6', ISLOGGEDIN: false, authenticationkey: 'auth6', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_6', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15') },
+  { ID: randomUUID(),  FULLNAME: 'Bob Williams', ROLENAME: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC002', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '777-888-9999', DEVICENAME: 'Device7', ENCRYPTIONKEY: 'key7', iV: 'iv7', ISLOGGEDIN: true, authenticationkey: 'auth7', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_7', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20') },
+  { ID: randomUUID(),  FULLNAME: 'Charlie Brown', ROLENAME: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC001', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '888-777-6666', DEVICENAME: 'Device12', ENCRYPTIONKEY: 'key12', iV: 'iv12', ISLOGGEDIN: true, authenticationkey: 'auth12', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_12', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-01-16'), UPDATEDATE: new Date('2023-01-16') },
+  { ID: randomUUID(),  FULLNAME: 'Diana Prince', ROLENAME: 'Sales', STATUS: 'Pending', ACCOUNTNUMBER: 'ACC004', ACCOUNTTYPE: 'TypeC', PHONENUMBER: '888-999-0000', DEVICENAME: 'Device8', ENCRYPTIONKEY: 'key8', iV: 'iv8', ISLOGGEDIN: false, authenticationkey: 'auth8', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_8', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05') },
+  { ID: randomUUID(),  FULLNAME: 'Ethan Hunt', ROLENAME: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC006', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '333-222-1111', DEVICENAME: 'Device13', ENCRYPTIONKEY: 'key13', iV: 'iv13', ISLOGGEDIN: false, authenticationkey: 'auth13', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-02'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_13', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-06-16'), UPDATEDATE: new Date('2023-06-16') },
+  { ID: randomUUID(),  FULLNAME: 'Fiona Glenanne', ROLENAME: 'Sales', STATUS: 'Disabled', ACCOUNTNUMBER: 'ACC007', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '444-333-2222', DEVICENAME: 'Device14', ENCRYPTIONKEY: 'key14', iV: 'iv14', ISLOGGEDIN: false, authenticationkey: 'auth14', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-21'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_14', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-07-21'), UPDATEDATE: new Date('2023-07-21') },
 ];
 
 const MOCK_BRANCH_USERS = [
@@ -147,12 +147,12 @@ async function main() {
     await prisma.arif_requests.deleteMany({});
     await prisma.merchant_txns.deleteMany({});
     await prisma.merchants_daily_balances.deleteMany({});
-    await prisma.branchUser.deleteMany({});
-    await prisma.merchant_users.deleteMany({});
+    await prisma.BranchUser.deleteMany({});
+    await prisma.Merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
-    await prisma.branch.deleteMany({});
-    await prisma.dashBoardRoles.deleteMany({});
-    await prisma.roles.deleteMany({});
+    await prisma.Branch.deleteMany({});
+    await prisma.DashBoardRoles.deleteMany({});
+    await prisma.Roles.deleteMany({});
 
 
     // Create default roles
@@ -168,7 +168,7 @@ async function main() {
         "/dashboard/role-management", "/dashboard/user-role-assignment"
     ];
 
-    const systemAdminRole = await prisma.dashBoardRoles.create({
+    const systemAdminRole = await prisma.DashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'System Admin',
@@ -177,7 +177,7 @@ async function main() {
         }
     });
 
-    const branchAdminRole = await prisma.dashBoardRoles.create({
+    const branchAdminRole = await prisma.DashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Branch Admin',
@@ -192,7 +192,7 @@ async function main() {
         }
     });
 
-    const branchUserRole = await prisma.dashBoardRoles.create({
+    const branchUserRole = await prisma.DashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Branch User',
@@ -206,7 +206,7 @@ async function main() {
         }
     });
 
-    const merchantAdminRole = await prisma.dashBoardRoles.create({
+    const merchantAdminRole = await prisma.DashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Merchant Admin',
@@ -221,7 +221,7 @@ async function main() {
         }
     });
 
-    const merchantSalesRole = await prisma.dashBoardRoles.create({
+    const merchantSalesRole = await prisma.DashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Merchant Sales',
@@ -236,13 +236,13 @@ async function main() {
     console.log('Seeded 5 default dashboard roles.');
 
     // Seed Application Roles
-    await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
-    await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
+    const adminRole = await prisma.Roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
+    const salesRole = await prisma.Roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
     console.log('Seeded 2 application roles (Admin, Sales).');
 
 
     // Seed "All Branches" first
-    await prisma.branch.create({
+    await prisma.Branch.create({
         data: {
             id: randomUUID(),
             name: 'All Branches',
@@ -254,7 +254,7 @@ async function main() {
     });
     console.log('Seeded "All Branches" for system users.');
 
-    await prisma.branchUser.create({
+    await prisma.BranchUser.create({
         data: {
             id: randomUUID(),
             name: 'System Admin',
@@ -269,7 +269,7 @@ async function main() {
 
 
     for (const b of MOCK_BRANCHES) {
-        await prisma.branch.create({ data: b });
+        await prisma.Branch.create({ data: b });
     }
     console.log(`Seeded ${MOCK_BRANCHES.length} branches.`);
 
@@ -280,23 +280,27 @@ async function main() {
 
     for (const m of MOCK_MERCHANT_USERS) {
         let roleId;
-        if (m.ROLE === 'Admin') {
-            roleId = merchantAdminRole.id;
+        let dashboardRoleId;
+        if (m.ROLENAME === 'Admin') {
+            roleId = adminRole.ID;
+            dashboardRoleId = merchantAdminRole.id;
         } else {
-            roleId = merchantSalesRole.id;
+            roleId = salesRole.ID;
+            dashboardRoleId = merchantSalesRole.id;
         }
        
-        await prisma.merchant_users.create({
+        await prisma.Merchant_users.create({
             data: {
                 ...m,
-                roleId: roleId
+                roleId: roleId,
+                dashboardRoleId: dashboardRoleId
             }
         });
     }
     console.log(`Seeded ${MOCK_MERCHANT_USERS.length} merchant users.`);
 
     for (const bu of MOCK_BRANCH_USERS) {
-        await prisma.branchUser.create({ data: {
+        await prisma.BranchUser.create({ data: {
             ...bu,
             password: 'password123', // This will be hashed in a real app
             // Assign roles based on name for mock purposes
@@ -362,7 +366,7 @@ async function main() {
 
     for (const rc of MOCK_ROLE_CAPABILITIES) {
         const { ROLEID, ...rest } = rc;
-        const role = await prisma.roles.findFirst({ where: { ROLENAME: ROLEID } });
+        const role = await prisma.Roles.findFirst({ where: { ROLENAME: ROLEID } });
         if(role){
             await prisma.role_capablities.create({ data: {
                 ...rest,
