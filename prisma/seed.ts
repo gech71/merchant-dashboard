@@ -279,13 +279,10 @@ async function main() {
     console.log(`Seeded ${MOCK_ALLOWED_COMPANIES.length} allowed companies.`);
 
     for (const m of MOCK_MERCHANT_USERS) {
-        let roleIdToAssign;
         let dashboardRoleId;
         if (m.ROLENAME === 'Admin') {
-            roleIdToAssign = adminRole.ID;
             dashboardRoleId = merchantAdminRole.id;
         } else {
-            roleIdToAssign = salesRole.ID;
             dashboardRoleId = merchantSalesRole.id;
         }
 
@@ -294,7 +291,7 @@ async function main() {
         await prisma.merchant_users.create({
             data: {
                 ...rest,
-                ROLE: roleIdToAssign,
+                ROLE: m.ROLENAME,
                 roleId: dashboardRoleId
             }
         });
