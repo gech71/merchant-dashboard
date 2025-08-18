@@ -37,7 +37,7 @@ export default function UserRoleAssignmentPage() {
         }
     };
 
-    const filteredMerchants = merchants.filter(user => user.FULLNAME.toLowerCase().includes(searchTerm.toLowerCase()));
+    const filteredMerchants = merchants.filter(user => user.FULLNAME?.toLowerCase().includes(searchTerm.toLowerCase()));
     const filteredBranchUsers = branchUsers.filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
     return (
@@ -76,7 +76,7 @@ export default function UserRoleAssignmentPage() {
                                         <TableRow key={user.ID}>
                                             <TableCell className="font-medium">{user.FULLNAME}</TableCell>
                                             <TableCell>{user.ACCOUNTNUMBER}</TableCell>
-                                            <TableCell>{user.role?.name || 'Unassigned'}</TableCell>
+                                            <TableCell>{user.DashBoardRoles?.name || 'Unassigned'}</TableCell>
                                             <TableCell>
                                                 <Select onValueChange={(roleId) => handleRoleChange(user.ID, roleId, 'merchant')} defaultValue={user.roleId || ''}>
                                                     <SelectTrigger className="w-[180px]">
@@ -137,3 +137,5 @@ export default function UserRoleAssignmentPage() {
         </Card>
     );
 }
+
+    

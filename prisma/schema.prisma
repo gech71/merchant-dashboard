@@ -1,126 +1,111 @@
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
 }
 
-model Branch {
-  id         String   @id @map("id") @db.Text
-  name       String   @unique @map("name") @db.Text
-  code       String   @unique @map("code") @db.Text
-  address    String   @map("address") @db.Text
-  contact    String   @map("contact") @db.Text
-  status     String   @map("status") @db.Text
-  INSERTDATE DateTime? @default(now()) @map("INSERTDATE") @db.Timestamp(3)
-  UPDATEDATE DateTime? @map("UPDATEDATE") @db.Timestamp(3)
-  BranchUser BranchUser[]
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-  @@map("Branch")
+model Branch {
+  id         String       @id @db.Uuid
+  name       String       @unique
+  code       String       @unique
+  address    String
+  contact    String
+  status     String
+  INSERTDATE DateTime?    @default(now()) @db.Timestamp(3)
+  UPDATEDATE DateTime?    @db.Timestamp(3)
+  BranchUser BranchUser[]
 }
 
 model BranchUser {
-  id       String  @id @map("id") @db.Text
-  name     String  @map("name") @db.Text
-  email    String  @unique @map("email") @db.Text
-  password String  @map("password") @db.Text
-  branch   String  @map("branch") @db.Text
-  status   String  @map("status") @db.Text
-  roleId   String? @map("roleId") @db.Text
-  branchId String? @map("branchId") @db.Text
-  
-  DashBoardRoles DashBoardRoles? @relation(fields: [roleId], references: [id])
-  Branch         Branch?         @relation(fields: [branchId], references: [id])
-
-  @@map("BranchUser")
+  id       String         @id @db.Uuid
+  name     String
+  email    String         @unique
+  password String
+  branch   String
+  status   String
+  roleId   String?        @db.Uuid
+  role     DashBoardRoles? @relation(fields: [roleId], references: [id])
 }
 
 model DashBoardRoles {
-  id          String       @id @map("id") @db.Text
-  name        String       @unique @map("name") @db.Text
-  description String?      @map("description") @db.Text
-  permissions Json         @map("permissions") @db.JsonB
-  createdAt   DateTime     @default(now()) @map("createdAt") @db.Timestamp(3)
-  updatedAt   DateTime     @updatedAt @map("updatedAt") @db.Timestamp(3)
+  id          String       @id @db.Uuid
+  name        String       @unique
+  description String?
+  permissions Json
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   BranchUser  BranchUser[]
-  Merchant_users Merchant_users[]
-
-  @@map("DashBoardRoles")
+  Merchant_users Merchant_users[] @relation("MerchantUserRoles")
 }
 
 model Manage_otps {
-  ID              String   @id @db.Uuid
-  ACCOUNTNUMBER   String   @db.VarChar(50)
-  PHONENUMBER     String   @db.VarChar(15)
-  FULLNAME        String?  @db.VarChar(100)
-  OTPSENT         DateTime @db.Timestamp()
-  OTPEXPIRE       DateTime @db.Timestamp()
-  SENTCHANNEL     String?  @db.VarChar(10)
-  OTPCODE         String   @default("") @db.Text
-  VALUE2          String?  @db.Text
-  VALUE3          String?  @db.Text
-  INSERTDATE      DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE      DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER      String?  @default("system") @db.Text
-  UPDATEUSER      String?  @default("system") @db.Text
+  ID            String    @id @db.Uuid
+  ACCOUNTNUMBER String    @db.VarChar(50)
+  PHONENUMBER   String    @db.VarChar(15)
+  FULLNAME      String?   @db.VarChar(100)
+  OTPSENT       DateTime  @db.Timestamp()
+  OTPEXPIRE     DateTime  @db.Timestamp()
+  SENTCHANNEL   String?   @db.VarChar(10)
+  OTPCODE       String    @default("")
+  VALUE2        String?
+  VALUE3        String?
+  INSERTDATE    DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER    String?   @default("system")
+  UPDATEUSER    String?   @default("system")
 
   @@map("Manage_otps")
 }
 
 model Merchant_users {
-  ID                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ACCOUNTNUMBER     String    @db.VarChar(20)
-  FULLNAME          String?   @db.VarChar(100)
-  ACCOUNTTYPE       String?   @db.VarChar(20)
-  PHONENUMBER       String?   @db.VarChar(15)
-  ROLE              String?   @db.VarChar(20)
-  DEVICENAME        String?   @db.VarChar(100)
-  ENCRYPTIONKEY     String?   @db.Text
-  iV                String?   @db.Text
+  ID                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ACCOUNTNUMBER     String          @db.VarChar(20)
+  FULLNAME          String?         @db.VarChar(100)
+  ACCOUNTTYPE       String?         @db.VarChar(20)
+  PHONENUMBER       String?         @db.VarChar(15)
+  ROLE              String?         @db.VarChar(20)
+  DEVICENAME        String?         @db.VarChar(100)
+  ENCRYPTIONKEY     String?
+  iV                String?
   ISLOGGEDIN        Boolean?
-  authenticationkey String?   @db.Text
-  STATUS            String?   @db.VarChar(100)
-  FAILEDATTMEPTS    Int?      @default(0)
-  LASTLOGINATTEMPT  DateTime? @default(now()) @db.Timestamp()
-  ISLOCKED          Boolean?  @default(false)
-  UNLOCKEDTIME      DateTime? @default(now()) @db.Timestamp()
-  VALUE3            String?   @db.Text
-  INSERTUSERID      String?   @default("system") @db.Text
-  UPDATEUSERID      String?   @default("system") @db.Text
-  INSERTDATE        DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE        DateTime? @default(now()) @db.Timestamp()
-  roleId            String?   @db.VarChar(150)
-  
-  DashBoardRoles    DashBoardRoles? @relation(fields: [roleId], references: [id])
-  ApplicationRole   Roles?          @relation(fields: [ROLE], references: [ID])
+  authenticationkey String?
+  STATUS            String?         @db.VarChar(100)
+  FAILEDATTMEPTS    Int?            @default(0)
+  LASTLOGINATTEMPT  DateTime?       @default(now()) @db.Timestamp()
+  ISLOCKED          Boolean?        @default(false)
+  UNLOCKEDTIME      DateTime?       @default(now()) @db.Timestamp()
+  VALUE3            String?
+  INSERTUSERID      String?         @default("system")
+  UPDATEUSERID      String?         @default("system")
+  INSERTDATE        DateTime?       @default(now()) @db.Timestamp()
+  UPDATEDATE        DateTime?       @default(now()) @db.Timestamp()
+  roleId            String?          @db.VarChar(150)
+  DashBoardRoles    DashBoardRoles?  @relation("MerchantUserRoles", fields: [roleId], references: [id])
+  ApplicationRole   Roles?           @relation(fields: [ROLE], references: [ID])
 
   @@map("Merchant_users")
 }
 
 model Roles {
-  ID              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ROLENAME        String    @db.VarChar(100)
-  VALUE1          String?   @db.Text
-  VALUE2          String?   @db.Text
-  VALUE3          String?   @db.Text
-  INSERTUSERID    String?   @db.Text
-  UPDATEUSERID    String?   @db.Text
-  INSERTDATE      DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE      DateTime? @default(now()) @db.Timestamp()
-  
-  Merchant_users  Merchant_users[]
+  ID           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ROLENAME     String  @db.VarChar(100)
+  VALUE1       String?
+  VALUE2       String?
+  VALUE3       String?
+  INSERTUSERID String?
+  UPDATEUSERID String?
+  INSERTDATE   DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE   DateTime? @default(now()) @db.Timestamp()
+  Merchant_users Merchant_users[]
 
   @@map("Roles")
-}
-
-model EFMigrationsHistory {
-  MigrationId    String @id @db.VarChar(150)
-  ProductVersion String @db.VarChar(32)
-
-  @@map("__EFMigrationsHistory")
 }
 
 model account_infos {
@@ -128,13 +113,13 @@ model account_infos {
   ACCOUNTNUMBER String    @db.VarChar(50)
   PHONENUMBER   String    @db.VarChar(15)
   FULLNAME      String?   @db.VarChar(100)
-  GENDER        String?   @db.Text
-  VALUE1        String?   @db.Text
-  VALUE2        String?   @db.Text
+  GENDER        String?
+  VALUE1        String?
+  VALUE2        String?
   INSERTDATE    DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER    String?   @db.Text
-  UPDATEUSER    String?   @db.Text
+  INSERTUSER    String?
+  UPDATEUSER    String?
 
   @@map("account_infos")
 }
@@ -149,8 +134,8 @@ model allowed_companies {
   STATUS              Boolean   @default(true)
   INSERTDATE          DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE          DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER          String?   @db.Text
-  UPDATEUSER          String?   @db.Text
+  INSERTUSER          String?
+  UPDATEUSER          String?
   OptimisticLockField Int?
   GCRecord            Int?
   branchName          String?   @db.VarChar(200)
@@ -160,14 +145,14 @@ model allowed_companies {
 
 model app_updates {
   ID               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  COMPARINGVERSION Float
-  LATESTVERSION    Float
+  COMPARINGVERSION Float     @db.Float8
+  LATESTVERSION    Float     @db.Float8
   DESCRIPTION      String?   @db.VarChar(2000)
   ISFORCED         Boolean?
   INSERTDATE       DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE       DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER       String?   @db.Text
-  UPDATEUSER       String?   @db.Text
+  INSERTUSER       String?
+  UPDATEUSER       String?
 
   @@map("app_updates")
 }
@@ -177,25 +162,25 @@ model arif_requests {
   SESSIONID                String?   @db.VarChar(500)
   DEBITACCOUNT             String    @db.VarChar(30)
   CREDITACCOUNT            String    @db.VarChar(30)
-  AMOUNT                   Decimal
+  AMOUNT                   Decimal   @db.Decimal
   MERCHANTACCOUNT          String    @db.VarChar(30)
   SALESPHONE               String    @db.VarChar(20)
   ARIFPAYTRANSACTIONID     String?   @db.VarChar(100)
   ARIFPAYTRANSACTIONSTATUS String?   @db.VarChar(50)
   T24TRANSACTIONSTATUS     String?   @db.VarChar(50)
-  REQUEST1                 String?   @db.Text
-  RESPONSE1                String?   @db.Text
-  REQUEST2                 String?   @db.Text
-  RESPONSE2                String?   @db.Text
-  REQUEST3                 String?   @db.Text
-  RESPONSE3                String?   @db.Text
-  WEBHOOKRESPONSE          String?   @db.Text
+  REQUEST1                 String?
+  RESPONSE1                String?
+  REQUEST2                 String?
+  RESPONSE2                String?
+  REQUEST3                 String?
+  RESPONSE3                String?
+  WEBHOOKRESPONSE          String?
   ERROR1                   String?   @db.VarChar(20)
-  MESSAGE1                 String?   @db.Text
+  MESSAGE1                 String?
   ERROR2                   String?   @db.VarChar(20)
-  MESSAGE2                 String?   @db.Text
+  MESSAGE2                 String?
   ERROR3                   String?   @db.VarChar(20)
-  MESSAGE3                 String?   @db.Text
+  MESSAGE3                 String?
   DATESEND1                DateTime  @db.Timestamp()
   DATERECIVED1             DateTime  @db.Timestamp()
   DATESEND2                DateTime  @default(now()) @db.Timestamp()
@@ -203,8 +188,8 @@ model arif_requests {
   DATESEND3                DateTime  @db.Timestamp()
   DATERECIVED3             DateTime  @db.Timestamp()
   WEBHOOKRECEIVEDDATE      DateTime  @db.Timestamp()
-  INSERTUSER               String?   @db.Text
-  UPDATEUSER               String?   @db.Text
+  INSERTUSER               String?
+  UPDATEUSER               String?
   T24TRANSACTIONID         String?   @db.VarChar(150)
 
   @@map("arif_requests")
@@ -212,39 +197,39 @@ model arif_requests {
 
 model arifpay_endpoints {
   ID                 String    @id @db.Uuid
-  BANK               String    @db.Text
+  BANK               String
   DISPLAYNAME        String    @db.VarChar(100)
   OTPLENGTH          Int
   ORDER              Int
-  ENDPOINT1          String?   @db.Text
-  ENDPOINT2          String?   @db.Text
-  ENDPOINT3          String?   @db.Text
-  CANCELURL          String    @db.Text
-  ERRORURL           String    @db.Text
-  SUCCESSURL         String    @db.Text
-  NOTIFYURL          String    @db.Text
+  ENDPOINT1          String?
+  ENDPOINT2          String?
+  ENDPOINT3          String?
+  CANCELURL          String
+  ERRORURL           String
+  SUCCESSURL         String
+  NOTIFYURL          String
   ISTWOSTEP          Boolean
   ISOTP              Boolean
   TRANSACTIONTYPE    String?   @db.VarChar(500)
   BENEFICIARYACCOUNT String    @db.VarChar(50)
   BENEFICIARYBANK    String    @db.VarChar(100)
-  IMAGEURL           String?   @db.Text
+  IMAGEURL           String?
   INSERTDATE         DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE         DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER         String?   @db.Text
-  UPDATEUSER         String?   @db.Text
+  INSERTUSER         String?
+  UPDATEUSER         String?
 
   @@map("arifpay_endpoints")
 }
 
 model controllersconfigs {
   ID           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  CONTROLLERKEY String    @db.Text
-  APIKEY        String?   @db.Text
+  CONTROLLERKEY String
+  APIKEY        String?
   INSERTDATE    DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER    String?   @db.Text
-  UPDATEUSER    String?   @db.Text
+  INSERTUSER    String?
+  UPDATEUSER    String?
 
   @@map("controllersconfigs")
 }
@@ -252,13 +237,13 @@ model controllersconfigs {
 model core_integration_settings {
   ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   UNIQUEKEY  String?   @db.VarChar(100)
-  ADDRESS    String    @db.Text
+  ADDRESS    String
   USERNAME   String    @db.VarChar(200)
   PASSWORD   String?   @db.VarChar(500)
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER String?   @db.Text
-  UPDATEUSER String?   @db.Text
+  INSERTUSER String?
+  UPDATEUSER String?
 
   @@map("core_integration_settings")
 }
@@ -267,7 +252,7 @@ model merchant_txns {
   ID                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   MERCHANTACCOUNT    String    @db.VarChar(20)
   MERCHANTPHONE      String    @db.VarChar(15)
-  AMOUNT             Decimal?
+  AMOUNT             Decimal?  @db.Decimal
   TXNID              String?   @db.VarChar(200)
   CUSTOMERNAME       String?   @db.VarChar(100)
   CUSTOMERACCOUNT    String?   @db.VarChar(50)
@@ -276,13 +261,13 @@ model merchant_txns {
   STATUS             String?   @db.VarChar(15)
   TRANSACTIONCHANNEL String?   @db.VarChar(50)
   TRANSACTIONSERVICE String?   @db.VarChar(50)
-  VALUE1             String?   @db.Text
-  VALUE2             String?   @db.Text
-  VALUE3             String?   @db.Text
+  VALUE1             String?
+  VALUE2             String?
+  VALUE3             String?
   INSERTDATE         DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE         DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER         String?   @db.Text
-  UPDATEUSER         String?   @db.Text
+  INSERTUSER         String?
+  UPDATEUSER         String?
 
   @@map("merchant_txns")
 }
@@ -291,13 +276,13 @@ model merchants_daily_balances {
   ID              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   MERCHANTACCOUNT String    @db.VarChar(50)
   MERCHANTPHONE   String    @db.VarChar(15)
-  DAILYBALANCE    Decimal?
+  DAILYBALANCE    Decimal?  @db.Decimal
   DAILYTXNCOUNT   BigInt    @default(0)
   BALANCEDATE     DateTime? @db.Timestamp()
   INSERTDATE      DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE      DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER      String?   @default("system") @db.Text
-  UPDATEUSER      String?   @default("system") @db.Text
+  INSERTUSER      String?   @default("system")
+  UPDATEUSER      String?   @default("system")
 
   @@map("merchants_daily_balances")
 }
@@ -308,12 +293,12 @@ model paystream_txns {
   SALERPHONENUMBER      String    @db.VarChar(15)
   TICKET                String?   @db.VarChar(500)
   ISCOMPLETED           Boolean?
-  AMOUNT                String?   @db.Text
+  AMOUNT                String?
   PAYERACCOUNT          String?   @db.VarChar(50)
   INSERTDATE            DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE            DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER            String?   @default("system") @db.Text
-  UPDATEUSER            String?   @default("system") @db.Text
+  INSERTUSER            String?   @default("system")
+  UPDATEUSER            String?   @default("system")
 
   @@map("paystream_txns")
 }
@@ -321,12 +306,12 @@ model paystream_txns {
 model promo_adds {
   ID           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ADDTITLE     String    @db.VarChar(100)
-  ADDSUBTITLE  String?   @db.Text
-  ADDADDRESS   String?   @db.Text
-  IMAGEADDRESS String?   @db.Text
+  ADDSUBTITLE  String?
+  ADDADDRESS   String?
+  IMAGEADDRESS String?
   ORDER        Int?
-  INSERTUSERID String?   @default("system") @db.Text
-  UPDATEUSERID String?   @default("system") @db.Text
+  INSERTUSERID String?   @default("system")
+  UPDATEUSERID String?   @default("system")
   INSERTDATE   DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE   DateTime? @default(now()) @db.Timestamp()
 
@@ -338,14 +323,14 @@ model qr_payments {
   DEBITACCOUNT     String   @db.VarChar(50)
   CREDITACCOUNT    String?  @db.VarChar(50)
   SALERPHONENUMBER String?  @db.VarChar(15)
-  AMOUNT           Decimal
+  AMOUNT           Decimal  @db.Decimal
   EXPIRETIME       DateTime @db.Timestamp()
-  QRCODE           String   @db.Text
+  QRCODE           String
   ISUSED           Boolean  @default(false)
   INSERTDATE       DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE       DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER       String?  @default("system") @db.Text
-  UPDATEUSER       String?  @default("system") @db.Text
+  INSERTUSER       String?  @default("system")
+  UPDATEUSER       String?  @default("system")
 
   @@map("qr_payments")
 }
@@ -357,12 +342,12 @@ model role_capablities {
   SUBMENUORDER Int?
   MENUNAME     String?   @db.VarChar(100)
   MENUNAME_am  String?   @db.VarChar(100)
-  ADDRESS      String?   @db.Text
+  ADDRESS      String?
   PARENT       Boolean?
   PARENTID     String?   @db.Uuid
-  VALUE3       String?   @db.Text
-  INSERTUSERID String?   @default("system") @db.Text
-  UPDATEUSERID String?   @default("system") @db.Text
+  VALUE3       String?
+  INSERTUSERID String?   @default("system")
+  UPDATEUSERID String?   @default("system")
   INSERTDATE   DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE   DateTime? @default(now()) @db.Timestamp()
 
@@ -371,51 +356,32 @@ model role_capablities {
 
 model stream_pay_settings {
   ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ADDRESS    String    @db.Text
-  IV         String    @db.Text
-  KEY        String    @db.Text
-  HV         String?   @db.Text
-  USERNAME   String?   @db.Text
-  PASSWORD   String?   @db.Text
+  ADDRESS    String
+  IV         String
+  KEY        String
+  HV         String?
+  USERNAME   String?
+  PASSWORD   String?
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER String?   @default("system") @db.Text
-  UPDATEUSER String?   @default("system") @db.Text
+  INSERTUSER String?   @default("system")
+  UPDATEUSER String?   @default("system")
 
   @@map("stream_pay_settings")
 }
 
 model ussd_push_settings {
   ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ADDRESS    String    @db.Text
-  RESULTURL  String?   @db.Text
-  USERNAME   String?   @db.Text
-  PASSWORD   String?   @db.Text
+  ADDRESS    String
+  RESULTURL  String?
+  USERNAME   String?
+  PASSWORD   String?
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER String?   @default("system") @db.Text
-  UPDATEUSER String?   @default("system") @db.Text
+  INSERTUSER String?   @default("system")
+  UPDATEUSER String?   @default("system")
 
   @@map("ussd_push_settings")
-}
-
-model voucher_codess {
-  ID                    String   @id @db.Uuid
-  MERCHANTACCOUNTNUMBER String   @db.VarChar(50)
-  SALERPHONENUMBER      String   @db.VarChar(15)
-  PAYERACCOUNTNUMBER    String   @db.VarChar(50)
-  PAYERNAME             String   @db.VarChar(200)
-  PAYERPHONENUMBER      String   @db.VarChar(15)
-  AMOUNT                Decimal  @default(0.0)
-  VOCHERCODE            String   @db.Text
-  ISUSED                Boolean  @default(false)
-  EXPIRETIME            DateTime @default(now()) @db.Timestamp()
-  INSERTDATE            DateTime? @default(now()) @db.Timestamp()
-  UPDATEDATE            DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER            String?  @default("system") @db.Text
-  UPDATEUSER            String?  @default("system") @db.Text
-
-  @@map("voucher_codess")
 }
 
     

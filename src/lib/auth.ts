@@ -39,21 +39,23 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
     } else if (userType === 'branch') {
         user = await prisma.BranchUser.findUnique({
             where: { id: userId },
-            include: { DashBoardRoles: true },
+            include: { role: true },
         });
     }
 
-    if (!user || !user.DashBoardRoles) {
+    const roles = user.DashBoardRoles || user.role;
+
+    if (!user || !roles) {
       return null;
     }
     
-    const permissions = (user.DashBoardRoles.permissions as { pages: string[] })?.pages || [];
+    const permissions = (roles.permissions as { pages: string[] })?.pages || [];
     
     if (userType === 'merchant') {
         return {
             userId: user.ID,
             userType: 'merchant',
-            role: user.DashBoardRoles.name,
+            role: roles.name,
             name: user.FULLNAME,
             email: user.PHONENUMBER,
             accountNumber: user.ACCOUNTNUMBER,
@@ -64,7 +66,7 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
          return {
             userId: user.id,
             userType: 'branch',
-            role: user.DashBoardRoles.name,
+            role: roles.name,
             name: user.name,
             email: user.email,
             accountNumber: null, 
@@ -88,3 +90,5 @@ export async function getMe() {
     }
     return new NextResponse(JSON.stringify(user));
 }
+
+    

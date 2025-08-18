@@ -65,16 +65,16 @@ export async function POST(request: Request) {
     } else if (userType === 'branch') {
         const branchUser = await prisma.BranchUser.findUnique({
             where: { email: identifier },
-            include: { dashBoardRoles: true },
+            include: { role: true },
         });
         
         if (branchUser && password && branchUser.password === password) {
             user = branchUser;
-            const permissions = (user.dashBoardRoles?.permissions as {pages: string[]})?.pages || [];
+            const permissions = (user.role?.permissions as {pages: string[]})?.pages || [];
             userPayload = {
                 userId: user.id.toString(),
                 userType: 'branch',
-                role: user.dashBoardRoles?.name || 'No Role',
+                role: user.role?.name || 'No Role',
                 name: user.name,
                 email: user.email,
                 accountNumber: null,
@@ -119,3 +119,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ isSuccess: false, message: 'Something went wrong!' }, { status: 500 });
   }
 }
+
+    

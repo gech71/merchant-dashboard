@@ -43,7 +43,7 @@ export type merchant_txns = Omit<Prisma.merchant_txnsGetPayload<{}>, 'AMOUNT' | 
     UPDATEDATE: string | null;
 };
 
-export type BranchUser = Omit<Prisma.BranchUserGetPayload<{ include: { DashBoardRoles: true } }>, 'password'> & { password?: string };
+export type BranchUser = Omit<Prisma.BranchUserGetPayload<{ include: { role: true } }>, 'password'> & { password?: string };
 
 export type arifpay_endpoints = Omit<Prisma.arifpay_endpointsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
   INSERTDATE: string | null;
