@@ -177,7 +177,16 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, merchants, initialData.accountInfos]);
   
   const promoAdds = initialData.promoAdds;
-  const roleCapabilities = isMerchantAdmin ? initialData.roleCapabilities : [];
+  
+  const allRoles = initialData.roles;
+  
+  const roleCapabilities = React.useMemo(() => {
+      if (isMerchantAdmin) {
+        return initialData.roleCapabilities;
+      }
+      return initialData.roleCapabilities.filter(rc => rc.ROLEID === currentUser?.role);
+  }, [isMerchantAdmin, currentUser, initialData.roleCapabilities]);
+
 
   const addAllowedCompany = async (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord' | 'branchName'>) => {
     const response = await fetch('/api/allowed_companies', {
@@ -340,3 +349,5 @@ export function useDataContext() {
   }
   return context;
 }
+
+    
