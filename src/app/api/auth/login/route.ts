@@ -65,16 +65,16 @@ export async function POST(request: Request) {
     } else if (userType === 'branch') {
         const branchUser = await prisma.branchUser.findUnique({
             where: { email: identifier },
-            include: { DashBoardRoles: true },
+            include: { role: true },
         });
         
         if (branchUser && password && branchUser.password === password) {
             user = branchUser;
-            const permissions = (user.DashBoardRoles?.permissions as {pages: string[]})?.pages || [];
+            const permissions = (user.role?.permissions as {pages: string[]})?.pages || [];
             userPayload = {
                 userId: user.id.toString(),
                 userType: 'branch',
-                role: user.DashBoardRoles?.name || 'No Role',
+                role: user.role?.name || 'No Role',
                 name: user.name,
                 email: user.email,
                 accountNumber: null,
