@@ -45,7 +45,7 @@ export async function POST(request: Request) {
             };
         }
     } else if (userType === 'branch') {
-        const branchUser = await prisma.branchUser.findUnique({
+        const branchUser = await prisma.BranchUser.findUnique({
             where: { email: identifier },
             include: { DashBoardRoles: true },
         });

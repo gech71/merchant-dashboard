@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const newUser = await prisma.branchUser.create({
+    const newUser = await prisma.BranchUser.create({
       data: {
         name,
         email,

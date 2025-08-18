@@ -21,7 +21,7 @@ export async function PUT(
       );
     }
     
-    const updatedUser = await prisma.branchUser.update({
+    const updatedUser = await prisma.BranchUser.update({
       where: { id: id },
       data: {
         name,

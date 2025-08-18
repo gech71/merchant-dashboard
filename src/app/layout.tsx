@@ -19,7 +19,7 @@ export default async function RootLayout({
   const branches = await prisma.branch.findMany();
   const allowedCompanies = await prisma.allowed_companies.findMany();
   const merchants = await prisma.Merchant_users.findMany({ include: { DashBoardRoles: true }});
-  const branchUsers = await prisma.branchUser.findMany({ include: { DashBoardRoles: true }});
+  const branchUsers = await prisma.BranchUser.findMany({ include: { DashBoardRoles: true }});
   const dailyBalances = await prisma.merchants_daily_balances.findMany();
   const merchantTxns = await prisma.merchant_txns.findMany();
   const arifRequests = await prisma.arif_requests.findMany();
@@ -33,7 +33,7 @@ export default async function RootLayout({
   const accountInfos = await prisma.account_infos.findMany();
   const promoAdds = await prisma.promo_adds.findMany();
   const roleCapabilities = await prisma.role_capablities.findMany();
-  const roles = await prisma.dashBoardRoles.findMany();
+  const roles = await prisma.DashBoardRoles.findMany();
 
   const initialData = {
     branches: branches.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),

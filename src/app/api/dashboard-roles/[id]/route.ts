@@ -14,7 +14,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    const updatedRole = await prisma.dashBoardRoles.update({
+    const updatedRole = await prisma.DashBoardRoles.update({
       where: { id },
       data: {
         name,
@@ -39,7 +39,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
-    await prisma.dashBoardRoles.delete({ where: { id } });
+    await prisma.DashBoardRoles.delete({ where: { id } });
     return NextResponse.json({ message: 'Role deleted successfully' }, { status: 200 });
   } catch (error) {
     console.error(`Error deleting role ${params.id}:`, error);

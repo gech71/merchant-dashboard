@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    const newRole = await prisma.dashBoardRoles.create({
+    const newRole = await prisma.DashBoardRoles.create({
       data: {
         id: randomUUID(),
         name,
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 
 export async function GET() {
     try {
-        const roles = await prisma.dashBoardRoles.findMany();
+        const roles = await prisma.DashBoardRoles.findMany();
         const rolesSerializable = roles.map(role => ({
             ...role,
             createdAt: role.createdAt.toISOString(),
