@@ -288,10 +288,12 @@ async function main() {
             roleIdToAssign = salesRole.ID;
             dashboardRoleId = merchantSalesRole.id;
         }
+
+        const { ROLENAME, ...rest } = m;
        
         await prisma.merchant_users.create({
             data: {
-                ...m,
+                ...rest,
                 ROLE: roleIdToAssign,
                 roleId: dashboardRoleId
             }
@@ -389,3 +391,5 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
+    
