@@ -13,8 +13,6 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { identifier, password, loginType } = body;
 
-    const userType = 'merchant';
-
     if (!identifier) {
       return NextResponse.json(
         { isSuccess: false, message: 'Identifier is required' },

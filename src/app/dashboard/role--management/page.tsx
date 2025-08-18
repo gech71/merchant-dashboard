@@ -21,7 +21,7 @@ import {
 import { PlusCircle, MoreHorizontal, Trash2, Edit } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import type { Role } from '@/types';
+import type { Roles } from '@/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { RoleForm } from '@/components/role-form';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -31,9 +31,9 @@ export default function RoleManagementPage() {
     const { roles, deleteRole } = useDataContext();
     const { toast } = useToast();
     const [isFormOpen, setIsFormOpen] = React.useState(false);
-    const [selectedRole, setSelectedRole] = React.useState<Role | null>(null);
+    const [selectedRole, setSelectedRole] = React.useState<Roles | null>(null);
 
-    const handleEdit = (role: Role) => {
+    const handleEdit = (role: Roles) => {
         setSelectedRole(role);
         setIsFormOpen(true);
     }
@@ -80,10 +80,10 @@ export default function RoleManagementPage() {
                             </TableHeader>
                             <TableBody>
                                 {roles.map(role => (
-                                    <TableRow key={role.id}>
-                                        <TableCell className="font-medium">{role.name}</TableCell>
+                                    <TableRow key={role.ID}>
+                                        <TableCell className="font-medium">{role.ROLENAME}</TableCell>
                                         <TableCell className="text-muted-foreground">{role.description}</TableCell>
-                                        <TableCell>{((role.permissions as any)?.pages as string[])?.length || 0} pages</TableCell>
+                                        <TableCell>{role.permissions?.length || 0} pages</TableCell>
                                         <TableCell>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
@@ -110,7 +110,7 @@ export default function RoleManagementPage() {
                                                             </AlertDialogHeader>
                                                             <AlertDialogFooter>
                                                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                                <AlertDialogAction onClick={() => handleDelete(role.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Continue</AlertDialogAction>
+                                                                <AlertDialogAction onClick={() => handleDelete(role.ID)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Continue</AlertDialogAction>
                                                             </AlertDialogFooter>
                                                         </AlertDialogContent>
                                                     </AlertDialog>
