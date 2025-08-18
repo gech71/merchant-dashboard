@@ -124,6 +124,7 @@ async function main() {
     console.log(`Start seeding ...`);
 
     // Deleting data
+    await prisma.role_capablities.deleteMany({});
     await prisma.dashboard_capablities.deleteMany({});
     await prisma.promo_adds.deleteMany({});
     await prisma.account_infos.deleteMany({});
@@ -289,3 +290,5 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
+    
