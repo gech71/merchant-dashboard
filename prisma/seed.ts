@@ -58,50 +58,73 @@ const MOCK_MERCHANT_TXNS = [
 const MOCK_ARIFPAY_ENDPOINTS = [
     { ID: randomUUID(), BANK: 'Bank of Abyssina', DISPLAYNAME: 'BoA', OTPLENGTH: 6, ORDER: 1, ENDPOINT1: 'https://api.boa.com/v1/pay', ENDPOINT2: 'https://api.boa.com/v1/confirm', ENDPOINT3: '', CANCELURL: 'https://boa.com/cancel', ERRORURL: 'https://boa.com/error', SUCCESSURL: 'https://boa.com/success', NOTIFYURL: 'https://api.myapp.com/notify/boa', ISTWOSTEP: true, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '987654321', BENEFICIARYBANK: 'BoA', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), BANK: 'Awash Bank', DISPLAYNAME: 'Awash', OTPLENGTH: 4, ORDER: 2, ENDPOINT1: 'https://api.awashbank.com/execute', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://awashbank.com/cancel', ERRORURL: 'https://awashbank.com/error', SUCCESSURL: 'https://awashbank.com/success', NOTIFYURL: 'https://api.myapp.com/notify/awash', ISTWOSTEP: false, ISOTP: false, TRANSACTIONTYPE: 'B2B', BENEFICIARYACCOUNT: '123456789', BENEFICIARYBANK: 'Awash', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-02'), UPDATEDATE: new Date('2023-01-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), BANK: 'CBE', DISPLAYNAME: 'CBE', OTPLENGTH: 6, ORDER: 3, ENDPOINT1: 'https://api.cbe.com.et/pay', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://cbe.com.et/cancel', ERRORURL: 'https://cbe.com.et/error', SUCCESSURL: 'https://cbe.com.et/success', NOTIFYURL: 'https://api.myapp.com/notify/cbe', ISTWOSTEP: false, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '1000012345678', BENEFICIARYBANK: 'CBE', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-03'), UPDATEDATE: new Date('2023-01-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), BANK: 'Dashen Bank', DISPLAYNAME: 'Dashen', OTPLENGTH: 5, ORDER: 4, ENDPOINT1: 'https://api.dashenbank.com/v2/payment', ENDPOINT2: 'https://api.dashenbank.com/v2/verify', ENDPOINT3: '', CANCELURL: 'https://dashenbank.com/cancel', ERRORURL: 'https://dashenbank.com/error', SUCCESSURL: 'https://dashenbank.com/success', NOTIFYURL: 'https://api.myapp.com/notify/dashen', ISTWOSTEP: true, ISOTP: true, TRANSACTIONTYPE: 'C2B', BENEFICIARYACCOUNT: '2233445566', BENEFICIARYBANK: 'Dashen', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-04'), UPDATEDATE: new Date('2023-01-04'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), BANK: 'Nib Bank', DISPLAYNAME: 'Nib', OTPLENGTH: 6, ORDER: 5, ENDPOINT1: 'https://api.nibbank.com.et/charge', ENDPOINT2: '', ENDPOINT3: '', CANCELURL: 'https://nibbank.com.et/cancel', ERRORURL: 'https://nibbank.com.et/error', SUCCESSURL: 'https://nibbank.com.et/success', NOTIFYURL: 'https://api.myapp.com/notify/nib', ISTWOSTEP: false, ISOTP: false, TRANSACTIONTYPE: 'B2C', BENEFICIARYACCOUNT: '9988776655', BENEFICIARYBANK: 'Nib', IMAGEURL: 'https://placehold.co/100x40.png', INSERTDATE: new Date('2023-01-05'), UPDATEDATE: new Date('2023-01-05'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_CONTROLLERSCONFIGS = [
     { ID: randomUUID(), CONTROLLERKEY: 'CTRL_KEY_001', APIKEY: 'API_KEY_001_XYZ', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), CONTROLLERKEY: 'CTRL_KEY_002', APIKEY: 'API_KEY_002_ABC', INSERTDATE: new Date('2023-02-15'), UPDATEDATE: new Date('2023-02-15'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), CONTROLLERKEY: 'CTRL_KEY_003', APIKEY: 'API_KEY_003_DEF', INSERTDATE: new Date('2023-03-01'), UPDATEDATE: new Date('2023-03-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), CONTROLLERKEY: 'CTRL_KEY_004', APIKEY: 'API_KEY_004_GHI', INSERTDATE: new Date('2023-04-10'), UPDATEDATE: new Date('2023-04-10'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), CONTROLLERKEY: 'CTRL_KEY_005', APIKEY: 'API_KEY_005_JKL', INSERTDATE: new Date('2023-05-20'), UPDATEDATE: new Date('2023-05-20'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_CORE_INTEGRATION_SETTINGS = [
     { ID: randomUUID(), UNIQUEKEY: 'INTEGRATION_MAIN', ADDRESS: 'https://core.bank.com/api', USERNAME: 'coreapiuser', PASSWORD: 'SuperSecretPassword123', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), UNIQUEKEY: 'INTEGRATION_BACKUP', ADDRESS: 'https://core-backup.bank.com/api', USERNAME: 'coreapiuser_bk', PASSWORD: 'AnotherSecretPassword456', INSERTDATE: new Date('2023-01-02'), UPDATEDATE: new Date('2023-01-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), UNIQUEKEY: 'INTEGRATION_QA', ADDRESS: 'https://qa-core.bank.com/api', USERNAME: 'coreapiuser_qa', PASSWORD: 'TestingPassword789', INSERTDATE: new Date('2023-01-03'), UPDATEDATE: new Date('2023-01-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), UNIQUEKEY: 'INTEGRATION_STAGING', ADDRESS: 'https://staging-core.bank.com/api', USERNAME: 'coreapiuser_stg', PASSWORD: 'StagingPassword101', INSERTDATE: new Date('2023-01-04'), UPDATEDATE: new Date('2023-01-04'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), UNIQUEKEY: 'INTEGRATION_UAT', ADDRESS: 'https://uat-core.bank.com/api', USERNAME: 'coreapiuser_uat', PASSWORD: 'UatPassword202', INSERTDATE: new Date('2023-01-05'), UPDATEDATE: new Date('2023-01-05'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_PAYSTREAM_TXNS = [
     { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT001', ISCOMPLETED: true, AMOUNT: "125.50", PAYERACCOUNT: 'PAYER001', INSERTDATE: new Date('2023-07-01'), UPDATEDATE: new Date('2023-07-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC002', SALERPHONENUMBER: '777-888-9999', TICKET: 'TKT002', ISCOMPLETED: false, AMOUNT: "300.00", PAYERACCOUNT: 'PAYER002', INSERTDATE: new Date('2023-07-02'), UPDATEDATE: new Date('2023-07-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC001', SALERPHONENUMBER: '666-777-8888', TICKET: 'TKT003', ISCOMPLETED: true, AMOUNT: "75.00", PAYERACCOUNT: 'PAYER003', INSERTDATE: new Date('2023-07-03'), UPDATEDATE: new Date('2023-07-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC004', SALERPHONENUMBER: '888-999-0000', TICKET: 'TKT004', ISCOMPLETED: true, AMOUNT: "50.00", PAYERACCOUNT: 'PAYER004', INSERTDATE: new Date('2023-07-04'), UPDATEDATE: new Date('2023-07-04'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), MERCHANTACCOUNTNUMBER: 'ACC006', SALERPHONENUMBER: '111-000-1111', TICKET: 'TKT005', ISCOMPLETED: false, AMOUNT: "250.75", PAYERACCOUNT: 'PAYER005', INSERTDATE: new Date('2023-07-05'), UPDATEDATE: new Date('2023-07-05'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
 const MOCK_STREAM_PAY_SETTINGS = [
     { ID: randomUUID(), ADDRESS: 'https://streampay.api/v1', IV: 'iv_streampay_123', KEY: 'key_streampay_abc', HV: 'hv_streampay_xyz', USERNAME: 'streamuser', PASSWORD: 'StreamPayPassword1', INSERTDATE: new Date('2023-08-01'), UPDATEDATE: new Date('2023-08-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), ADDRESS: 'https://streampay.api/v2', IV: 'iv_streampay_456', KEY: 'key_streampay_def', HV: 'hv_streampay_uvw', USERNAME: 'streamuser2', PASSWORD: 'StreamPayPassword2', INSERTDATE: new Date('2023-08-02'), UPDATEDATE: new Date('2023-08-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ADDRESS: 'https://streampay.api/v3', IV: 'iv_streampay_789', KEY: 'key_streampay_ghi', HV: 'hv_streampay_rst', USERNAME: 'streamuser3', PASSWORD: 'StreamPayPassword3', INSERTDATE: new Date('2023-08-03'), UPDATEDATE: new Date('2023-08-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ADDRESS: 'https://streampay.api/v4', IV: 'iv_streampay_101', KEY: 'key_streampay_jkl', HV: 'hv_streampay_mno', USERNAME: 'streamuser4', PASSWORD: 'StreamPayPassword4', INSERTDATE: new Date('2023-08-04'), UPDATEDATE: new Date('2023-08-04'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ADDRESS: 'https://streampay.api/v5', IV: 'iv_streampay_112', KEY: 'key_streampay_pqr', HV: 'hv_streampay_stu', USERNAME: 'streamuser5', PASSWORD: 'StreamPayPassword5', INSERTDATE: new Date('2023-08-05'), UPDATEDATE: new Date('2023-08-05'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_USSD_PUSH_SETTINGS = [
     { ID: randomUUID(), ADDRESS: 'https://ussd.gateway.com/push', RESULTURL: 'https://api.myapp.com/ussd/callback', USERNAME: 'ussd_user', PASSWORD: 'UssdPassword123', INSERTDATE: new Date('2023-09-01'), UPDATEDATE: new Date('2023-09-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), ADDRESS: 'https://another-ussd.gateway.com/push/v2', RESULTURL: 'https://api.myapp.com/ussd/callback2', USERNAME: 'ussd_user2', PASSWORD: 'UssdPassword456', INSERTDATE: new Date('2023-09-02'), UPDATEDATE: new Date('2023-09-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ADDRESS: 'https://third-ussd.gateway.com/push/v1', RESULTURL: 'https://api.myapp.com/ussd/callback3', USERNAME: 'ussd_user3', PASSWORD: 'UssdPassword789', INSERTDATE: new Date('2023-09-03'), UPDATEDATE: new Date('2023-09-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ADDRESS: 'https://fourth-ussd.gateway.com/submit', RESULTURL: 'https://api.myapp.com/ussd/callback4', USERNAME: 'ussd_user4', PASSWORD: 'UssdPassword101', INSERTDATE: new Date('2023-09-04'), UPDATEDATE: new Date('2023-09-04'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ADDRESS: 'https://fifth-ussd.gateway.com/request', RESULTURL: 'https://api.myapp.com/ussd/callback5', USERNAME: 'ussd_user5', PASSWORD: 'UssdPassword202', INSERTDATE: new Date('2023-09-05'), UPDATEDATE: new Date('2023-09-05'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_QR_PAYMENTS = [
     { ID: randomUUID(), DEBITACCOUNT: 'D001', CREDITACCOUNT: 'C001', SALERPHONENUMBER: '666-777-8888', AMOUNT: 50.00, EXPIRETIME: new Date('2023-10-31T23:59:59Z'), QRCODE: 'dummy-qr-code-1', ISUSED: false, INSERTDATE: new Date('2023-10-01'), UPDATEDATE: new Date('2023-10-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), DEBITACCOUNT: 'D002', CREDITACCOUNT: 'C002', SALERPHONENUMBER: '777-888-9999', AMOUNT: 150.75, EXPIRETIME: new Date('2023-11-15T12:00:00Z'), QRCODE: 'dummy-qr-code-2', ISUSED: true, INSERTDATE: new Date('2023-10-02'), UPDATEDATE: new Date('2023-10-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), DEBITACCOUNT: 'D003', CREDITACCOUNT: 'C001', SALERPHONENUMBER: '888-999-0000', AMOUNT: 25.00, EXPIRETIME: new Date('2023-11-01T08:30:00Z'), QRCODE: 'dummy-qr-code-3', ISUSED: false, INSERTDATE: new Date('2023-10-03'), UPDATEDATE: new Date('2023-10-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), DEBITACCOUNT: 'D004', CREDITACCOUNT: 'C003', SALERPHONENUMBER: '111-000-1111', AMOUNT: 10.00, EXPIRETIME: new Date('2023-11-05T10:00:00Z'), QRCODE: 'dummy-qr-code-4', ISUSED: false, INSERTDATE: new Date('2023-10-04'), UPDATEDATE: new Date('2023-10-04'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), DEBITACCOUNT: 'D005', CREDITACCOUNT: 'C004', SALERPHONENUMBER: '333-222-1111', AMOUNT: 99.99, EXPIRETIME: new Date('2023-11-20T18:00:00Z'), QRCODE: 'dummy-qr-code-5', ISUSED: true, INSERTDATE: new Date('2023-10-05'), UPDATEDATE: new Date('2023-10-05'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ]
 
 const MOCK_ACCOUNT_INFOS = [
     { ID: randomUUID(), ACCOUNTNUMBER: 'ACC001', PHONENUMBER: '111-222-3333', FULLNAME: 'The Corner Cafe Admin', GENDER: 'N/A', VALUE1: null, VALUE2: null, INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), ACCOUNTNUMBER: 'CUST001', PHONENUMBER: '123-456-7890', FULLNAME: 'Customer A', GENDER: 'Male', VALUE1: 'VIP', VALUE2: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), ACCOUNTNUMBER: 'CUST002', PHONENUMBER: '098-765-4321', FULLNAME: 'Customer B', GENDER: 'Female', VALUE1: null, VALUE2: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ACCOUNTNUMBER: 'CUST003', PHONENUMBER: '555-555-5555', FULLNAME: 'Customer C', GENDER: 'Male', VALUE1: null, VALUE2: null, INSERTDATE: new Date('2023-06-02'), UPDATEDATE: new Date('2023-06-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
+    { ID: randomUUID(), ACCOUNTNUMBER: 'CUST004', PHONENUMBER: '555-123-4567', FULLNAME: 'Customer D', GENDER: 'Female', VALUE1: 'New', VALUE2: null, INSERTDATE: new Date('2023-06-03'), UPDATEDATE: new Date('2023-06-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
 const MOCK_PROMO_ADDS = [
     { ID: randomUUID(), ADDTITLE: 'Summer Sale!', ADDSUBTITLE: 'Up to 50% off on selected items.', ADDADDRESS: 'https://example.com/summer-sale', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 1, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-01'), UPDATEDATE: new Date('2023-11-01') },
     { ID: randomUUID(), ADDTITLE: 'New Arrivals', ADDSUBTITLE: 'Check out the latest fashion trends.', ADDADDRESS: 'https://example.com/new-arrivals', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 2, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-05'), UPDATEDATE: new Date('2023-11-05') },
     { ID: randomUUID(), ADDTITLE: 'Holiday Special', ADDSUBTITLE: 'Get your gifts now!', ADDADDRESS: 'https://example.com/holiday-special', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 3, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-10'), UPDATEDATE: new Date('2023-11-10') },
+    { ID: randomUUID(), ADDTITLE: 'Black Friday Deals', ADDSUBTITLE: 'Doorbuster deals on electronics.', ADDADDRESS: 'https://example.com/black-friday', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 4, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-15'), UPDATEDATE: new Date('2023-11-15') },
+    { ID: randomUUID(), ADDTITLE: 'Clearance Event', ADDSUBTITLE: 'Everything must go!', ADDADDRESS: 'https://example.com/clearance', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 5, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-20'), UPDATEDATE: new Date('2023-11-20') },
 ];
 
 async function main() {
@@ -216,5 +239,7 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
+    
 
     
