@@ -62,7 +62,7 @@ const LoginForm = ({
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...data, loginType }),
+                body: JSON.stringify({ ...data, loginType, userType: 'merchant' }),
             });
 
             const result = await response.json();
@@ -156,5 +156,3 @@ export default function LoginPage() {
         </div>
     );
 }
-
-    

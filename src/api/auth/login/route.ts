@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
     const merchantUser = await prisma.merchant_users.findFirst({
         where: { PHONENUMBER: loginType === 'merchantSales' ? identifier : password },
-        include: { ApplicationRole: { include: { capabilities: true } } },
+        include: { role: true },
     });
 
     if (!merchantUser) {
@@ -36,14 +36,14 @@ export async function POST(request: Request) {
     }
 
     if (loginType === 'merchantAdmin') {
-        if (merchantUser.ApplicationRole?.ROLENAME !== 'Admin') {
+        if (merchantUser.ROLE !== 'Admin') {
             return NextResponse.json({ isSuccess: false, message: 'This user is not an Admin. Please use the Sales login.' }, { status: 403 });
         }
         if (merchantUser.ACCOUNTNUMBER !== identifier) {
             return NextResponse.json({ isSuccess: false, message: 'Invalid Account Number for the given Phone Number.' }, { status: 401 });
         }
     } else if (loginType === 'merchantSales') {
-        if (merchantUser.ApplicationRole?.ROLENAME !== 'Sales') {
+        if (merchantUser.ROLE !== 'Sales') {
             return NextResponse.json({ isSuccess: false, message: 'This user is not a Sales user. Please use the Admin login.' }, { status: 403 });
         }
     } else {
@@ -51,13 +51,15 @@ export async function POST(request: Request) {
     }
 
     user = merchantUser;
-    role = user.ApplicationRole;
-    const permissions = role.capabilities.map((cap: any) => cap.ADDRESS);
+    role = user.role;
+    
+    // We will assume no capabilities are defined for now.
+    const permissions: string[] = [];
 
     userPayload = {
         userId: user.ID,
         userType: 'merchant',
-        role: role.ROLENAME,
+        role: user.ROLE,
         name: user.FULLNAME,
         email: user.PHONENUMBER,
         accountNumber: user.ACCOUNTNUMBER,
@@ -97,5 +99,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ isSuccess: false, message: 'Something went wrong!' }, { status: 500 });
   }
 }
-
-    
