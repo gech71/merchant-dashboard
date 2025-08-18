@@ -158,12 +158,12 @@ async function main() {
     await prisma.merchants_daily_balances.deleteMany({});
     await prisma.merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
-    await prisma.Roles.deleteMany({});
+    await prisma.roles.deleteMany({});
 
 
     // Create default roles
-    const adminRole = await prisma.Roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
-    const salesRole = await prisma.Roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
+    const adminRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
+    const salesRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
     
     console.log('Seeded 2 default roles.');
 

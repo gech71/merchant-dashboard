@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
     const merchantUser = await prisma.merchant_users.findFirst({
         where: { PHONENUMBER: loginType === 'merchantSales' ? identifier : password },
-        include: { role: true },
+        include: { role: { include: { permissions: true } } },
     });
 
     if (!merchantUser) {
@@ -36,14 +36,14 @@ export async function POST(request: Request) {
     }
 
     if (loginType === 'merchantAdmin') {
-        if (merchantUser.ROLE !== 'Admin') {
+        if (merchantUser.role?.ROLENAME !== 'Admin') {
             return NextResponse.json({ isSuccess: false, message: 'This user is not an Admin. Please use the Sales login.' }, { status: 403 });
         }
         if (merchantUser.ACCOUNTNUMBER !== identifier) {
             return NextResponse.json({ isSuccess: false, message: 'Invalid Account Number for the given Phone Number.' }, { status: 401 });
         }
     } else if (loginType === 'merchantSales') {
-        if (merchantUser.ROLE !== 'Sales') {
+        if (merchantUser.role?.ROLENAME !== 'Sales') {
             return NextResponse.json({ isSuccess: false, message: 'This user is not a Sales user. Please use the Admin login.' }, { status: 403 });
         }
     } else {
@@ -53,8 +53,7 @@ export async function POST(request: Request) {
     user = merchantUser;
     role = user.role;
     
-    // We will assume no capabilities are defined for now.
-    const permissions: string[] = [];
+    const permissions: string[] = role?.permissions.map((p: { page: string; }) => p.page) || [];
 
     userPayload = {
         userId: user.ID,
