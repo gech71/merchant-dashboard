@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos, promo_adds, Roles } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos, promo_adds, Roles, role_capablities } from '@/types';
 
 type CurrentUser = {
     userId: string;
@@ -33,26 +33,10 @@ type InitialData = {
     accountInfos: account_infos[];
     promoAdds: promo_adds[];
     roles: Roles[];
+    roleCapabilities: role_capablities[];
 }
 
-type DataContextType = {
-  branches: Branch[];
-  allowedCompanies: allowed_companies[];
-  merchants: Merchant_users[];
-  branchUsers: BranchUser[];
-  dailyBalances: merchants_daily_balances[];
-  merchantTxns: merchant_txns[];
-  arifRequests: arif_requests[];
-  arifpayEndpoints: arifpay_endpoints[];
-  controllersConfigs: controllersconfigs[];
-  coreIntegrationSettings: core_integration_settings[];
-  paystreamTxns: paystream_txns[];
-  streamPaySettings: stream_pay_settings[];
-  ussdPushSettings: ussd_push_settings[];
-  qrPayments: qr_payments[];
-  accountInfos: account_infos[];
-  promoAdds: promo_adds[];
-  roles: Roles[];
+type DataContextType = InitialData & {
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
   addBranch: (branch: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE' | 'BranchUser'>) => Promise<void>;
@@ -224,6 +208,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, merchants, initialData.accountInfos]);
   
   const promoAdds = initialData.promoAdds;
+  const roleCapabilities = isSystemAdmin ? initialData.roleCapabilities : [];
 
 
   const addBranch = async (branchData: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE' | 'BranchUser'>) => {
@@ -367,7 +352,8 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   };
 
 
-  const value = {
+  const value: DataContextType = {
+    ...initialData,
     branches: filteredBranches,
     allowedCompanies: filteredAllowedCompanies,
     merchants: filteredMerchants,
@@ -375,16 +361,11 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     dailyBalances,
     merchantTxns,
     arifRequests,
-    arifpayEndpoints,
-    controllersConfigs,
-    coreIntegrationSettings,
     paystreamTxns,
-    streamPaySettings,
-    ussdPushSettings,
     qrPayments,
     accountInfos,
     promoAdds,
-    roles,
+    roleCapabilities,
     currentUser,
     setCurrentUser,
     addBranch,

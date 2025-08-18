@@ -100,6 +100,14 @@ export type dashboard_capablities = Omit<Prisma.dashboard_capablitiesGetPayload<
   PARENTID: string | null;
 };
 
+export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE' | 'PARENT' | 'PARENTID'> & {
+  INSERTDATE: string | null;
+  UPDATEDATE: string | null;
+  PARENT: boolean | null;
+  PARENTID: string | null;
+};
+
+
 export type Roles = Omit<Prisma.RolesGetPayload<{ include: { capabilities: true } }>, 'INSERTDATE' | 'UPDATEDATE'> & {
     INSERTDATE: string | null;
     UPDATEDATE: string | null;

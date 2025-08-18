@@ -33,6 +33,8 @@ export default async function RootLayout({
   const accountInfos = await prisma.account_infos.findMany();
   const promoAdds = await prisma.promo_adds.findMany();
   const roles = await prisma.roles.findMany({ include: { capabilities: true }});
+  const roleCapabilities = await prisma.role_capablities.findMany();
+
 
   const initialData = {
     branches: branches.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
@@ -53,6 +55,7 @@ export default async function RootLayout({
     promoAdds: promoAdds.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     roles: roles.map(role => ({ ...role, capabilities: role.capabilities.map(c => ({...c, INSERTDATE: c.INSERTDATE?.toISOString() ?? null, UPDATEDATE: c.UPDATEDATE?.toISOString() ?? null, PARENT: c.PARENT ?? false, PARENTID: c.PARENTID ?? null})), INSERTDATE: role.INSERTDATE?.toISOString() ?? null, UPDATEDATE: role.UPDATEDATE?.toISOString() ?? null })),
     dashboardCapabilities: [],
+    roleCapabilities: roleCapabilities.map(rc => ({...rc, INSERTDATE: rc.INSERTDATE?.toISOString() ?? null, UPDATEDATE: rc.UPDATEDATE?.toISOString() ?? null, PARENT: rc.PARENT ?? false, PARENTID: rc.PARENTID ?? null}))
   }
 
   return (
