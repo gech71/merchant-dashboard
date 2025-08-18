@@ -224,7 +224,10 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         throw new Error('Failed to update merchant user');
     }
     const returnedUser = await response.json();
-    setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? returnedUser : m));
+    const fullUser = merchants.find(m => m.ID === returnedUser.ID);
+    if(fullUser) {
+        setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? { ...fullUser, ...returnedUser } : m));
+    }
   };
   
   const updateAllowedCompanyApproval = async (companyId: string, isApproved: boolean) => {
@@ -253,7 +256,10 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         throw new Error('Failed to update merchant status');
     }
     const returnedUser = await response.json();
-    setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? returnedUser : m));
+    const fullUser = merchants.find(m => m.ID === returnedUser.ID);
+    if(fullUser) {
+        setMerchants(prev => prev.map(m => m.ID === returnedUser.ID ? { ...fullUser, ...returnedUser } : m));
+    }
   };
 
   const addRole = async (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions'> & { pages: string[] }) => {

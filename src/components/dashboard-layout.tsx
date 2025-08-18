@@ -23,6 +23,7 @@ import {
   FileText,
   Megaphone,
   LogOut,
+  UserCog,
 } from 'lucide-react';
 
 import {
@@ -67,6 +68,7 @@ const ALL_NAV_ITEMS = [
   { group: 'System Settings', href: '/dashboard/stream-pay-settings', icon: Settings, label: 'StreamPay Settings' },
   { group: 'System Settings', href: '/dashboard/ussd-push-settings', icon: Smartphone, label: 'USSD Push Settings' },
   { group: 'Approvals', href: '/dashboard/approvals/allowed_companies', icon: Building, label: 'Allowed Companies' },
+  { group: 'Administration', href: '/dashboard/role-management', icon: UserCog, label: 'Role Management' },
 ];
 
 const NAV_GROUPS = [
@@ -74,6 +76,7 @@ const NAV_GROUPS = [
     { label: 'Transactions', icon: Receipt },
     { label: 'Approvals', icon: ShieldCheck },
     { label: 'System Settings', icon: Settings2 },
+    { label: 'Administration', icon: UserCog },
 ];
 
 
@@ -237,5 +240,3 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </div>
   );
 }
-
-    
