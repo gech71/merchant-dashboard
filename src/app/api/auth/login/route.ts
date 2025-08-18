@@ -11,7 +11,7 @@ const JWT_EXPIRES_IN = '1h';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { identifier, password, userType } = body;
+    const { identifier, password, userType, loginType } = body;
 
     if (!identifier || !userType) {
       return NextResponse.json(
@@ -24,41 +24,56 @@ export async function POST(request: Request) {
     let userPayload: any = null;
 
     if (userType === 'merchant') {
-        // Password check is removed. We just find the user by phone number.
-        const merchantUser = await prisma.Merchant_users.findUnique({
-            where: { PHONENUMBER: identifier },
-            include: { DashBoardRoles: true },
-        });
+      const merchantUser = await prisma.merchant_users.findFirst({
+        where: { PHONENUMBER: loginType === 'merchantSales' ? identifier : password },
+        include: { DashBoardRoles: true },
+      });
 
-        if (merchantUser) {
-            user = merchantUser;
-            const permissions = (user.DashBoardRoles?.permissions as {pages: string[]})?.pages || [];
-            userPayload = {
-                userId: user.ID,
-                userType: 'merchant',
-                role: user.DashBoardRoles?.name || 'No Role',
-                name: user.FULLNAME,
-                email: user.PHONENUMBER,
-                accountNumber: user.ACCOUNTNUMBER,
-                branch: null,
-                permissions,
-            };
+      if (!merchantUser) {
+        return NextResponse.json({ isSuccess: false, message: 'Merchant user not found.' }, { status: 404 });
+      }
+
+      if (loginType === 'merchantAdmin') {
+        if (merchantUser.ROLE !== 'Admin') {
+            return NextResponse.json({ isSuccess: false, message: 'This user is not an Admin. Please use the Sales login.' }, { status: 403 });
         }
+        if (merchantUser.ACCOUNTNUMBER !== identifier) {
+            return NextResponse.json({ isSuccess: false, message: 'Invalid Account Number for the given Phone Number.' }, { status: 401 });
+        }
+      } else if (loginType === 'merchantSales') {
+          if (merchantUser.ROLE !== 'Sales') {
+              return NextResponse.json({ isSuccess: false, message: 'This user is not a Sales user. Please use the Admin login.' }, { status: 403 });
+          }
+      } else {
+          return NextResponse.json({ isSuccess: false, message: 'Invalid merchant login type.' }, { status: 400 });
+      }
+
+      user = merchantUser;
+      const permissions = (user.DashBoardRoles?.permissions as {pages: string[]})?.pages || [];
+      userPayload = {
+          userId: user.ID,
+          userType: 'merchant',
+          role: user.DashBoardRoles?.name || 'No Role',
+          name: user.FULLNAME,
+          email: user.PHONENUMBER,
+          accountNumber: user.ACCOUNTNUMBER,
+          branch: null,
+          permissions,
+      };
+
     } else if (userType === 'branch') {
-        const branchUser = await prisma.BranchUser.findUnique({
+        const branchUser = await prisma.branchUser.findUnique({
             where: { email: identifier },
-            include: { DashBoardRoles: true },
+            include: { dashBoardRoles: true },
         });
         
-        // Assuming branch users still use passwords for now.
-        // If they also don't need passwords, this should be updated.
         if (branchUser && password && branchUser.password === password) {
             user = branchUser;
-            const permissions = (user.DashBoardRoles?.permissions as {pages: string[]})?.pages || [];
+            const permissions = (user.dashBoardRoles?.permissions as {pages: string[]})?.pages || [];
             userPayload = {
                 userId: user.id.toString(),
                 userType: 'branch',
-                role: user.DashBoardRoles?.name || 'No Role',
+                role: user.dashBoardRoles?.name || 'No Role',
                 name: user.name,
                 email: user.email,
                 accountNumber: null,
@@ -72,7 +87,7 @@ export async function POST(request: Request) {
 
     if (!user || !userPayload) {
       return NextResponse.json(
-        { isSuccess: false, message: 'Invalid credentials' },
+        { isSuccess: false, message: 'Invalid credentials or user not found' },
         { status: 401 }
       );
     }
