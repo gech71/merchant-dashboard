@@ -124,9 +124,10 @@ const MOCK_PROMO_ADDS = [
     { ID: randomUUID(), ADDTITLE: 'Holiday Special', ADDSUBTITLE: 'Get your gifts now!', ADDADDRESS: 'https://example.com/holiday-special', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 3, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-10'), UPDATEDATE: new Date('2023-11-10') },
 ];
 
+const parentId = randomUUID();
 const MOCK_ROLE_CAPABILITIES = [
     { ID: randomUUID(), ROLEID: 'Admin', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'Dashboard', MENUNAME_am: 'ዳሽቦርድ', ADDRESS: '/dashboard', PARENT: true, PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
-    { ID: randomUUID(), ROLEID: 'Admin', MENUORDER: 2, SUBMENUORDER: 1, MENUNAME: 'Allowed Companies', MENUNAME_am: 'የተፈቀዱ ኩባንያዎች', ADDRESS: '/dashboard/allowed_companies', PARENT: false, PARENTID: 'mg_1', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
+    { ID: randomUUID(), ROLEID: 'Admin', MENUORDER: 2, SUBMENUORDER: 1, MENUNAME: 'Allowed Companies', MENUNAME_am: 'የተፈቀዱ ኩባንያዎች', ADDRESS: '/dashboard/allowed_companies', PARENT: false, PARENTID: parentId, VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
     { ID: randomUUID(), ROLEID: 'Sales', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'My Transactions', MENUNAME_am: 'የእኔ ግብይቶች', ADDRESS: '/dashboard/merchant-txns', PARENT: true, PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
 ];
 
@@ -388,5 +389,3 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-
-    
