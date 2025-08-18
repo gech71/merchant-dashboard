@@ -62,7 +62,7 @@ const LoginForm = ({
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...data, loginType, userType: 'merchant' }),
+                body: JSON.stringify({ ...data, loginType }),
             });
 
             const result = await response.json();
@@ -73,6 +73,7 @@ const LoginForm = ({
                     title: 'Login Successful',
                     description: 'Welcome back!',
                 });
+                router.refresh();
                 router.push('/dashboard');
             } else {
                 toast({
