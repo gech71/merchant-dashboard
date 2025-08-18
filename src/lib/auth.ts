@@ -33,9 +33,9 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
     
     user = await prisma.merchant_users.findUnique({
         where: { ID: userId },
-        include: { role: { include: { permissions: true } } },
+        include: { ApplicationRole: { include: { permissions: true } } },
     });
-    role = user?.role;
+    role = user?.ApplicationRole;
     
     if (!user || !role) {
       return null;
