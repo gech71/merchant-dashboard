@@ -2,10 +2,10 @@
 'use client';
 
 import * as React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useDataContext } from '@/context/data-context';
-import { Building, Home, Users, CheckSquare, Briefcase, UserCog, DollarSign, Activity } from 'lucide-react';
+import { Building, Users, CheckSquare, DollarSign, Activity } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
 const COLORS = {
@@ -46,56 +46,18 @@ const CustomPieChart = ({ title, description, data, colors }: { title: string, d
 )
 
 export default function DashboardPage() {
-  const { allowedCompanies, branches, merchants, branchUsers, merchantTxns } = useDataContext();
+  const { allowedCompanies, merchants, merchantTxns } = useDataContext();
 
   const totalCompanies = allowedCompanies.length;
-  const totalBranches = branches.length;
   const totalMerchantUsers = merchants.length;
-  const totalBranchUsers = branchUsers.length;
 
   const pendingCompanies = allowedCompanies.filter(c => !c.APPROVED).length;
-  const pendingBranches = branches.filter(b => b.status === 'Pending').length;
   const pendingMerchants = merchants.filter(m => m.STATUS === 'Pending').length;
-  const pendingBranchUsers = branchUsers.filter(u => u.status === 'Pending').length;
-  const totalPending = pendingCompanies + pendingBranches + pendingMerchants + pendingBranchUsers;
+  const totalPending = pendingCompanies + pendingMerchants;
 
   const successfulTxns = merchantTxns.filter(t => t.STATUS === 'Completed');
   const totalTxnVolume = successfulTxns.reduce((acc, txn) => acc + txn.AMOUNT, 0);
   const totalTxnCount = successfulTxns.length;
-
-
-  const companiesByBranch = branches.map(branch => {
-    // This logic is complex because there's no direct branch-to-company link.
-    // We can infer a link: A company belongs to a branch if one of its 'Admin' merchants
-    // is associated with that branch. However, there's no direct merchant-to-branch link either.
-    // The closest link is branchUser.branch.
-    // For this demo, let's assume a company is in a branch if any of its merchant users
-    // has a phone number that is also a branch user's email (a weak link, but demonstrates the idea).
-    
-    // A more robust but still indirect link:
-    // 1. Get all merchant account numbers.
-    const merchantAccountNumbers = new Set(merchants.map(m => m.ACCOUNTNUMBER));
-    // 2. Find which companies are associated with these merchants.
-    const activeCompanies = allowedCompanies.filter(c => merchantAccountNumbers.has(c.ACCOUNTNUMBER));
-    
-    // 3. To link to a branch, we use the branch users.
-    const usersInThisBranch = branchUsers.filter(bu => bu.branch === branch.name);
-    
-    // This is where the schema lacks a clear connection. We will simulate a connection for the chart.
-    // Let's assume a company is in a branch if its ACCOUNTNUMBER is one of the first few in our mock data,
-    // and we assign it to a branch for visual purposes. This part remains a simulation due to schema limitations.
-    const companyCount = allowedCompanies.filter(c => {
-        if (branch.name === 'Downtown Branch') return ['ACC001', 'ACC003'].includes(c.ACCOUNTNUMBER);
-        if (branch.name === 'Uptown Branch') return ['ACC002'].includes(c.ACCOUNTNUMBER);
-        if (branch.name === 'Westside Branch') return ['ACC004'].includes(c.ACCOUNTNUMBER);
-        return false;
-    }).length;
-
-    return {
-      name: branch.name,
-      companies: companyCount,
-    };
-  }).filter(b => b.companies > 0); // Only show branches with companies for a cleaner chart.
 
   const companyStatusData = [
     { name: 'Active', value: allowedCompanies.filter(c => c.STATUS).length },
@@ -103,22 +65,10 @@ export default function DashboardPage() {
     { name: 'Inactive', value: allowedCompanies.filter(c => !c.STATUS).length },
   ];
   
-  const branchStatusData = [
-    { name: 'Approved', value: branches.filter(b => b.status === 'Approved').length },
-    { name: 'Pending', value: pendingBranches },
-    { name: 'Rejected', value: branches.filter(b => b.status === 'Rejected').length },
-  ];
-  
   const merchantStatusData = [
     { name: 'Active', value: merchants.filter(m => m.STATUS === 'Active').length },
     { name: 'Pending', value: pendingMerchants },
     { name: 'Disabled', value: merchants.filter(m => m.STATUS === 'Disabled').length },
-  ];
-
-  const branchUserStatusData = [
-    { name: 'Active', value: branchUsers.filter(u => u.status === 'Active').length },
-    { name: 'Pending', value: pendingBranchUsers },
-    { name: 'Inactive', value: branchUsers.filter(u => u.status === 'Inactive').length },
   ];
   
   const transactionStatusData = [
@@ -134,7 +84,7 @@ export default function DashboardPage() {
           <CardTitle className="text-3xl">Dashboard</CardTitle>
           <CardDescription>A comprehensive summary of your merchant ecosystem.</CardDescription>
         </CardHeader>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Companies</CardTitle>
@@ -146,21 +96,12 @@ export default function DashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Branches</CardTitle>
-            <Home className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalBranches}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalMerchantUsers + totalBranchUsers}</div>
-            <p className="text-xs text-muted-foreground">{totalMerchantUsers} Merchant, {totalBranchUsers} Branch</p>
+            <div className="text-2xl font-bold">{totalMerchantUsers}</div>
+            <p className="text-xs text-muted-foreground">{totalMerchantUsers} Merchant Users</p>
           </CardContent>
         </Card>
         <Card>
@@ -189,41 +130,19 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold">{totalPending}</div>
              <p className="text-xs text-muted-foreground">
-                {pendingCompanies} Co, {pendingBranches} Br, {pendingMerchants} Mer, {pendingBranchUsers} Usr
+                {pendingCompanies} Companies, {pendingMerchants} Merchants
              </p>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-         <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Companies per Branch</CardTitle>
-            <CardDescription>Number of companies registered under each branch.</CardDescription>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <ChartContainer config={{}} className="h-[300px] w-full">
-                <BarChart data={companiesByBranch}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip 
-                      cursor={{fill: 'hsl(var(--muted))'}}
-                      content={<ChartTooltipContent />}
-                    />
-                    <Bar dataKey="companies" fill="hsl(var(--primary))" radius={4} />
-                </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
         <CustomPieChart title="Company Status" description="Distribution of all registered companies." data={companyStatusData} colors={pieColors} />
-      </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <CustomPieChart title="Transaction Status" description="Distribution of all merchant transactions." data={transactionStatusData} colors={txnPieColors} />
         <CustomPieChart title="Merchant User Status" description="Distribution of all merchant users." data={merchantStatusData} colors={pieColors} />
-        <CustomPieChart title="Branch User Status" description="Distribution of all branch users." data={branchUserStatusData} colors={pieColors} />
       </div>
-
     </div>
   );
 }
+
+    

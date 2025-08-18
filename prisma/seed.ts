@@ -4,16 +4,6 @@ import { randomUUID } from 'crypto';
 import { prisma } from '@/lib/prisma';
 
 
-const MOCK_BRANCHES = [
-  { id: randomUUID(), name: 'Downtown Branch', code: 'DT001', address: '123 Main St, Anytown, USA', contact: '555-1234', status: 'Approved' },
-  { id: randomUUID(), name: 'Uptown Branch', code: 'UP002', address: '456 Oak Ave, Anytown, USA', contact: '555-5678', status: 'Pending' },
-  { id: randomUUID(), name: 'Westside Branch', code: 'WS003', address: '789 Pine Rd, Anytown, USA', contact: '555-9012', status: 'Approved' },
-  { id: randomUUID(), name: 'Eastside Branch', code: 'ES004', address: '101 Maple Blvd, Anytown, USA', contact: '555-3456', status: 'Approved' },
-  { id: randomUUID(), name: 'South Branch', code: 'SB005', address: '212 Birch Ln, Anytown, USA', contact: '555-7890', status: 'Rejected' },
-  { id: randomUUID(), name: 'Northside Branch', code: 'NS006', address: '303 Cedar Dr, Anytown, USA', contact: '555-1122', status: 'Approved' },
-  { id: randomUUID(), name: 'Central Hub', code: 'CH007', address: '555 Central Plaza, Anytown, USA', contact: '555-3344', status: 'Approved' },
-];
-
 const MOCK_ALLOWED_COMPANIES = [
   { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC001', FIELDNAME: 'Innovate Inc.', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Downtown Branch' },
   { Oid: randomUUID(), ID: randomUUID(), ACCOUNTNUMBER: 'ACC002', FIELDNAME: 'Apex Solutions', APPROVEUSER: 'admin', APPROVED: true, STATUS: true, INSERTDATE: new Date('2023-02-20'), UPDATEDATE: new Date('2023-02-20'), INSERTUSER: 'system', UPDATEUSER: 'system', OptimisticLockField: 0, GCRecord: 0, branchName: 'Uptown Branch' },
@@ -41,12 +31,6 @@ const MOCK_MERCHANT_USERS = [
   { ID: randomUUID(), FULLNAME: 'Diana Prince', ROLENAME: 'Sales', STATUS: 'Pending', ACCOUNTNUMBER: 'ACC004', ACCOUNTTYPE: 'TypeC', PHONENUMBER: '888-999-0000', DEVICENAME: 'Device8', ENCRYPTIONKEY: 'key8', iV: 'iv8', ISLOGGEDIN: false, authenticationkey: 'auth8', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-06-01'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_8', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-04-05'), UPDATEDATE: new Date('2023-04-05') },
   { ID: randomUUID(), FULLNAME: 'Ethan Hunt', ROLENAME: 'Sales', STATUS: 'Active', ACCOUNTNUMBER: 'ACC006', ACCOUNTTYPE: 'TypeA', PHONENUMBER: '333-222-1111', DEVICENAME: 'Device13', ENCRYPTIONKEY: 'key13', iV: 'iv13', ISLOGGEDIN: false, authenticationkey: 'auth13', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-02'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_13', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-06-16'), UPDATEDATE: new Date('2023-06-16') },
   { ID: randomUUID(), FULLNAME: 'Fiona Glenanne', ROLENAME: 'Sales', STATUS: 'Disabled', ACCOUNTNUMBER: 'ACC007', ACCOUNTTYPE: 'TypeB', PHONENUMBER: '444-333-2222', DEVICENAME: 'Device14', ENCRYPTIONKEY: 'key14', iV: 'iv14', ISLOGGEDIN: false, authenticationkey: 'auth14', FAILEDATTMEPTS: 0, LASTLOGINATTEMPT: new Date('2023-07-21'), ISLOCKED: false, UNLOCKEDTIME: null, VALUE3: 'v3_14', INSERTUSERID: 'sys', UPDATEUSERID: 'sys', INSERTDATE: new Date('2023-07-21'), UPDATEDATE: new Date('2023-07-21') },
-];
-
-const MOCK_BRANCH_USERS = [
-  { id: randomUUID(), name: 'System Admin', email: 'systemadmin@gmail.com', branch: 'All Branches', status: 'Active', password: 'password@1232', roleId: '' },
-  { id: randomUUID(), name: 'Branch Admin Jane', email: 'jane.s@branch.com', branch: 'Uptown Branch', status: 'Active', password: 'password123', roleId: '' },
-  { id: randomUUID(), name: 'Branch User John', email: 'john.d@branch.com', branch: 'Downtown Branch', status: 'Active', password: 'password123', roleId: '' },
 ];
 
 const MOCK_DAILY_BALANCES = [
@@ -125,7 +109,6 @@ async function main() {
 
     // Deleting data
     await prisma.role_capablities.deleteMany({});
-    await prisma.dashboard_capablities.deleteMany({});
     await prisma.promo_adds.deleteMany({});
     await prisma.account_infos.deleteMany({});
     await prisma.qr_payments.deleteMany({});
@@ -138,69 +121,16 @@ async function main() {
     await prisma.arif_requests.deleteMany({});
     await prisma.merchant_txns.deleteMany({});
     await prisma.merchants_daily_balances.deleteMany({});
-    await prisma.branchUser.deleteMany({});
     await prisma.merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
-    await prisma.branch.deleteMany({});
     await prisma.roles.deleteMany({});
 
 
     // Create default roles
     const adminRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
     const salesRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
-    const systemAdminRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'System Admin' } });
-    const branchAdminRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Branch Admin' } });
-    const branchUserRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Branch User' } });
-
-    console.log('Seeded 5 default roles.');
-
-    const ALL_PAGES = [
-        "/dashboard", "/dashboard/allowed_companies", "/dashboard/branches",
-        "/dashboard/branch-users", "/dashboard/merchant_users", "/dashboard/account-infos",
-        "/dashboard/promo-adds", "/dashboard/daily-balances", "/dashboard/merchant-txns",
-        "/dashboard/arif-requests", "/dashboard/paystream-txns", "/dashboard/qr-payments",
-        "/dashboard/arifpay-endpoints", "/dashboard/controllers-configs",
-        "/dashboard/core-integration-settings", "/dashboard/stream-pay-settings",
-        "/dashboard/ussd-push-settings",
-        "/dashboard/approvals/allowed_companies", "/dashboard/approvals/branch_users"
-    ];
-
-    for (const page of ALL_PAGES) {
-      await prisma.dashboard_capablities.create({
-        data: {
-          ROLEID: systemAdminRole.ID,
-          ADDRESS: page,
-          MENUNAME: page.split('/').pop()?.replace(/_/g, ' ').replace(/-/g, ' ')
-        }
-      })
-    }
-     console.log('Seeded capabilities for System Admin.');
     
-    // Seed "All Branches" first
-    await prisma.branch.create({
-        data: {
-            id: randomUUID(),
-            name: 'All Branches',
-            code: 'GLOBAL',
-            address: 'System-wide',
-            contact: 'N/A',
-            status: 'Approved'
-        }
-    });
-    console.log('Seeded "All Branches" for system users.');
-
-    // Assign roles to MOCK_BRANCH_USERS before the loop
-    MOCK_BRANCH_USERS.forEach(user => {
-      if (user.name.includes('System Admin')) user.roleId = systemAdminRole.ID;
-      else if (user.name.includes('Branch Admin')) user.roleId = branchAdminRole.ID;
-      else user.roleId = branchUserRole.ID;
-    });
-
-
-    for (const b of MOCK_BRANCHES) {
-        await prisma.branch.create({ data: b });
-    }
-    console.log(`Seeded ${MOCK_BRANCHES.length} branches.`);
+    console.log('Seeded 2 default roles.');
 
     for (const c of MOCK_ALLOWED_COMPANIES) {
         await prisma.allowed_companies.create({ data: c });
@@ -212,16 +142,12 @@ async function main() {
         await prisma.merchant_users.create({
             data: {
                 ...merchantData,
-                ROLE: ROLENAME === 'Admin' ? adminRole.ROLENAME : salesRole.ROLENAME
+                ROLE: ROLENAME,
+                roleId: ROLENAME === 'Admin' ? adminRole.ID : salesRole.ID,
             }
         });
     }
     console.log(`Seeded ${MOCK_MERCHANT_USERS.length} merchant users.`);
-
-    for (const bu of MOCK_BRANCH_USERS) {
-        await prisma.branchUser.create({ data: bu });
-    }
-    console.log(`Seeded ${MOCK_BRANCH_USERS.length} branch users.`);
 
     for (const db of MOCK_DAILY_BALANCES) {
       await prisma.merchants_daily_balances.create({ data: db });

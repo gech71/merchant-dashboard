@@ -27,7 +27,12 @@ export default function DashboardLayout({
     
     if (currentUser) {
         const authorized = currentUser.permissions?.includes(pathname) ?? false;
-        setIsAuthorized(authorized);
+        // The root dashboard page is always allowed if the user is logged in
+        if (pathname === '/dashboard') {
+            setIsAuthorized(true);
+        } else {
+            setIsAuthorized(authorized);
+        }
     }
   }, [currentUser, pathname, router]);
 
@@ -63,3 +68,5 @@ export default function DashboardLayout({
 
   return <Layout>{children}</Layout>;
 }
+
+    

@@ -37,10 +37,8 @@ type SalesLoginFormValues = z.infer<typeof salesLoginSchema>;
 
 const LoginForm = ({
     loginType,
-    userType,
 }: {
-    loginType: 'merchantAdmin' | 'merchantSales' | 'branch';
-    userType: 'merchant' | 'branch';
+    loginType: 'merchantAdmin' | 'merchantSales';
 }) => {
     const router = useRouter();
     const { toast } = useToast();
@@ -64,7 +62,7 @@ const LoginForm = ({
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...data, userType, loginType }),
+                body: JSON.stringify({ ...data, loginType }),
             });
 
             const result = await response.json();
@@ -92,40 +90,6 @@ const LoginForm = ({
         } finally {
             setIsLoading(false);
         }
-    }
-
-    if (userType === 'branch') {
-        return (
-             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                        control={form.control}
-                        name="identifier"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Email Address</FormLabel>
-                                <FormControl><Input placeholder='e.g., john.d@branch.com' {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Password</FormLabel>
-                                <FormControl><Input type="password" placeholder='••••••••' {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <Button type="submit" className="w-full" disabled={isLoading}>
-                        {isLoading ? 'Signing in...' : 'Sign In'}
-                    </Button>
-                </form>
-            </Form>
-        )
     }
 
     return (
@@ -165,42 +129,32 @@ const LoginForm = ({
 
 
 export default function LoginPage() {
-    const [userType, setUserType] = React.useState<'merchant' | 'branch'>('merchant');
     const [merchantLoginType, setMerchantLoginType] = React.useState<'merchantAdmin' | 'merchantSales'>('merchantAdmin');
 
     return (
         <div className="flex min-h-screen w-full items-center justify-center bg-background">
-            <Tabs value={userType} onValueChange={(val) => setUserType(val as 'merchant' | 'branch')} className="w-full max-w-sm">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-2xl">Login</CardTitle>
-                        <CardDescription>Select your user type to sign in.</CardDescription>
-                        <TabsList className="grid w-full grid-cols-2 mt-4">
-                            <TabsTrigger value="merchant">Merchant User</TabsTrigger>
-                            <TabsTrigger value="branch">Branch/System User</TabsTrigger>
+            <Card className="w-full max-w-sm">
+                <CardHeader>
+                    <CardTitle className="text-2xl">Merchant Login</CardTitle>
+                    <CardDescription>Select your role to sign in.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Tabs value={merchantLoginType} onValueChange={(val) => setMerchantLoginType(val as 'merchantAdmin' | 'merchantSales')}>
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="merchantAdmin">Admin</TabsTrigger>
+                            <TabsTrigger value="merchantSales">Sales</TabsTrigger>
                         </TabsList>
-                    </CardHeader>
-                    <CardContent>
-                        <TabsContent value="merchant">
-                            <Tabs value={merchantLoginType} onValueChange={(val) => setMerchantLoginType(val as 'merchantAdmin' | 'merchantSales')}>
-                                <TabsList className="grid w-full grid-cols-2">
-                                    <TabsTrigger value="merchantAdmin">Admin</TabsTrigger>
-                                    <TabsTrigger value="merchantSales">Sales</TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="merchantAdmin" className="pt-4">
-                                    <LoginForm loginType="merchantAdmin" userType="merchant" />
-                                </TabsContent>
-                                <TabsContent value="merchantSales" className="pt-4">
-                                     <LoginForm loginType="merchantSales" userType="merchant" />
-                                </TabsContent>
-                            </Tabs>
+                        <TabsContent value="merchantAdmin" className="pt-4">
+                            <LoginForm loginType="merchantAdmin" />
                         </TabsContent>
-                         <TabsContent value="branch">
-                           <LoginForm loginType="branch" userType="branch" />
+                        <TabsContent value="merchantSales" className="pt-4">
+                                <LoginForm loginType="merchantSales" />
                         </TabsContent>
-                    </CardContent>
-                </Card>
-            </Tabs>
+                    </Tabs>
+                </CardContent>
+            </Card>
         </div>
     );
 }
+
+    

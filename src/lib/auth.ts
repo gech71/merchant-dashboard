@@ -11,12 +11,11 @@ const secret = new TextEncoder().encode(JWT_SECRET);
 
 type UserPayload = {
     userId: string;
-    userType: 'merchant' | 'branch';
+    userType: 'merchant';
     role: string;
     name: string;
     email: string;
     accountNumber: string | null;
-    branch: string | null;
     permissions: string[];
 };
 
@@ -27,54 +26,32 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
 
   try {
     const { payload } = await jwtVerify(token, secret);
-    const { userId, userType } = payload as { userId: string, userType: 'merchant' | 'branch' };
+    const { userId } = payload as { userId: string };
     
     let user: any = null;
     let role: any = null;
     
-    if (userType === 'merchant') {
-        user = await prisma.merchant_users.findUnique({
-            where: { ID: userId },
-            include: { ApplicationRole: { include: { capabilities: true } } },
-        });
-        role = user?.ApplicationRole;
-    } else if (userType === 'branch') {
-        user = await prisma.branchUser.findUnique({
-            where: { id: userId },
-            include: { role: { include: { capabilities: true } } },
-        });
-        role = user?.role;
-    }
-
+    user = await prisma.merchant_users.findUnique({
+        where: { ID: userId },
+        include: { ApplicationRole: { include: { capabilities: true } } },
+    });
+    role = user?.ApplicationRole;
+    
     if (!user || !role) {
       return null;
     }
     
     const permissions = role.capabilities.map((cap: { ADDRESS: string }) => cap.ADDRESS);
     
-    if (userType === 'merchant') {
-        return {
-            userId: user.ID,
-            userType: 'merchant',
-            role: role.ROLENAME,
-            name: user.FULLNAME,
-            email: user.PHONENUMBER,
-            accountNumber: user.ACCOUNTNUMBER,
-            branch: null, 
-            permissions: permissions,
-        };
-    } else { // userType === 'branch'
-         return {
-            userId: user.id,
-            userType: 'branch',
-            role: role.name,
-            name: user.name,
-            email: user.email,
-            accountNumber: null, 
-            branch: user.branch,
-            permissions: permissions,
-        };
-    }
+    return {
+        userId: user.ID,
+        userType: 'merchant',
+        role: role.ROLENAME,
+        name: user.FULLNAME,
+        email: user.PHONENUMBER,
+        accountNumber: user.ACCOUNTNUMBER,
+        permissions: permissions,
+    };
 
   } catch (err) {
     console.error('Failed to verify JWT:', err);
@@ -91,3 +68,5 @@ export async function getMe() {
     }
     return new NextResponse(JSON.stringify(user));
 }
+
+    

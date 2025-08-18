@@ -17,11 +17,6 @@ export type allowed_companies = Omit<Prisma.allowed_companiesGetPayload<{}>, 'IN
   UPDATEDATE: string | null;
 };
 
-export type Branch = Omit<Prisma.BranchGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
-  INSERTDATE: string | null;
-  UPDATEDATE: string | null;
-};
-
 export type Merchant_users = Omit<Prisma.merchant_usersGetPayload<{ include: { ApplicationRole: true } }>, 'LASTLOGINATTEMPT' | 'UNLOCKEDTIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
   LASTLOGINATTEMPT: string | null;
   UNLOCKEDTIME: string | null;
@@ -42,8 +37,6 @@ export type merchant_txns = Omit<Prisma.merchant_txnsGetPayload<{}>, 'AMOUNT' | 
     INSERTDATE: string | null;
     UPDATEDATE: string | null;
 };
-
-export type BranchUser = Omit<Prisma.BranchUserGetPayload<{ include: { role: true } }>, 'password'> & { password?: string };
 
 export type arifpay_endpoints = Omit<Prisma.arifpay_endpointsGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
   INSERTDATE: string | null;
@@ -93,13 +86,6 @@ export type promo_adds = Omit<Prisma.promo_addsGetPayload<{}>, 'INSERTDATE' | 'U
   UPDATEDATE: string | null;
 };
 
-export type dashboard_capablities = Omit<Prisma.dashboard_capablitiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE' | 'PARENT' | 'PARENTID'> & {
-  INSERTDATE: string | null;
-  UPDATEDATE: string | null;
-  PARENT: boolean | null;
-  PARENTID: string | null;
-};
-
 export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE' | 'PARENT' | 'PARENTID'> & {
   INSERTDATE: string | null;
   UPDATEDATE: string | null;
@@ -107,10 +93,11 @@ export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSE
   PARENTID: string | null;
 };
 
-
 export type Roles = Omit<Prisma.RolesGetPayload<{ include: { capabilities: true } }>, 'INSERTDATE' | 'UPDATEDATE'> & {
     INSERTDATE: string | null;
     UPDATEDATE: string | null;
 };
 
-export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | dashboard_capablities | Roles | null;
+export type EditableItem = allowed_companies | Merchant_users | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | Roles | null;
+
+    

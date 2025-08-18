@@ -26,8 +26,7 @@ export async function POST(request: Request) {
       );
     }
     
-    // If the user is a branch user, associate the company with their branch
-    const branchName = user.userType === 'branch' ? user.branch : null;
+    const branchName = 'Default Branch'; // Since branch model is removed
 
     const newCompany = await prisma.allowed_companies.create({
       data: {

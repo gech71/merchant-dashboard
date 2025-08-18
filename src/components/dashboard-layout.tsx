@@ -6,12 +6,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Building,
-  Home,
   Users,
   Briefcase,
-  UserCircle,
-  CheckSquare,
-  UserCog,
   LayoutGrid,
   DollarSign,
   Receipt,
@@ -22,14 +18,11 @@ import {
   Repeat,
   Smartphone,
   QrCode,
-  Landmark,
   ShieldCheck,
   Settings2,
   FileText,
   Megaphone,
-  UserCheck,
   LogOut,
-  UserPlus,
 } from 'lucide-react';
 
 import {
@@ -60,9 +53,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const ALL_NAV_ITEMS = [
   { group: 'Management', href: '/dashboard/allowed_companies', icon: Building, label: 'Allowed Companies' },
-  { group: 'Management', href: '/dashboard/branches', icon: Home, label: 'Branches' },
-  { group: 'Management', href: '/dashboard/branch-users', icon: UserCog, label: 'Branch Users' },
-  { group: 'Management', href: '/dashboard/merchant_users', icon: Briefcase, label: 'Merchant Users' },
+  { group: 'Management', href: '/dashboard/merchant_users', icon: Users, label: 'Merchant Users' },
   { group: 'Management', href: '/dashboard/account-infos', icon: FileText, label: 'Account Infos' },
   { group: 'Management', href: '/dashboard/promo-adds', icon: Megaphone, label: 'Promo Ads' },
   { group: 'Transactions', href: '/dashboard/daily-balances', icon: DollarSign, label: 'Daily Balances' },
@@ -76,11 +67,10 @@ const ALL_NAV_ITEMS = [
   { group: 'System Settings', href: '/dashboard/stream-pay-settings', icon: Settings, label: 'StreamPay Settings' },
   { group: 'System Settings', href: '/dashboard/ussd-push-settings', icon: Smartphone, label: 'USSD Push Settings' },
   { group: 'Approvals', href: '/dashboard/approvals/allowed_companies', icon: Building, label: 'Allowed Companies' },
-  { group: 'Approvals', href: '/dashboard/approvals/branch_users', icon: UserCog, label: 'Branch Users' },
 ];
 
 const NAV_GROUPS = [
-    { label: 'Management', icon: Landmark },
+    { label: 'Management', icon: Briefcase },
     { label: 'Transactions', icon: Receipt },
     { label: 'Approvals', icon: ShieldCheck },
     { label: 'System Settings', icon: Settings2 },
@@ -154,7 +144,6 @@ function UserProfile() {
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { state } = useSidebar();
   const { currentUser } = useDataContext();
 
   const hasPermission = (href: string) => {
@@ -248,3 +237,5 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </div>
   );
 }
+
+    

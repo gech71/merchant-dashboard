@@ -16,10 +16,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const branches = await prisma.Branch.findMany();
   const allowedCompanies = await prisma.allowed_companies.findMany();
-  const merchants = await prisma.merchant_users.findMany({ include: { ApplicationRole: true }});
-  const branchUsers = await prisma.BranchUser.findMany({ include: { role: true }});
+  const merchants = await prisma.merchant_users.findMany({ include: { ApplicationRole: { include: { capabilities: true }} }});
   const dailyBalances = await prisma.merchants_daily_balances.findMany();
   const merchantTxns = await prisma.merchant_txns.findMany();
   const arifRequests = await prisma.arif_requests.findMany();
@@ -35,12 +33,9 @@ export default async function RootLayout({
   const roles = await prisma.roles.findMany({ include: { capabilities: true }});
   const roleCapabilities = await prisma.role_capablities.findMany();
 
-
   const initialData = {
-    branches: branches.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     allowedCompanies: allowedCompanies.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
-    merchants: merchants.map(item => ({ ...item, ApplicationRole: item.ApplicationRole ? { ...item.ApplicationRole, capabilities: [], INSERTDATE: item.ApplicationRole.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.ApplicationRole.UPDATEDATE?.toISOString() ?? null} : null, LASTLOGINATTEMPT: item.LASTLOGINATTEMPT?.toISOString() ?? null, UNLOCKEDTIME: item.UNLOCKEDTIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
-    branchUsers: branchUsers.map(user => ({...user, password: '', role: user.role ? { ...user.role, capabilities: [], INSERTDATE: user.role.INSERTDATE?.toISOString() ?? null, UPDATEDATE: user.role.UPDATEDATE?.toISOString() ?? null } : null })),
+    merchants: merchants.map(item => ({ ...item, ApplicationRole: item.ApplicationRole ? { ...item.ApplicationRole, capabilities: item.ApplicationRole.capabilities.map(c => ({...c, INSERTDATE: c.INSERTDATE?.toISOString() ?? null, UPDATEDATE: c.UPDATEDATE?.toISOString() ?? null})), INSERTDATE: item.ApplicationRole.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.ApplicationRole.UPDATEDATE?.toISOString() ?? null} : null, LASTLOGINATTEMPT: item.LASTLOGINATTEMPT?.toISOString() ?? null, UNLOCKEDTIME: item.UNLOCKEDTIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     dailyBalances: dailyBalances.map(item => ({ ...item, DAILYBALANCE: item.DAILYBALANCE ? item.DAILYBALANCE.toNumber() : 0, BALANCEDATE: item.BALANCEDATE?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     merchantTxns: merchantTxns.map(item => ({ ...item, AMOUNT: item.AMOUNT ? item.AMOUNT.toNumber() : 0, T2TRANSACTIONDATE: item.T2TRANSACTIONDATE?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     arifRequests: arifRequests.map(item => ({...item, AMOUNT: item.AMOUNT.toNumber(), DATESEND1: item.DATESEND1?.toISOString() ?? null, DATERECIVED1: item.DATERECIVED1?.toISOString() ?? null, DATESEND2: item.DATESEND2?.toISOString() ?? null, DATERECIVED2: item.DATERECIVED2?.toISOString() ?? null, DATESEND3: item.DATESEND3?.toISOString() ?? null, DATERECIVED3: item.DATERECIVED3?.toISOString() ?? null, WEBHOOKRECEIVEDDATE: item.WEBHOOKRECEIVEDDATE?.toISOString() ?? null })),
@@ -54,7 +49,6 @@ export default async function RootLayout({
     accountInfos: accountInfos.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     promoAdds: promoAdds.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     roles: roles.map(role => ({ ...role, capabilities: role.capabilities.map(c => ({...c, INSERTDATE: c.INSERTDATE?.toISOString() ?? null, UPDATEDATE: c.UPDATEDATE?.toISOString() ?? null, PARENT: c.PARENT ?? false, PARENTID: c.PARENTID ?? null})), INSERTDATE: role.INSERTDATE?.toISOString() ?? null, UPDATEDATE: role.UPDATEDATE?.toISOString() ?? null })),
-    dashboardCapabilities: [],
     roleCapabilities: roleCapabilities.map(rc => ({...rc, INSERTDATE: rc.INSERTDATE?.toISOString() ?? null, UPDATEDATE: rc.UPDATEDATE?.toISOString() ?? null, PARENT: rc.PARENT ?? false, PARENTID: rc.PARENTID ?? null}))
   }
 
@@ -76,3 +70,5 @@ export default async function RootLayout({
     </html>
   );
 }
+
+    
