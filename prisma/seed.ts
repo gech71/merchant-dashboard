@@ -44,13 +44,9 @@ const MOCK_MERCHANT_USERS = [
 ];
 
 const MOCK_BRANCH_USERS = [
-  { id: randomUUID(), name: 'John Doe', email: 'john.d@branch.com', branch: 'Downtown Branch', status: 'Active' },
-  { id: randomUUID(), name: 'Jane Smith', email: 'jane.s@branch.com', branch: 'Uptown Branch', status: 'Active' },
-  { id: randomUUID(), name: 'Peter Jones', email: 'peter.j@branch.com', branch: 'Downtown Branch', status: 'Inactive' },
-  { id: randomUUID(), name: 'Mary Johnson', email: 'mary.j@branch.com', branch: 'Westside Branch', status: 'Pending' },
-  { id: randomUUID(), name: 'David Williams', email: 'david.w@branch.com', branch: 'Uptown Branch', status: 'Active' },
-  { id: randomUUID(), name: 'Susan Clark', email: 'susan.c@branch.com', branch: 'Northside Branch', status: 'Active' },
-  { id: randomUUID(), name: 'Tom Brown', email: 'tom.b@branch.com', branch: 'Central Hub', status: 'Active' },
+  { id: randomUUID(), name: 'System Admin', email: 'systemadmin@gmail.com', branch: 'All Branches', status: 'Active', password: 'password@1232', roleId: '' },
+  { id: randomUUID(), name: 'Branch Admin Jane', email: 'jane.s@branch.com', branch: 'Uptown Branch', status: 'Active', password: 'password123', roleId: '' },
+  { id: randomUUID(), name: 'Branch User John', email: 'john.d@branch.com', branch: 'Downtown Branch', status: 'Active', password: 'password123', roleId: '' },
 ];
 
 const MOCK_DAILY_BALANCES = [
@@ -124,18 +120,11 @@ const MOCK_PROMO_ADDS = [
     { ID: randomUUID(), ADDTITLE: 'Holiday Special', ADDSUBTITLE: 'Get your gifts now!', ADDADDRESS: 'https://example.com/holiday-special', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 3, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-10'), UPDATEDATE: new Date('2023-11-10') },
 ];
 
-const parentId = randomUUID();
-const MOCK_ROLE_CAPABILITIES = [
-    { ID: randomUUID(), ROLEID: 'Admin', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'Dashboard', MENUNAME_am: 'ዳሽቦርድ', ADDRESS: '/dashboard', PARENT: true, PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
-    { ID: randomUUID(), ROLEID: 'Admin', MENUORDER: 2, SUBMENUORDER: 1, MENUNAME: 'Allowed Companies', MENUNAME_am: 'የተፈቀዱ ኩባንያዎች', ADDRESS: '/dashboard/allowed_companies', PARENT: false, PARENTID: parentId, VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
-    { ID: randomUUID(), ROLEID: 'Sales', MENUORDER: 1, SUBMENUORDER: 0, MENUNAME: 'My Transactions', MENUNAME_am: 'የእኔ ግብይቶች', ADDRESS: '/dashboard/merchant-txns', PARENT: true, PARENTID: '0', VALUE3: null, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-01-01'), UPDATEDATE: new Date('2023-01-01') },
-];
-
 async function main() {
     console.log(`Start seeding ...`);
 
     // Deleting data
-    await prisma.role_capablities.deleteMany({});
+    await prisma.dashboard_capablities.deleteMany({});
     await prisma.promo_adds.deleteMany({});
     await prisma.account_infos.deleteMany({});
     await prisma.qr_payments.deleteMany({});
@@ -152,11 +141,18 @@ async function main() {
     await prisma.merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
     await prisma.branch.deleteMany({});
-    await prisma.dashBoardRoles.deleteMany({});
     await prisma.roles.deleteMany({});
 
 
     // Create default roles
+    const adminRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
+    const salesRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
+    const systemAdminRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'System Admin' } });
+    const branchAdminRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Branch Admin' } });
+    const branchUserRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Branch User' } });
+
+    console.log('Seeded 5 default roles.');
+
     const ALL_PAGES = [
         "/dashboard", "/dashboard/allowed_companies", "/dashboard/branches",
         "/dashboard/branch-users", "/dashboard/merchant_users", "/dashboard/account-infos",
@@ -164,84 +160,21 @@ async function main() {
         "/dashboard/arif-requests", "/dashboard/paystream-txns", "/dashboard/qr-payments",
         "/dashboard/arifpay-endpoints", "/dashboard/controllers-configs",
         "/dashboard/core-integration-settings", "/dashboard/stream-pay-settings",
-        "/dashboard/ussd-push-settings", "/dashboard/role-capabilities",
-        "/dashboard/approvals/allowed_companies", "/dashboard/approvals/branch_users",
-        "/dashboard/role-management", "/dashboard/user-role-assignment"
+        "/dashboard/ussd-push-settings",
+        "/dashboard/approvals/allowed_companies", "/dashboard/approvals/branch_users"
     ];
 
-    const systemAdminRole = await prisma.dashBoardRoles.create({
+    for (const page of ALL_PAGES) {
+      await prisma.dashboard_capablities.create({
         data: {
-            id: randomUUID(),
-            name: 'System Admin',
-            description: 'Has full access to all system features and data across all companies.',
-            permissions: { "pages": ALL_PAGES }
+          ROLEID: systemAdminRole.ID,
+          ADDRESS: page,
+          MENUNAME: page.split('/').pop()?.replace(/_/g, ' ').replace(/-/g, ' ')
         }
-    });
-
-    const branchAdminRole = await prisma.dashBoardRoles.create({
-        data: {
-            id: randomUUID(),
-            name: 'Branch Admin',
-            description: 'Can manage companies and users within their own branch, including approvals.',
-            permissions: {
-                "pages": [
-                    "/dashboard",
-                    "/dashboard/allowed_companies",
-                    "/dashboard/approvals/allowed_companies"
-                ]
-            }
-        }
-    });
-
-    const branchUserRole = await prisma.dashBoardRoles.create({
-        data: {
-            id: randomUUID(),
-            name: 'Branch User',
-            description: 'Can create and update companies within their branch, but cannot approve them.',
-            permissions: {
-                 "pages": [
-                    "/dashboard",
-                    "/dashboard/allowed_companies",
-                ]
-            }
-        }
-    });
-
-    const merchantAdminRole = await prisma.dashBoardRoles.create({
-        data: {
-            id: randomUUID(),
-            name: 'Merchant Admin',
-            description: 'Full dashboard access, restricted to their own company.',
-            permissions: {
-                "pages": [
-                    "/dashboard/merchant_users",
-                    "/dashboard/daily-balances",
-                    "/dashboard/merchant-txns",
-                ]
-            }
-        }
-    });
-
-    const merchantSalesRole = await prisma.dashBoardRoles.create({
-        data: {
-            id: randomUUID(),
-            name: 'Merchant Sales',
-            description: 'Can only view their own transactions and basic company info.',
-            permissions: {
-                "pages": [
-                    "/dashboard/merchant-txns"
-                ]
-            }
-        }
-    });
-    console.log('Seeded 5 default dashboard roles.');
-
-    // Seed Application Roles
-    const adminRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
-    const salesRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
-    console.log('Seeded 2 application roles (Admin, Sales).');
-
-
+      })
+    }
+     console.log('Seeded capabilities for System Admin.');
+    
     // Seed "All Branches" first
     await prisma.branch.create({
         data: {
@@ -255,18 +188,12 @@ async function main() {
     });
     console.log('Seeded "All Branches" for system users.');
 
-    await prisma.branchUser.create({
-        data: {
-            id: randomUUID(),
-            name: 'System Admin',
-            email: 'systemadmin@gmail.com',
-            branch: 'All Branches', // System admin is not tied to a specific branch
-            status: 'Active',
-            password: 'password@1232', // This will be hashed in a real app
-            roleId: systemAdminRole.id
-        }
+    // Assign roles to MOCK_BRANCH_USERS before the loop
+    MOCK_BRANCH_USERS.forEach(user => {
+      if (user.name.includes('System Admin')) user.roleId = systemAdminRole.ID;
+      else if (user.name.includes('Branch Admin')) user.roleId = branchAdminRole.ID;
+      else user.roleId = branchUserRole.ID;
     });
-    console.log('Seeded System Admin user.');
 
 
     for (const b of MOCK_BRANCHES) {
@@ -280,32 +207,18 @@ async function main() {
     console.log(`Seeded ${MOCK_ALLOWED_COMPANIES.length} allowed companies.`);
 
     for (const m of MOCK_MERCHANT_USERS) {
-        let dashboardRoleId;
-        if (m.ROLENAME === 'Admin') {
-            dashboardRoleId = merchantAdminRole.id;
-        } else {
-            dashboardRoleId = merchantSalesRole.id;
-        }
-
-        const { ROLENAME, ...rest } = m;
        
         await prisma.merchant_users.create({
             data: {
-                ...rest,
-                ROLE: m.ROLENAME,
-                roleId: dashboardRoleId
+                ...m,
+                ROLE: m.ROLENAME === 'Admin' ? adminRole.ROLENAME : salesRole.ROLENAME
             }
         });
     }
     console.log(`Seeded ${MOCK_MERCHANT_USERS.length} merchant users.`);
 
     for (const bu of MOCK_BRANCH_USERS) {
-        await prisma.branchUser.create({ data: {
-            ...bu,
-            password: 'password123', // This will be hashed in a real app
-            // Assign roles based on name for mock purposes
-            roleId: bu.name.includes('Jane') ? branchAdminRole.id : branchUserRole.id
-        } });
+        await prisma.branchUser.create({ data: bu });
     }
     console.log(`Seeded ${MOCK_BRANCH_USERS.length} branch users.`);
 
@@ -363,19 +276,6 @@ async function main() {
         await prisma.promo_adds.create({ data: pa });
     }
     console.log(`Seeded ${MOCK_PROMO_ADDS.length} promo adds.`);
-
-    for (const rc of MOCK_ROLE_CAPABILITIES) {
-        const role = await prisma.roles.findFirst({ where: { ROLENAME: rc.ROLEID } });
-        if(role){
-            await prisma.role_capablities.create({ data: {
-                ...rc,
-                ROLEID: role.ID,
-                PARENT: rc.PARENT === true,
-                PARENTID: rc.PARENTID === '0' ? null : rc.PARENTID
-            } });
-        }
-    }
-    console.log(`Seeded ${MOCK_ROLE_CAPABILITIES.length} role capabilities.`);
 
     console.log(`Seeding finished.`);
 }

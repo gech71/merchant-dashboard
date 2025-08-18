@@ -12,12 +12,9 @@ export async function PUT(
     const { id } = params;
     
     const body = await request.json();
-    const { roleId, STATUS, ROLE } = body;
+    const { STATUS, ROLE } = body;
 
-    const dataToUpdate: { roleId?: string; STATUS?: string, ROLE?: string } = {};
-    if (roleId) {
-        dataToUpdate.roleId = roleId;
-    }
+    const dataToUpdate: { STATUS?: string, ROLE?: string } = {};
     if (STATUS) {
         dataToUpdate.STATUS = STATUS;
     }
@@ -50,5 +47,3 @@ export async function PUT(
     return NextResponse.json({ message: 'Something went wrong!' }, { status: 500 });
   }
 }
-
-    

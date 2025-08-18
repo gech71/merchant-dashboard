@@ -22,7 +22,7 @@ export type Branch = Omit<Prisma.BranchGetPayload<{}>, 'INSERTDATE' | 'UPDATEDAT
   UPDATEDATE: string | null;
 };
 
-export type Merchant_users = Omit<Prisma.Merchant_usersGetPayload<{ include: { DashBoardRoles: true, ApplicationRole: true } }>, 'LASTLOGINATTEMPT' | 'UNLOCKEDTIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
+export type Merchant_users = Omit<Prisma.merchant_usersGetPayload<{ include: { ApplicationRole: true } }>, 'LASTLOGINATTEMPT' | 'UNLOCKEDTIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
   LASTLOGINATTEMPT: string | null;
   UNLOCKEDTIME: string | null;
   INSERTDATE: string | null;
@@ -93,23 +93,16 @@ export type promo_adds = Omit<Prisma.promo_addsGetPayload<{}>, 'INSERTDATE' | 'U
   UPDATEDATE: string | null;
 };
 
-export type role_capablities = Omit<Prisma.role_capablitiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE' | 'PARENT' | 'PARENTID'> & {
+export type dashboard_capablities = Omit<Prisma.dashboard_capablitiesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE' | 'PARENT' | 'PARENTID'> & {
   INSERTDATE: string | null;
   UPDATEDATE: string | null;
   PARENT: boolean | null;
   PARENTID: string | null;
 };
 
-export type DashBoardRoles = Omit<Prisma.DashBoardRolesGetPayload<{}>, 'createdAt' | 'updatedAt'> & {
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type Roles = Omit<Prisma.RolesGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
+export type Roles = Omit<Prisma.RolesGetPayload<{ include: { capabilities: true } }>, 'INSERTDATE' | 'UPDATEDATE'> & {
     INSERTDATE: string | null;
     UPDATEDATE: string | null;
 };
 
-export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | role_capablities | DashBoardRoles | Roles | null;
-
-    
+export type EditableItem = allowed_companies | Branch | Merchant_users | BranchUser | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | dashboard_capablities | Roles | null;

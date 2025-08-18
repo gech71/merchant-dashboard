@@ -30,43 +30,44 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
     const { userId, userType } = payload as { userId: string, userType: 'merchant' | 'branch' };
     
     let user: any = null;
+    let role: any = null;
     
     if (userType === 'merchant') {
-        user = await prisma.Merchant_users.findUnique({
+        user = await prisma.merchant_users.findUnique({
             where: { ID: userId },
-            include: { DashBoardRoles: true },
+            include: { ApplicationRole: { include: { capabilities: true } } },
         });
+        role = user?.ApplicationRole;
     } else if (userType === 'branch') {
-        user = await prisma.BranchUser.findUnique({
+        user = await prisma.branchUser.findUnique({
             where: { id: userId },
-            include: { role: true },
+            include: { role: { include: { capabilities: true } } },
         });
+        role = user?.role;
     }
 
-    const roles = user.DashBoardRoles || user.role;
-
-    if (!user || !roles) {
+    if (!user || !role) {
       return null;
     }
     
-    const permissions = (roles.permissions as { pages: string[] })?.pages || [];
+    const permissions = role.capabilities.map((cap: { ADDRESS: string }) => cap.ADDRESS);
     
     if (userType === 'merchant') {
         return {
             userId: user.ID,
             userType: 'merchant',
-            role: roles.name,
+            role: role.ROLENAME,
             name: user.FULLNAME,
             email: user.PHONENUMBER,
             accountNumber: user.ACCOUNTNUMBER,
-            branch: null, // Merchant users are not directly in a branch
+            branch: null, 
             permissions: permissions,
         };
     } else { // userType === 'branch'
          return {
             userId: user.id,
             userType: 'branch',
-            role: roles.name,
+            role: role.name,
             name: user.name,
             email: user.email,
             accountNumber: null, 
@@ -90,5 +91,3 @@ export async function getMe() {
     }
     return new NextResponse(JSON.stringify(user));
 }
-
-    

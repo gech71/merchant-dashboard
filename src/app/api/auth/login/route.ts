@@ -22,11 +22,12 @@ export async function POST(request: Request) {
 
     let user: any = null;
     let userPayload: any = null;
+    let role: any = null;
 
     if (userType === 'merchant') {
       const merchantUser = await prisma.merchant_users.findFirst({
         where: { PHONENUMBER: loginType === 'merchantSales' ? identifier : password },
-        include: { DashBoardRoles: true, ApplicationRole: true },
+        include: { ApplicationRole: { include: { capabilities: true } } },
       });
 
       if (!merchantUser) {
@@ -49,12 +50,14 @@ export async function POST(request: Request) {
       }
 
       user = merchantUser;
-      const permissions = (user.DashBoardRoles?.permissions as {pages: string[]})?.pages || [];
+      role = user.ApplicationRole;
+      const permissions = role.capabilities.map((cap: any) => cap.ADDRESS);
+
       userPayload = {
           userId: user.ID,
           userType: 'merchant',
-          role: user.DashBoardRoles?.name || 'No Role',
-          applicationRole: user.ApplicationRole?.ROLENAME,
+          role: role.ROLENAME,
+          applicationRole: role.ROLENAME,
           name: user.FULLNAME,
           email: user.PHONENUMBER,
           accountNumber: user.ACCOUNTNUMBER,
@@ -65,16 +68,17 @@ export async function POST(request: Request) {
     } else if (userType === 'branch') {
         const branchUser = await prisma.branchUser.findUnique({
             where: { email: identifier },
-            include: { role: true },
+            include: { role: { include: { capabilities: true } } },
         });
         
         if (branchUser && password && branchUser.password === password) {
             user = branchUser;
-            const permissions = (user.role?.permissions as {pages: string[]})?.pages || [];
+            role = user.role;
+            const permissions = role.capabilities.map((cap: any) => cap.ADDRESS);
             userPayload = {
                 userId: user.id.toString(),
                 userType: 'branch',
-                role: user.role?.name || 'No Role',
+                role: role.name,
                 name: user.name,
                 email: user.email,
                 accountNumber: null,
@@ -119,5 +123,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ isSuccess: false, message: 'Something went wrong!' }, { status: 500 });
   }
 }
-
-    

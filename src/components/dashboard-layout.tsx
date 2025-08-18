@@ -75,9 +75,6 @@ const ALL_NAV_ITEMS = [
   { group: 'System Settings', href: '/dashboard/core-integration-settings', icon: Settings, label: 'Core Integration Settings' },
   { group: 'System Settings', href: '/dashboard/stream-pay-settings', icon: Settings, label: 'StreamPay Settings' },
   { group: 'System Settings', href: '/dashboard/ussd-push-settings', icon: Smartphone, label: 'USSD Push Settings' },
-  { group: 'System Settings', href: '/dashboard/role-capabilities', icon: UserCheck, label: 'Role Capabilities' },
-  { group: 'System Settings', href: '/dashboard/role-management', icon: ShieldCheck, label: 'Role Management' },
-  { group: 'System Settings', href: '/dashboard/user-role-assignment', icon: UserPlus, label: 'User Role Assignment' },
   { group: 'Approvals', href: '/dashboard/approvals/allowed_companies', icon: Building, label: 'Allowed Companies' },
   { group: 'Approvals', href: '/dashboard/approvals/branch_users', icon: UserCog, label: 'Branch Users' },
 ];

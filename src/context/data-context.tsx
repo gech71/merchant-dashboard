@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos, promo_adds, role_capablities, DashBoardRoles } from '@/types';
+import type { Branch, allowed_companies, Merchant_users, BranchUser, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos, promo_adds, Roles } from '@/types';
 
 type CurrentUser = {
     userId: string;
@@ -32,8 +32,7 @@ type InitialData = {
     qrPayments: qr_payments[];
     accountInfos: account_infos[];
     promoAdds: promo_adds[];
-    roleCapabilities: role_capablities[];
-    roles: DashBoardRoles[];
+    roles: Roles[];
 }
 
 type DataContextType = {
@@ -53,8 +52,7 @@ type DataContextType = {
   qrPayments: qr_payments[];
   accountInfos: account_infos[];
   promoAdds: promo_adds[];
-  roleCapabilities: role_capablities[];
-  roles: DashBoardRoles[];
+  roles: Roles[];
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
   addBranch: (branch: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE' | 'BranchUser'>) => Promise<void>;
@@ -68,10 +66,6 @@ type DataContextType = {
   updateAllowedCompanyApproval: (companyId: string, isApproved: boolean) => Promise<void>;
   updateMerchantStatus: (merchantId: string, status: 'Active' | 'Disabled') => Promise<void>;
   updateBranchUserStatus: (userId: string, status: 'Active' | 'Inactive') => Promise<void>;
-  addRole: (role: Omit<DashBoardRoles, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
-  updateRole: (role: DashBoardRoles) => Promise<void>;
-  deleteRole: (roleId: string) => Promise<void>;
-  updateUserRole: (userId: string, roleId: string, userType: 'merchant' | 'branch') => Promise<void>;
 };
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
@@ -80,12 +74,11 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const [currentUser, setCurrentUser] = React.useState<CurrentUser | null>(null);
   const [loading, setLoading] = React.useState(true);
 
-  // Convert mutable data to state
   const [allowedCompanies, setAllowedCompanies] = React.useState(initialData.allowedCompanies);
   const [branchUsers, setBranchUsers] = React.useState(initialData.branchUsers);
   const [merchants, setMerchants] = React.useState(initialData.merchants);
   const [branches, setBranches] = React.useState(initialData.branches);
-  const [roles, setRoles] = React.useState<DashBoardRoles[]>(initialData.roles);
+  const [roles, setRoles] = React.useState<Roles[]>(initialData.roles);
 
 
   React.useEffect(() => {
@@ -111,8 +104,8 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const isSystemAdmin = currentUser?.role === 'System Admin';
   const isBranchUser = currentUser?.userType === 'branch';
   const userAccountNumber = currentUser?.accountNumber;
-  const isMerchantAdmin = currentUser?.role === 'Merchant Admin';
-  const isMerchantSales = currentUser?.role === 'Merchant Sales';
+  const isMerchantAdmin = currentUser?.role === 'Admin';
+  const isMerchantSales = currentUser?.role === 'Sales';
 
 
   const filteredBranches = React.useMemo(() => branches.filter(b => isSystemAdmin || (isBranchUser && b.name === currentUser?.branch)), [isSystemAdmin, isBranchUser, currentUser, branches]);
@@ -180,13 +173,11 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     return [];
   }, [currentUser, userAccountNumber, initialData.arifRequests]);
   
-  // These are system-level and should probably only be visible to system admins
   const arifpayEndpoints = React.useMemo(() => isSystemAdmin ? initialData.arifpayEndpoints : [], [isSystemAdmin, initialData.arifpayEndpoints]);
   const controllersConfigs = React.useMemo(() => isSystemAdmin ? initialData.controllersConfigs : [], [isSystemAdmin, initialData.controllersConfigs]);
   const coreIntegrationSettings = React.useMemo(() => isSystemAdmin ? initialData.coreIntegrationSettings : [], [isSystemAdmin, initialData.coreIntegrationSettings]);
   const streamPaySettings = React.useMemo(() => isSystemAdmin ? initialData.streamPaySettings : [], [isSystemAdmin, initialData.streamPaySettings]);
   const ussdPushSettings = React.useMemo(() => isSystemAdmin ? initialData.ussdPushSettings : [], [isSystemAdmin, initialData.ussdPushSettings]);
-  const roleCapabilities = React.useMemo(() => isSystemAdmin ? initialData.roleCapabilities : [], [isSystemAdmin, initialData.roleCapabilities]);
   
   const paystreamTxns = React.useMemo(() => {
     if (currentUser?.userType === 'branch') return initialData.paystreamTxns;
@@ -232,7 +223,6 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     return [];
   }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, merchants, initialData.accountInfos]);
   
-  // Promo adds are likely global
   const promoAdds = initialData.promoAdds;
 
 
@@ -376,51 +366,6 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     }
   };
 
-  const addRole = async (roleData: Omit<DashBoardRoles, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const response = await fetch('/api/dashboard-roles', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(roleData),
-    });
-    if (!response.ok) throw new Error('Failed to create role');
-    const newRole = await response.json();
-    setRoles(prev => [...prev, newRole]);
-  };
-
-  const updateRole = async (roleData: DashBoardRoles) => {
-    const response = await fetch(`/api/dashboard-roles/${roleData.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(roleData),
-    });
-    if (!response.ok) throw new Error('Failed to update role');
-    const updatedRole = await response.json();
-    setRoles(prev => prev.map(r => r.id === updatedRole.id ? updatedRole : r));
-  };
-
-  const deleteRole = async (roleId: string) => {
-    const response = await fetch(`/api/dashboard-roles/${roleId}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error('Failed to delete role');
-    setRoles(prev => prev.filter(r => r.id !== roleId));
-  };
-
-  const updateUserRole = async (userId: string, roleId: string, userType: 'merchant' | 'branch') => {
-    const response = await fetch(`/api/user-roles`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, roleId, userType }),
-    });
-    if (!response.ok) throw new Error('Failed to update user role');
-    const updatedUser = await response.json();
-    if (userType === 'merchant') {
-        setMerchants(prev => prev.map(u => u.ID === userId ? updatedUser : u));
-    } else {
-        setBranchUsers(prev => prev.map(u => u.id.toString() === userId ? updatedUser : u));
-    }
-  };
-
 
   const value = {
     branches: filteredBranches,
@@ -439,7 +384,6 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     qrPayments,
     accountInfos,
     promoAdds,
-    roleCapabilities,
     roles,
     currentUser,
     setCurrentUser,
@@ -454,10 +398,6 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     updateAllowedCompanyApproval,
     updateMerchantStatus,
     updateBranchUserStatus,
-    addRole,
-    updateRole,
-    deleteRole,
-    updateUserRole,
   };
 
   if (loading) {
@@ -478,5 +418,3 @@ export function useDataContext() {
   }
   return context;
 }
-
-    

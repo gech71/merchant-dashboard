@@ -22,7 +22,7 @@ import { Merchant_users } from '@/types';
 import { useDataContext } from '@/context/data-context';
 
 const merchantFormSchema = z.object({
-  roleId: z.string({ required_error: 'Please select a role.' }),
+  ROLE: z.string({ required_error: 'Please select a role.' }),
 });
 
 type MerchantFormValues = z.infer<typeof merchantFormSchema>;
@@ -42,30 +42,15 @@ export function EditMerchantForm({
   const form = useForm<MerchantFormValues>({
     resolver: zodResolver(merchantFormSchema),
     defaultValues: {
-      roleId: merchantUser.roleId || '',
+      ROLE: merchantUser.ROLE || '',
     },
   });
 
   async function onSubmit(data: MerchantFormValues) {
     setIsLoading(true);
-    const selectedRole = roles.find(r => r.id === data.roleId);
-
-    if (selectedRole?.name === 'Merchant Admin') {
-      const adminExists = merchants.some(
-        (m) => m.ID !== merchantUser.ID && m.ACCOUNTNUMBER === merchantUser.ACCOUNTNUMBER && m.DashBoardRoles?.name === 'Merchant Admin'
-      );
-      if (adminExists) {
-        form.setError('roleId', {
-          type: 'manual',
-          message: `An Admin user already exists for this company. You can't have more than one.`,
-        });
-        setIsLoading(false);
-        return;
-      }
-    }
 
     try {
-        await updateMerchant({ ...merchantUser, roleId: data.roleId });
+        await updateMerchant({ ...merchantUser, ROLE: data.ROLE });
         toast({
             title: 'Merchant User Updated',
             description: `${merchantUser.FULLNAME}'s role has been successfully updated.`,
@@ -101,7 +86,7 @@ export function EditMerchantForm({
 
         <FormField
           control={form.control}
-          name="roleId"
+          name="ROLE"
           render={({ field }) => (
             <FormItem>
               <FormLabel>ROLE</FormLabel>
@@ -112,8 +97,8 @@ export function EditMerchantForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {roles.filter(r => r.name.startsWith('Merchant')).map(role => (
-                    <SelectItem key={role.id} value={role.id}>{role.name}</SelectItem>
+                  {roles.filter(r => r.ROLENAME === 'Admin' || r.ROLENAME === 'Sales').map(role => (
+                    <SelectItem key={role.ID} value={role.ROLENAME}>{role.ROLENAME}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -144,5 +129,3 @@ export function EditMerchantForm({
     </Form>
   );
 }
-
-    
