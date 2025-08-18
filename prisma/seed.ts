@@ -127,11 +127,11 @@ async function main() {
     await prisma.arif_requests.deleteMany({});
     await prisma.merchant_txns.deleteMany({});
     await prisma.merchants_daily_balances.deleteMany({});
-    await prisma.BranchUser.deleteMany({});
+    await prisma.branchUser.deleteMany({});
     await prisma.merchant_users.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
     await prisma.branch.deleteMany({});
-    await prisma.DashBoardRoles.deleteMany({});
+    await prisma.dashBoardRoles.deleteMany({});
     await prisma.roles.deleteMany({});
 
 
@@ -148,7 +148,7 @@ async function main() {
         "/dashboard/role-management", "/dashboard/user-role-assignment"
     ];
 
-    const systemAdminRole = await prisma.DashBoardRoles.create({
+    const systemAdminRole = await prisma.dashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'System Admin',
@@ -157,7 +157,7 @@ async function main() {
         }
     });
 
-    const branchAdminRole = await prisma.DashBoardRoles.create({
+    const branchAdminRole = await prisma.dashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Branch Admin',
@@ -172,7 +172,7 @@ async function main() {
         }
     });
 
-    const branchUserRole = await prisma.DashBoardRoles.create({
+    const branchUserRole = await prisma.dashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Branch User',
@@ -186,7 +186,7 @@ async function main() {
         }
     });
 
-    const merchantAdminRole = await prisma.DashBoardRoles.create({
+    const merchantAdminRole = await prisma.dashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Merchant Admin',
@@ -201,7 +201,7 @@ async function main() {
         }
     });
 
-    const merchantSalesRole = await prisma.DashBoardRoles.create({
+    const merchantSalesRole = await prisma.dashBoardRoles.create({
         data: {
             id: randomUUID(),
             name: 'Merchant Sales',
@@ -234,7 +234,7 @@ async function main() {
     });
     console.log('Seeded "All Branches" for system users.');
 
-    await prisma.BranchUser.create({
+    await prisma.branchUser.create({
         data: {
             id: randomUUID(),
             name: 'System Admin',
@@ -276,7 +276,7 @@ async function main() {
     console.log(`Seeded ${MOCK_MERCHANT_USERS.length} merchant users.`);
 
     for (const bu of MOCK_BRANCH_USERS) {
-        await prisma.BranchUser.create({ data: {
+        await prisma.branchUser.create({ data: {
             ...bu,
             password: 'password123', // This will be hashed in a real app
             // Assign roles based on name for mock purposes
