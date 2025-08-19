@@ -3,8 +3,24 @@
 
 import * as React from 'react';
 import type { role_capablities } from '@/types';
-import { ArrowUpDown } from 'lucide-react';
-
+import { ArrowUpDown, Edit, MoreHorizontal, Trash2 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -25,12 +41,14 @@ import {
 } from '@/components/ui/card';
 import { Badge } from './ui/badge';
 import { useDataContext } from '@/context/data-context';
+import { useToast } from '@/hooks/use-toast';
 
 type SortableKeys = 'roleName' | 'MENUNAME' | 'PARENT' | 'MENUORDER' | 'SUBMENUORDER';
 const ITEMS_PER_PAGE = 15;
 
 export default function RoleCapabilityList({ roleCapabilities: initialCapabilities }: { roleCapabilities: role_capablities[] }) {
-  const { roles } = useDataContext();
+  const { roles, roleCapabilities, deleteRoleCapability } = useDataContext();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
@@ -50,9 +68,26 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
     }
     setSortConfig({ key, direction });
   };
+  
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteRoleCapability(id);
+      toast({
+        title: 'Success',
+        description: 'Role capability deleted successfully.',
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to delete role capability.',
+      });
+    }
+  };
+
 
   const filteredAndSortedItems = React.useMemo(() => {
-    let sortableItems = [...initialCapabilities].map(item => ({
+    let sortableItems = [...roleCapabilities].map(item => ({
         ...item,
         roleName: getRoleName(item.ROLEID)
     }));
@@ -90,7 +125,7 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
     }
 
     return sortableItems;
-  }, [initialCapabilities, searchTerm, sortConfig, getRoleName]);
+  }, [roleCapabilities, searchTerm, sortConfig, getRoleName]);
 
   const paginatedItems = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -128,6 +163,7 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
                 <TableHead><Button variant="ghost" onClick={() => requestSort('PARENT')} className="px-2">Parent{getSortIndicator('PARENT')}</Button></TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('MENUORDER')} className="px-2">Menu Order{getSortIndicator('MENUORDER')}</Button></TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('SUBMENUORDER')} className="px-2">Sub-Menu Order{getSortIndicator('SUBMENUORDER')}</Button></TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -145,11 +181,52 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
                     </TableCell>
                     <TableCell>{item.MENUORDER}</TableCell>
                     <TableCell>{item.SUBMENUORDER ?? 'N/A'}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button aria-haspopup="true" size="icon" variant="ghost">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => {
+                              // handleEdit(item)
+                              toast({ title: "Coming Soon!", description: "Edit functionality will be implemented soon."})
+                          }}>
+                            <Edit className="mr-2 h-4 w-4" /> Edit
+                          </DropdownMenuItem>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button className="w-full text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-red-600 focus:bg-red-50 focus:text-red-600">
+                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                              </button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently delete this capability.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(item.ID)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Continue
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">No capabilities found.</TableCell>
+                  <TableCell colSpan={8} className="h-24 text-center">No capabilities found.</TableCell>
                 </TableRow>
               )}
             </TableBody>
