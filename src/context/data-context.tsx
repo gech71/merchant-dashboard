@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -54,6 +53,7 @@ type DataContextType = Omit<InitialData, 'systemUsers'> & {
   addBranch: (branch: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => Promise<void>;
   updateBranch: (branch: Branch) => Promise<void>;
   deleteRoleCapability: (id: string) => Promise<void>;
+  updateRoleCapability: (capability: role_capablities) => Promise<void>;
 };
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
@@ -392,6 +392,19 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     }
     setRoleCapabilities((prev) => prev.filter((rc) => rc.ID !== id));
   };
+  
+  const updateRoleCapability = async (capability: role_capablities) => {
+    const response = await fetch(`/api/role-capabilities/${capability.ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(capability),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update role capability');
+    }
+    const updatedCapability = await response.json();
+    setRoleCapabilities((prev) => prev.map((rc) => (rc.ID === updatedCapability.ID ? updatedCapability : rc)));
+  };
 
   const value: DataContextType = {
     ...initialData,
@@ -424,6 +437,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     addBranch,
     updateBranch,
     deleteRoleCapability,
+    updateRoleCapability,
   };
 
   if (loading) {

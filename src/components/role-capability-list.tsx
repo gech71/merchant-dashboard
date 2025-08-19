@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -21,6 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -42,6 +42,7 @@ import {
 import { Badge } from './ui/badge';
 import { useDataContext } from '@/context/data-context';
 import { useToast } from '@/hooks/use-toast';
+import { EditRoleCapabilityForm } from './edit-role-capability-form';
 
 type SortableKeys = 'roleName' | 'MENUNAME' | 'PARENT' | 'MENUORDER' | 'SUBMENUORDER';
 const ITEMS_PER_PAGE = 15;
@@ -55,6 +56,8 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
     direction: 'ascending' | 'descending';
   } | null>({ key: 'MENUORDER', direction: 'ascending' });
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
+  const [selectedCapability, setSelectedCapability] = React.useState<role_capablities | null>(null);
 
   const getRoleName = React.useCallback((roleId: string) => {
     const role = roles.find(r => r.ID === roleId);
@@ -67,6 +70,11 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
       direction = 'descending';
     }
     setSortConfig({ key, direction });
+  };
+  
+  const handleEdit = (capability: role_capablities) => {
+    setSelectedCapability(capability);
+    setIsEditDialogOpen(true);
   };
   
   const handleDelete = async (id: string) => {
@@ -138,124 +146,131 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Role Capabilities</CardTitle>
-        <CardDescription>A list of all role-based capabilities for sidebar navigation.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center justify-end gap-2 py-4">
-          <Input
-            placeholder="Search capabilities..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
-        </div>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('roleName')} className="px-2">Role Name{getSortIndicator('roleName')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('MENUNAME')} className="px-2">Menu Name{getSortIndicator('MENUNAME')}</Button></TableHead>
-                <TableHead>Menu Name (Amharic)</TableHead>
-                <TableHead>Address</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('PARENT')} className="px-2">Parent{getSortIndicator('PARENT')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('MENUORDER')} className="px-2">Menu Order{getSortIndicator('MENUORDER')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('SUBMENUORDER')} className="px-2">Sub-Menu Order{getSortIndicator('SUBMENUORDER')}</Button></TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedItems.length > 0 ? (
-                paginatedItems.map((item) => (
-                  <TableRow key={item.ID}>
-                    <TableCell className="font-medium">{item.roleName}</TableCell>
-                    <TableCell>{item.MENUNAME}</TableCell>
-                    <TableCell>{item.MENUNAME_am}</TableCell>
-                    <TableCell>{item.ADDRESS}</TableCell>
-                    <TableCell>
-                      <Badge variant={item.PARENT ? 'default' : 'secondary'}>
-                        {item.PARENT ? 'Yes' : 'No'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{item.MENUORDER}</TableCell>
-                    <TableCell>{item.SUBMENUORDER ?? 'N/A'}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => {
-                              // handleEdit(item)
-                              toast({ title: "Coming Soon!", description: "Edit functionality will be implemented soon."})
-                          }}>
-                            <Edit className="mr-2 h-4 w-4" /> Edit
-                          </DropdownMenuItem>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <button className="w-full text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-red-600 focus:bg-red-50 focus:text-red-600">
-                                <Trash2 className="mr-2 h-4 w-4" /> Delete
-                              </button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently delete this capability.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDelete(item.ID)}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                >
-                                  Continue
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Role Capabilities</CardTitle>
+          <CardDescription>A list of all role-based capabilities for sidebar navigation.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-end gap-2 py-4">
+            <Input
+              placeholder="Search capabilities..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
+          </div>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={8} className="h-24 text-center">No capabilities found.</TableCell>
+                  <TableHead><Button variant="ghost" onClick={() => requestSort('roleName')} className="px-2">Role Name{getSortIndicator('roleName')}</Button></TableHead>
+                  <TableHead><Button variant="ghost" onClick={() => requestSort('MENUNAME')} className="px-2">Menu Name{getSortIndicator('MENUNAME')}</Button></TableHead>
+                  <TableHead>Menu Name (Amharic)</TableHead>
+                  <TableHead>Address</TableHead>
+                  <TableHead><Button variant="ghost" onClick={() => requestSort('PARENT')} className="px-2">Parent{getSortIndicator('PARENT')}</Button></TableHead>
+                  <TableHead><Button variant="ghost" onClick={() => requestSort('MENUORDER')} className="px-2">Menu Order{getSortIndicator('MENUORDER')}</Button></TableHead>
+                  <TableHead><Button variant="ghost" onClick={() => requestSort('SUBMENUORDER')} className="px-2">Sub-Menu Order{getSortIndicator('SUBMENUORDER')}</Button></TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-      <CardFooter>
-        <div className="text-xs text-muted-foreground">
-          Showing <strong>{paginatedItems.length}</strong> of <strong>{filteredAndSortedItems.length}</strong> capabilities
-        </div>
-        <div className="ml-auto flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(prev => prev + 1)}
-            disabled={currentPage * ITEMS_PER_PAGE >= filteredAndSortedItems.length}
-          >
-            Next
-          </Button>
-        </div>
-      </CardFooter>
-    </Card>
+              </TableHeader>
+              <TableBody>
+                {paginatedItems.length > 0 ? (
+                  paginatedItems.map((item) => (
+                    <TableRow key={item.ID}>
+                      <TableCell className="font-medium">{item.roleName}</TableCell>
+                      <TableCell>{item.MENUNAME}</TableCell>
+                      <TableCell>{item.MENUNAME_am}</TableCell>
+                      <TableCell>{item.ADDRESS}</TableCell>
+                      <TableCell>
+                        <Badge variant={item.PARENT ? 'default' : 'secondary'}>
+                          {item.PARENT ? 'Yes' : 'No'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{item.MENUORDER}</TableCell>
+                      <TableCell>{item.SUBMENUORDER ?? 'N/A'}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" size="icon" variant="ghost">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(item)}>
+                              <Edit className="mr-2 h-4 w-4" /> Edit
+                            </DropdownMenuItem>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <button className="w-full text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-red-600 focus:bg-red-50 focus:text-red-600">
+                                  <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                </button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete this capability.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDelete(item.ID)}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    Continue
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={8} className="h-24 text-center">No capabilities found.</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <div className="text-xs text-muted-foreground">
+            Showing <strong>{paginatedItems.length}</strong> of <strong>{filteredAndSortedItems.length}</strong> capabilities
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              disabled={currentPage * ITEMS_PER_PAGE >= filteredAndSortedItems.length}
+            >
+              Next
+            </Button>
+          </div>
+        </CardFooter>
+      </Card>
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Edit Role Capability</DialogTitle>
+          </DialogHeader>
+          {selectedCapability && <EditRoleCapabilityForm capability={selectedCapability} setOpen={setIsEditDialogOpen} />}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
