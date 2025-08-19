@@ -17,7 +17,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const allowedCompanies = await prisma.allowed_companies.findMany();
-  const merchants = await prisma.merchant_users.findMany({ include: { ApplicationRole: { include: { capabilities: true, permissions: true }} }});
+  const merchants = await prisma.merchant_users.findMany({ include: { role: { include: { capabilities: true, permissions: true }} }});
   const dailyBalances = await prisma.merchants_daily_balances.findMany();
   const merchantTxns = await prisma.merchant_txns.findMany();
   const arifRequests = await prisma.arif_requests.findMany();
@@ -35,7 +35,7 @@ export default async function RootLayout({
 
   const initialData = {
     allowedCompanies: allowedCompanies.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
-    merchants: merchants.map(item => ({ ...item, ApplicationRole: item.ApplicationRole ? { ...item.ApplicationRole, capabilities: item.ApplicationRole.capabilities.map(c => ({...c, INSERTDATE: c.INSERTDATE?.toISOString() ?? null, UPDATEDATE: c.UPDATEDATE?.toISOString() ?? null, PARENT: c.PARENT ?? null, PARENTID: c.PARENTID ?? null})), permissions: item.ApplicationRole.permissions.map(p => ({...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString()})), INSERTDATE: item.ApplicationRole.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.ApplicationRole.UPDATEDATE?.toISOString() ?? null} : null, LASTLOGINATTEMPT: item.LASTLOGINATTEMPT?.toISOString() ?? null, UNLOCKEDTIME: item.UNLOCKEDTIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
+    merchants: merchants.map(item => ({ ...item, role: item.role ? { ...item.role, capabilities: item.role.capabilities.map(c => ({...c, INSERTDATE: c.INSERTDATE?.toISOString() ?? null, UPDATEDATE: c.UPDATEDATE?.toISOString() ?? null, PARENT: c.PARENT ?? null, PARENTID: c.PARENTID ?? null})), permissions: item.role.permissions.map(p => ({...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString()})), INSERTDATE: item.role.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.role.UPDATEDATE?.toISOString() ?? null} : null, LASTLOGINATTEMPT: item.LASTLOGINATTEMPT?.toISOString() ?? null, UNLOCKEDTIME: item.UNLOCKEDTIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     dailyBalances: dailyBalances.map(item => ({ ...item, DAILYBALANCE: item.DAILYBALANCE ? item.DAILYBALANCE.toNumber() : 0, BALANCEDATE: item.BALANCEDATE?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     merchantTxns: merchantTxns.map(item => ({ ...item, AMOUNT: item.AMOUNT ? item.AMOUNT.toNumber() : 0, T2TRANSACTIONDATE: item.T2TRANSACTIONDATE?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     arifRequests: arifRequests.map(item => ({...item, AMOUNT: item.AMOUNT.toNumber(), DATESEND1: item.DATESEND1?.toISOString() ?? null, DATERECIVED1: item.DATERECIVED1?.toISOString() ?? null, DATESEND2: item.DATESEND2?.toISOString() ?? null, DATERECIVED2: item.DATERECIVED2?.toISOString() ?? null, DATESEND3: item.DATESEND3?.toISOString() ?? null, DATERECIVED3: item.DATERECIVED3?.toISOString() ?? null, WEBHOOKRECEIVEDDATE: item.WEBHOOKRECEIVEDDATE?.toISOString() ?? null })),

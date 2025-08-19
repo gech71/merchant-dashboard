@@ -73,8 +73,9 @@ const LoginForm = ({
                     title: 'Login Successful',
                     description: 'Welcome back!',
                 });
-                router.refresh();
                 router.push('/dashboard');
+                // Use refresh to ensure server-side data is re-fetched with the new auth state
+                router.refresh();
             } else {
                 toast({
                     variant: 'destructive',

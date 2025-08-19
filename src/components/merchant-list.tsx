@@ -35,7 +35,7 @@ import {
 import { useDataContext } from '@/context/data-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
-type SortableKeys = 'FULLNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'ApplicationRole';
+type SortableKeys = 'FULLNAME' | 'ACCOUNTNUMBER' | 'STATUS' | 'role';
 const ITEMS_PER_PAGE = 15;
 
 const statusBadgeVariants = cva(
@@ -144,8 +144,8 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
 
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        const valA = sortConfig.key === 'ApplicationRole' ? a.ApplicationRole?.ROLENAME : a[sortConfig.key];
-        const valB = sortConfig.key === 'ApplicationRole' ? b.ApplicationRole?.ROLENAME : b[sortConfig.key];
+        const valA = sortConfig.key === 'role' ? a.role?.ROLENAME : a[sortConfig.key];
+        const valB = sortConfig.key === 'role' ? b.role?.ROLENAME : b[sortConfig.key];
         
         if (valA === null || valA === undefined) return 1;
         if (valB === null || valB === undefined) return -1;
@@ -162,8 +162,8 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
         sortableItems.sort((a, b) => {
             if (currentUser && a.ID === currentUser.userId) return -1;
             if (currentUser && b.ID === currentUser.userId) return 1;
-            if (a.ApplicationRole?.ROLENAME === 'Admin' && b.ApplicationRole?.ROLENAME !== 'Admin') return -1;
-            if (a.ApplicationRole?.ROLENAME !== 'Admin' && b.ApplicationRole?.ROLENAME === 'Admin') return 1;
+            if (a.role?.ROLENAME === 'Admin' && b.role?.ROLENAME !== 'Admin') return -1;
+            if (a.role?.ROLENAME !== 'Admin' && b.role?.ROLENAME === 'Admin') return 1;
             return a.FULLNAME.localeCompare(b.FULLNAME);
         });
     }
@@ -261,9 +261,9 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
                         </Button>
                       </TableHead>
                       <TableHead>
-                        <Button variant="ghost" onClick={() => requestSort('ApplicationRole')} className="px-2">
+                        <Button variant="ghost" onClick={() => requestSort('role')} className="px-2">
                           Role
-                          {getSortIndicator('ApplicationRole')}
+                          {getSortIndicator('role')}
                         </Button>
                       </TableHead>
                       <TableHead>Phone Number</TableHead>
@@ -283,7 +283,7 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
                           <TableCell>{getCompanyName(merchantUser.ACCOUNTNUMBER)}</TableCell>
                           <TableCell>{merchantUser.ACCOUNTNUMBER}</TableCell>
                           <TableCell>
-                             <Badge variant={merchantUser.ApplicationRole?.ROLENAME === 'Admin' ? 'default' : 'secondary'}>{merchantUser.ApplicationRole?.ROLENAME}</Badge>
+                             <Badge variant={merchantUser.role?.ROLENAME === 'Admin' ? 'default' : 'secondary'}>{merchantUser.role?.ROLENAME}</Badge>
                           </TableCell>
                           <TableCell className="hidden md:table-cell">{merchantUser.PHONENUMBER}</TableCell>
                           <TableCell>

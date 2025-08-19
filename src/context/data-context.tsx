@@ -60,6 +60,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
 
   React.useEffect(() => {
     const fetchUser = async () => {
+        setLoading(true);
         try {
             const response = await fetch('/api/auth/me');
             if (response.ok) {
@@ -84,11 +85,11 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
 
   const filteredAllowedCompanies = React.useMemo(() => {
     if (currentUser?.userType === 'merchant') {
-        if (isMerchantAdmin) return allowedCompanies; // Admin sees all
         return allowedCompanies.filter(c => c.ACCOUNTNUMBER === userAccountNumber);
     }
-    return [];
-  }, [userAccountNumber, isMerchantAdmin, allowedCompanies, currentUser]);
+    // Return all for non-merchant users or if no user is logged in (for public pages)
+    return initialData.allowedCompanies;
+  }, [userAccountNumber, allowedCompanies, currentUser, initialData.allowedCompanies]);
 
   const filteredMerchants = React.useMemo(() => {
       if (currentUser?.userType === 'merchant') {
@@ -99,14 +100,14 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
               return merchants.filter(m => m.ID === currentUser.userId);
           }
       }
-      return [];
-  }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, merchants]);
+      return initialData.merchants;
+  }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, merchants, initialData.merchants]);
 
   const dailyBalances = React.useMemo(() => {
       if (currentUser?.userType === 'merchant') {
           return initialData.dailyBalances.filter(db => db.MERCHANTACCOUNT === userAccountNumber);
       }
-      return [];
+      return initialData.dailyBalances;
   }, [currentUser, userAccountNumber, initialData.dailyBalances]);
 
 
@@ -119,21 +120,15 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
               return initialData.merchantTxns.filter(txn => txn.MERCHANTPHONE === currentUser.email);
           }
       }
-      return [];
+      return initialData.merchantTxns;
   }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, initialData.merchantTxns]);
 
   const arifRequests = React.useMemo(() => {
     if (currentUser?.userType === 'merchant') {
         return initialData.arifRequests.filter(ar => ar.MERCHANTACCOUNT === userAccountNumber);
     }
-    return [];
+    return initialData.arifRequests;
   }, [currentUser, userAccountNumber, initialData.arifRequests]);
-  
-  const arifpayEndpoints = React.useMemo(() => isMerchantAdmin ? initialData.arifpayEndpoints : [], [isMerchantAdmin, initialData.arifpayEndpoints]);
-  const controllersConfigs = React.useMemo(() => isMerchantAdmin ? initialData.controllersConfigs : [], [isMerchantAdmin, initialData.controllersConfigs]);
-  const coreIntegrationSettings = React.useMemo(() => isMerchantAdmin ? initialData.coreIntegrationSettings : [], [isMerchantAdmin, initialData.coreIntegrationSettings]);
-  const streamPaySettings = React.useMemo(() => isMerchantAdmin ? initialData.streamPaySettings : [], [isMerchantAdmin, initialData.streamPaySettings]);
-  const ussdPushSettings = React.useMemo(() => isMerchantAdmin ? initialData.ussdPushSettings : [], [isMerchantAdmin, initialData.ussdPushSettings]);
   
   const paystreamTxns = React.useMemo(() => {
     if (currentUser?.userType === 'merchant') {
@@ -147,7 +142,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
             }
         }
     }
-    return [];
+    return initialData.paystreamTxns;
   }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, initialData.paystreamTxns, merchants]);
 
   const qrPayments = React.useMemo(() => {
@@ -160,7 +155,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
             return initialData.qrPayments.filter(qp => qp.SALERPHONENUMBER === currentUser?.email);
         }
     }
-    return [];
+    return initialData.qrPayments;
   }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, merchants, initialData.qrPayments]);
 
   const accountInfos = React.useMemo(() => {
@@ -173,20 +168,9 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
             return initialData.accountInfos.filter(ai => ai.PHONENUMBER === currentUser?.email || ai.ACCOUNTNUMBER === userAccountNumber);
         }
     }
-    return [];
+    return initialData.accountInfos;
   }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, merchants, initialData.accountInfos]);
   
-  const promoAdds = initialData.promoAdds;
-  
-  const allRoles = initialData.roles;
-  
-  const roleCapabilities = React.useMemo(() => {
-      if (isMerchantAdmin) {
-        return initialData.roleCapabilities;
-      }
-      return initialData.roleCapabilities.filter(rc => rc.ROLEID === currentUser?.role);
-  }, [isMerchantAdmin, currentUser, initialData.roleCapabilities]);
-
 
   const addAllowedCompany = async (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord' | 'branchName'>) => {
     const response = await fetch('/api/allowed_companies', {
@@ -308,16 +292,9 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     dailyBalances,
     merchantTxns,
     arifRequests,
-    arifpayEndpoints,
-    controllersConfigs,
-    coreIntegrationSettings,
     paystreamTxns,
-    streamPaySettings,
-    ussdPushSettings,
     qrPayments,
     accountInfos,
-    promoAdds,
-    roleCapabilities,
     roles,
     currentUser,
     setCurrentUser,
