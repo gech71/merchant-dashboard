@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -34,11 +35,12 @@ type InitialData = {
     branches: Branch[];
 }
 
-type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings'> & {
+type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 'streamPaySettings'> & {
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
   systemUsers: SystemUser[];
   ussdPushSettings: ussd_push_settings[];
+  streamPaySettings: stream_pay_settings[];
   addRole: (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions' | 'SystemUsers' | 'Merchant_users'> & { pages: string[] }) => Promise<void>;
   updateRole: (role: { id: string; ROLENAME: string; description?: string | null; pages: string[] }) => Promise<void>;
   deleteRole: (roleId: string) => Promise<void>;
@@ -56,6 +58,7 @@ type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings'> & {
   deleteRoleCapability: (id: string) => Promise<void>;
   updateRoleCapability: (capability: role_capablities) => Promise<void>;
   updateUssdPushSetting: (setting: ussd_push_settings) => Promise<void>;
+  updateStreamPaySetting: (setting: stream_pay_settings) => Promise<void>;
 };
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
@@ -71,6 +74,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const [branches, setBranches] = React.useState<Branch[]>(initialData.branches);
   const [roleCapabilities, setRoleCapabilities] = React.useState<role_capablities[]>(initialData.roleCapabilities);
   const [ussdPushSettings, setUssdPushSettings] = React.useState<ussd_push_settings[]>(initialData.ussdPushSettings);
+  const [streamPaySettings, setStreamPaySettings] = React.useState<stream_pay_settings[]>(initialData.streamPaySettings);
 
 
   React.useEffect(() => {
@@ -422,6 +426,19 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setUssdPushSettings((prev) => prev.map((s) => (s.ID === updatedSetting.ID ? updatedSetting : s)));
   };
 
+  const updateStreamPaySetting = async (setting: stream_pay_settings) => {
+    const response = await fetch(`/api/stream-pay-settings/${setting.ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(setting),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update StreamPay Setting');
+    }
+    const updatedSetting = await response.json();
+    setStreamPaySettings((prev) => prev.map((s) => (s.ID === updatedSetting.ID ? updatedSetting : s)));
+  };
+
   const value: DataContextType = {
     ...initialData,
     allowedCompanies: filteredAllowedCompanies,
@@ -437,6 +454,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     branches,
     roleCapabilities,
     ussdPushSettings,
+    streamPaySettings,
     currentUser,
     setCurrentUser,
     addAllowedCompany,
@@ -456,6 +474,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     deleteRoleCapability,
     updateRoleCapability,
     updateUssdPushSetting,
+    updateStreamPaySetting,
   };
 
   if (loading) {
