@@ -35,12 +35,13 @@ type InitialData = {
     branches: Branch[];
 }
 
-type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 'streamPaySettings'> & {
+type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 'streamPaySettings' | 'coreIntegrationSettings'> & {
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
   systemUsers: SystemUser[];
   ussdPushSettings: ussd_push_settings[];
   streamPaySettings: stream_pay_settings[];
+  coreIntegrationSettings: core_integration_settings[];
   addRole: (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions' | 'SystemUsers' | 'Merchant_users'> & { pages: string[] }) => Promise<void>;
   updateRole: (role: { id: string; ROLENAME: string; description?: string | null; pages: string[] }) => Promise<void>;
   deleteRole: (roleId: string) => Promise<void>;
@@ -59,6 +60,7 @@ type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 's
   updateRoleCapability: (capability: role_capablities) => Promise<void>;
   updateUssdPushSetting: (setting: ussd_push_settings) => Promise<void>;
   updateStreamPaySetting: (setting: stream_pay_settings) => Promise<void>;
+  updateCoreIntegrationSetting: (setting: core_integration_settings) => Promise<void>;
 };
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
@@ -75,6 +77,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const [roleCapabilities, setRoleCapabilities] = React.useState<role_capablities[]>(initialData.roleCapabilities);
   const [ussdPushSettings, setUssdPushSettings] = React.useState<ussd_push_settings[]>(initialData.ussdPushSettings);
   const [streamPaySettings, setStreamPaySettings] = React.useState<stream_pay_settings[]>(initialData.streamPaySettings);
+  const [coreIntegrationSettings, setCoreIntegrationSettings] = React.useState<core_integration_settings[]>(initialData.coreIntegrationSettings);
 
 
   React.useEffect(() => {
@@ -438,6 +441,20 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     const updatedSetting = await response.json();
     setStreamPaySettings((prev) => prev.map((s) => (s.ID === updatedSetting.ID ? updatedSetting : s)));
   };
+  
+  const updateCoreIntegrationSetting = async (setting: core_integration_settings) => {
+    const response = await fetch(`/api/core-integration-settings/${setting.ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(setting),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update Core Integration Setting');
+    }
+    const updatedSetting = await response.json();
+    setCoreIntegrationSettings((prev) => prev.map((s) => (s.ID === updatedSetting.ID ? updatedSetting : s)));
+  };
+
 
   const value: DataContextType = {
     ...initialData,
@@ -455,6 +472,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     roleCapabilities,
     ussdPushSettings,
     streamPaySettings,
+    coreIntegrationSettings,
     currentUser,
     setCurrentUser,
     addAllowedCompany,
@@ -475,6 +493,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     updateRoleCapability,
     updateUssdPushSetting,
     updateStreamPaySetting,
+    updateCoreIntegrationSetting,
   };
 
   if (loading) {
