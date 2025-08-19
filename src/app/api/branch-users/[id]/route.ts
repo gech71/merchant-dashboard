@@ -25,7 +25,7 @@ export async function PUT(
         return NextResponse.json({ message: 'No fields to update' }, { status: 400 });
     }
 
-    const updatedUser = await prisma.systemUser.update({
+    const updatedUser = await prisma.systemUsers.update({
       where: { id: id },
       data: dataToUpdate,
       include: {

@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     let role: any = null;
 
     if (loginType === 'system') {
-        const systemUser = await prisma.systemUser.findFirst({
+        const systemUser = await prisma.systemUsers.findFirst({
             where: { email: identifier },
             include: { role: { include: { permissions: true } } },
         });

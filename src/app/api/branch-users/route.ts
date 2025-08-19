@@ -16,12 +16,12 @@ export async function POST(request: Request) {
       );
     }
     
-    const existingUser = await prisma.systemUser.findUnique({ where: { email }});
+    const existingUser = await prisma.systemUsers.findUnique({ where: { email }});
     if (existingUser) {
         return NextResponse.json({ message: 'A user with this email already exists.' }, { status: 409 });
     }
 
-    const newUser = await prisma.systemUser.create({
+    const newUser = await prisma.systemUsers.create({
       data: {
         name,
         email,
