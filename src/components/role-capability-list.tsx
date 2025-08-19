@@ -79,8 +79,8 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
         }
         
         // Secondary sort by sub-order if primary is the same
-        if (sortConfig.key === 'MENUORDER' && a.SUBMENUORDER < b.SUBMENUORDER) return -1;
-        if (sortConfig.key === 'MENUORDER' && a.SUBMENUORDER > b.SUBMENUORDER) return 1;
+        if (sortConfig.key === 'MENUORDER' && (a.SUBMENUORDER ?? 0) < (b.SUBMENUORDER ?? 0)) return -1;
+        if (sortConfig.key === 'MENUORDER' && (a.SUBMENUORDER ?? 0) > (b.SUBMENUORDER ?? 0)) return 1;
         return 0;
       });
     }
@@ -138,7 +138,7 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
                         {item.PARENT ? 'Yes' : 'No'}
                       </Badge>
                     </TableCell>
-                    <TableCell>{item.MENUORDER}.{item.SUBMENUORDER}</TableCell>
+                    <TableCell>{item.PARENT ? item.MENUORDER : `${item.MENUORDER}.${item.SUBMENUORDER}`}</TableCell>
                   </TableRow>
                 ))
               ) : (
