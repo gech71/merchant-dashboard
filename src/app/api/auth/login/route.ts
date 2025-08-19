@@ -11,11 +11,11 @@ const JWT_EXPIRES_IN = '1h';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { identifier, password, userType, loginType } = body;
+    const { identifier, password, loginType } = body;
 
-    if (!identifier || !userType) {
+    if (!identifier) {
       return NextResponse.json(
-        { isSuccess: false, message: 'Identifier and user type are required' },
+        { isSuccess: false, message: 'Identifier is required' },
         { status: 400 }
       );
     }
@@ -24,72 +24,45 @@ export async function POST(request: Request) {
     let userPayload: any = null;
     let role: any = null;
 
-    if (userType === 'merchant') {
-      const merchantUser = await prisma.merchant_users.findFirst({
+    const merchantUser = await prisma.merchant_users.findFirst({
         where: { PHONENUMBER: loginType === 'merchantSales' ? identifier : password },
-        include: { ApplicationRole: { include: { capabilities: true } } },
-      });
+        include: { ApplicationRole: { include: { permissions: true } } },
+    });
 
-      if (!merchantUser) {
+    if (!merchantUser) {
         return NextResponse.json({ isSuccess: false, message: 'Merchant user not found.' }, { status: 404 });
-      }
+    }
 
-      if (loginType === 'merchantAdmin') {
+    if (loginType === 'merchantAdmin') {
         if (merchantUser.ApplicationRole?.ROLENAME !== 'Admin') {
             return NextResponse.json({ isSuccess: false, message: 'This user is not an Admin. Please use the Sales login.' }, { status: 403 });
         }
         if (merchantUser.ACCOUNTNUMBER !== identifier) {
             return NextResponse.json({ isSuccess: false, message: 'Invalid Account Number for the given Phone Number.' }, { status: 401 });
         }
-      } else if (loginType === 'merchantSales') {
-          if (merchantUser.ApplicationRole?.ROLENAME !== 'Sales') {
-              return NextResponse.json({ isSuccess: false, message: 'This user is not a Sales user. Please use the Admin login.' }, { status: 403 });
-          }
-      } else {
-          return NextResponse.json({ isSuccess: false, message: 'Invalid merchant login type.' }, { status: 400 });
-      }
-
-      user = merchantUser;
-      role = user.ApplicationRole;
-      const permissions = role.capabilities.map((cap: any) => cap.ADDRESS);
-
-      userPayload = {
-          userId: user.ID,
-          userType: 'merchant',
-          role: role.ROLENAME,
-          applicationRole: role.ROLENAME,
-          name: user.FULLNAME,
-          email: user.PHONENUMBER,
-          accountNumber: user.ACCOUNTNUMBER,
-          branch: null,
-          permissions,
-      };
-
-    } else if (userType === 'branch') {
-        const branchUser = await prisma.branchUser.findUnique({
-            where: { email: identifier },
-            include: { role: { include: { capabilities: true } } },
-        });
-        
-        if (branchUser && password && branchUser.password === password) {
-            user = branchUser;
-            role = user.role;
-            const permissions = role.capabilities.map((cap: any) => cap.ADDRESS);
-            userPayload = {
-                userId: user.id.toString(),
-                userType: 'branch',
-                role: role.name,
-                name: user.name,
-                email: user.email,
-                accountNumber: null,
-                branch: user.branch,
-                permissions,
-            };
+    } else if (loginType === 'merchantSales') {
+        if (merchantUser.ApplicationRole?.ROLENAME !== 'Sales') {
+            return NextResponse.json({ isSuccess: false, message: 'This user is not a Sales user. Please use the Admin login.' }, { status: 403 });
         }
     } else {
-        return NextResponse.json({ isSuccess: false, message: 'Invalid user type' }, { status: 400 });
+        return NextResponse.json({ isSuccess: false, message: 'Invalid merchant login type.' }, { status: 400 });
     }
 
+    user = merchantUser;
+    role = user.ApplicationRole;
+    
+    const permissions: string[] = role?.permissions.map((p: { page: string; }) => p.page) || [];
+
+    userPayload = {
+        userId: user.ID,
+        userType: 'merchant',
+        role: user.ROLE,
+        name: user.FULLNAME,
+        email: user.PHONENUMBER,
+        accountNumber: user.ACCOUNTNUMBER,
+        permissions,
+    };
+   
     if (!user || !userPayload) {
       return NextResponse.json(
         { isSuccess: false, message: 'Invalid credentials or user not found' },

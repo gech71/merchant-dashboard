@@ -17,7 +17,7 @@ export type allowed_companies = Omit<Prisma.allowed_companiesGetPayload<{}>, 'IN
   UPDATEDATE: string | null;
 };
 
-export type Merchant_users = Omit<Prisma.merchant_usersGetPayload<{ include: { role: { include: { permissions: true, capabilities: true } } } }>, 'LASTLOGINATTEMPT' | 'UNLOCKEDTIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
+export type Merchant_users = Omit<Prisma.merchant_usersGetPayload<{ include: { ApplicationRole: { include: { permissions: true, capabilities: true } } } }>, 'LASTLOGINATTEMPT' | 'UNLOCKEDTIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
   LASTLOGINATTEMPT: string | null;
   UNLOCKEDTIME: string | null;
   INSERTDATE: string | null;

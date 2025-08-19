@@ -33,9 +33,10 @@ type InitialData = {
     roleCapabilities: role_capablities[];
 }
 
-type DataContextType = Omit<InitialData, 'roles'> & {
+type DataContextType = Omit<InitialData, 'merchants' | 'roles'> & {
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
+  merchants: Merchant_users[];
   roles: Roles[];
   addRole: (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions'> & { pages: string[] }) => Promise<void>;
   updateRole: (role: { id: string; ROLENAME: string; description?: string | null; pages: string[] }) => Promise<void>;
