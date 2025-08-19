@@ -32,6 +32,7 @@ export default async function RootLayout({
   const promoAdds = await prisma.promo_adds.findMany();
   const roles = await prisma.roles.findMany({ include: { capabilities: true, permissions: true }});
   const roleCapabilities = await prisma.role_capablities.findMany();
+  const systemUsers = await prisma.systemUsers.findMany({ include: { role: { include: { permissions: true } } } });
 
   const initialData = {
     allowedCompanies: allowedCompanies.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
@@ -49,7 +50,8 @@ export default async function RootLayout({
     accountInfos: accountInfos.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     promoAdds: promoAdds.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     roles: roles.map(role => ({ ...role, capabilities: role.capabilities.map(c => ({...c, INSERTDATE: c.INSERTDATE?.toISOString() ?? null, UPDATEDATE: c.UPDATEDATE?.toISOString() ?? null, PARENT: c.PARENT ?? null, PARENTID: c.PARENTID ?? null})), permissions: role.permissions.map(p => ({...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString()})), INSERTDATE: role.INSERTDATE?.toISOString() ?? null, UPDATEDATE: role.UPDATEDATE?.toISOString() ?? null })),
-    roleCapabilities: roleCapabilities.map(rc => ({...rc, INSERTDATE: rc.INSERTDATE?.toISOString() ?? null, UPDATEDATE: rc.UPDATEDATE?.toISOString() ?? null, PARENT: rc.PARENT ?? false, PARENTID: rc.PARENTID ?? null}))
+    roleCapabilities: roleCapabilities.map(rc => ({...rc, INSERTDATE: rc.INSERTDATE?.toISOString() ?? null, UPDATEDATE: rc.UPDATEDATE?.toISOString() ?? null, PARENT: rc.PARENT ?? false, PARENTID: rc.PARENTID ?? null})),
+    systemUsers: systemUsers.map(user => ({ ...user, createdAt: user.createdAt.toISOString(), updatedAt: user.updatedAt.toISOString(), role: user.role ? { ...user.role, permissions: user.role.permissions.map(p => ({ ...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString() })) } : null })),
   }
 
   return (
@@ -70,3 +72,5 @@ export default async function RootLayout({
     </html>
   );
 }
+
+    

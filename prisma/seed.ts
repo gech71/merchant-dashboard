@@ -111,7 +111,7 @@ const MOCK_PROMO_ADDS = [
     { ID: randomUUID(), ADDTITLE: 'Clearance Event', ADDSUBTITLE: 'Everything must go!', ADDADDRESS: 'https://example.com/clearance', IMAGEADDRESS: 'https://placehold.co/600x400.png', ORDER: 5, INSERTUSERID: 'system', UPDATEUSERID: 'system', INSERTDATE: new Date('2023-11-20'), UPDATEDATE: new Date('2023-11-20') },
 ];
 
-const ADMIN_PAGES = [
+const ALL_PAGES = [
   '/dashboard',
   '/dashboard/allowed_companies',
   '/dashboard/merchant_users',
@@ -130,6 +130,21 @@ const ADMIN_PAGES = [
   '/dashboard/role-capabilities',
   '/dashboard/approvals/allowed_companies',
   '/dashboard/role-management',
+  '/dashboard/system-users',
+];
+
+const ADMIN_PAGES = [
+  '/dashboard',
+  '/dashboard/allowed_companies',
+  '/dashboard/merchant_users',
+  '/dashboard/account-infos',
+  '/dashboard/promo-adds',
+  '/dashboard/daily-balances',
+  '/dashboard/merchant-txns',
+  '/dashboard/arif-requests',
+  '/dashboard/paystream-txns',
+  '/dashboard/qr-payments',
+  '/dashboard/approvals/allowed_companies',
 ];
 
 const SALES_PAGES = [
@@ -157,17 +172,26 @@ async function main() {
     await prisma.merchant_txns.deleteMany({});
     await prisma.merchants_daily_balances.deleteMany({});
     await prisma.merchant_users.deleteMany({});
+    await prisma.systemUsers.deleteMany({});
     await prisma.allowed_companies.deleteMany({});
     await prisma.roles.deleteMany({});
 
 
     // Create default roles
-    const adminRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Admin' }});
-    const salesRole = await prisma.roles.create({ data: { ID: randomUUID(), ROLENAME: 'Sales' }});
+    const systemAdminRole = await prisma.roles.create({ data: { ROLENAME: 'System Admin' }});
+    const adminRole = await prisma.roles.create({ data: { ROLENAME: 'Admin' }});
+    const salesRole = await prisma.roles.create({ data: { ROLENAME: 'Sales' }});
     
-    console.log('Seeded 2 default roles.');
+    console.log('Seeded 3 default roles.');
 
     // Seed permissions for roles
+    for (const page of ALL_PAGES) {
+      await prisma.dashboard_permissions.create({
+        data: { page, roleId: systemAdminRole.ID }
+      });
+    }
+    console.log(`Seeded ${ALL_PAGES.length} permissions for System Admin role.`);
+
     for (const page of ADMIN_PAGES) {
       await prisma.dashboard_permissions.create({
         data: { page, roleId: adminRole.ID }
@@ -182,6 +206,18 @@ async function main() {
     }
     console.log(`Seeded ${SALES_PAGES.length} permissions for Sales role.`);
 
+    // Seed a default system admin user
+    await prisma.systemUsers.create({
+      data: {
+        name: 'System Admin',
+        email: 'admin@system.com',
+        password: 'password', // In a real app, HASH THIS!
+        status: 'Active',
+        roleId: systemAdminRole.ID
+      }
+    });
+    console.log('Seeded 1 default system admin user.');
+
 
     for (const c of MOCK_ALLOWED_COMPANIES) {
         await prisma.allowed_companies.create({ data: c });
@@ -190,11 +226,17 @@ async function main() {
 
     for (const m of MOCK_MERCHANT_USERS) {
         const { ROLENAME, ...merchantData } = m;
+        let roleId;
+        if (ROLENAME === 'Admin') {
+            roleId = adminRole.ID;
+        } else if (ROLENAME === 'Sales') {
+            roleId = salesRole.ID;
+        }
         await prisma.merchant_users.create({
             data: {
                 ...merchantData,
                 ROLE: ROLENAME,
-                roleId: ROLENAME === 'Admin' ? adminRole.ID : salesRole.ID,
+                roleId: roleId,
             }
         });
     }
@@ -267,5 +309,4 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-
     

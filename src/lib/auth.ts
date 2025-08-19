@@ -32,7 +32,7 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
     let role: any = null;
     
     if (userType === 'system') {
-        user = await prisma.systemUser.findUnique({
+        user = await prisma.systemUsers.findUnique({
             where: { id: userId },
             include: { role: { include: { permissions: true } } },
         });
@@ -94,3 +94,5 @@ export async function getMe() {
     }
     return new NextResponse(JSON.stringify(user));
 }
+
+    

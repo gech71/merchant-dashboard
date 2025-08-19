@@ -35,13 +35,11 @@ type InitialData = {
     branches: Branch[];
 }
 
-type DataContextType = Omit<InitialData, 'merchants' | 'roles' | 'systemUsers'> & {
+type DataContextType = Omit<InitialData, 'systemUsers'> & {
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
-  merchants: Merchant_users[];
-  roles: Roles[];
   systemUsers: SystemUser[];
-  addRole: (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions'> & { pages: string[] }) => Promise<void>;
+  addRole: (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions' | 'SystemUsers' | 'Merchant_users'> & { pages: string[] }) => Promise<void>;
   updateRole: (role: { id: string; ROLENAME: string; description?: string | null; pages: string[] }) => Promise<void>;
   deleteRole: (roleId: string) => Promise<void>;
   addAllowedCompany: (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord' | 'branchName'>) => Promise<void>;
@@ -51,7 +49,7 @@ type DataContextType = Omit<InitialData, 'merchants' | 'roles' | 'systemUsers'> 
   updateMerchantStatus: (merchantId: string, status: 'Active' | 'Disabled') => Promise<void>;
   updateSystemUser: (user: SystemUser) => Promise<void>;
   updateSystemUserStatus: (userId: string, status: 'Active' | 'Inactive') => Promise<void>;
-  addSystemUser: (user: Omit<SystemUser, 'id' | 'role'>) => Promise<void>;
+  addSystemUser: (user: Omit<SystemUser, 'id' | 'role' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateUserRole: (userId: string, roleId: string, userType: 'merchant' | 'system') => Promise<void>;
   addBranch: (branch: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => Promise<void>;
   updateBranch: (branch: Branch) => Promise<void>;
@@ -100,23 +98,23 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     if (userAccountNumber) {
         return initialData.allowedCompanies.filter(c => c.ACCOUNTNUMBER === userAccountNumber);
     }
-    return initialData.allowedCompanies;
-  }, [userAccountNumber, initialData.allowedCompanies]);
+    return allowedCompanies;
+  }, [userAccountNumber, allowedCompanies]);
 
   const filteredMerchants = React.useMemo(() => {
       if (isSystemUser) {
-        return initialData.merchants;
+        return merchants;
       }
       if (userAccountNumber) {
           if (isMerchantAdmin) {
-              return initialData.merchants.filter(m => m.ACCOUNTNUMBER === userAccountNumber);
+              return merchants.filter(m => m.ACCOUNTNUMBER === userAccountNumber);
           }
           if (isMerchantSales) {
-              return initialData.merchants.filter(m => m.ID === currentUser.userId);
+              return merchants.filter(m => m.ID === currentUser.userId);
           }
       }
       return [];
-  }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, isSystemUser, initialData.merchants]);
+  }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, isSystemUser, merchants]);
 
   const dailyBalances = React.useMemo(() => {
       if (isSystemUser) return initialData.dailyBalances;
@@ -276,7 +274,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     }
   };
 
-  const addRole = async (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions'> & { pages: string[] }) => {
+  const addRole = async (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions' | 'SystemUsers' | 'Merchant_users'> & { pages: string[] }) => {
     const response = await fetch('/api/roles', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -306,8 +304,8 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setRoles(prev => prev.filter(r => r.ID !== roleId));
   };
 
-  const addSystemUser = async (user: Omit<SystemUser, 'id' | 'role'>) => {
-    const response = await fetch('/api/system-users', {
+  const addSystemUser = async (user: Omit<SystemUser, 'id' | 'role' | 'createdAt' | 'updatedAt'>) => {
+    const response = await fetch('/api/branch-users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(user),
@@ -321,7 +319,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   };
 
   const updateSystemUser = async (user: SystemUser) => {
-    const response = await fetch(`/api/system-users/${user.id}`, {
+    const response = await fetch(`/api/branch-users/${user.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(user),
@@ -332,7 +330,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   };
 
   const updateSystemUserStatus = async (userId: string, status: 'Active' | 'Inactive') => {
-    const response = await fetch(`/api/system-users/${userId}`, {
+    const response = await fetch(`/api/branch-users/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
@@ -433,3 +431,5 @@ export function useDataContext() {
   }
   return context;
 }
+
+    

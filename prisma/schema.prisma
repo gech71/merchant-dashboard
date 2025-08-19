@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -5,6 +6,20 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model SystemUsers {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  email     String   @unique
+  password  String
+  status    String   @default("Pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  roleId    String?  @db.Uuid
+  role      Roles?   @relation(fields: [roleId], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_system_users_roles")
+
+  @@map("system_users")
 }
 
 model Manage_otps {
@@ -49,34 +64,35 @@ model Merchant_users {
   INSERTDATE        DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE        DateTime? @default(now()) @db.Timestamp()
   roleId            String?   @db.Uuid
-  ApplicationRole   Roles?    @relation(fields: [roleId], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_merchant_users_roles")
+  ApplicationRole   Roles?    @relation("MerchantUsersToRoles", fields: [roleId], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_merchant_users_roles")
 
   @@map("Merchant_users")
 }
 
 model Roles {
-  ID           String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ROLENAME     String                  @db.VarChar(100)
-  description  String?                 @db.Text
-  VALUE1       String?                 @db.Text
-  VALUE2       String?                 @db.Text
-  VALUE3       String?                 @db.Text
-  INSERTUSERID String?                 @db.Text
-  UPDATEUSERID String?                 @db.Text
-  INSERTDATE   DateTime?               @default(now()) @db.Timestamp()
-  UPDATEDATE   DateTime?               @default(now()) @db.Timestamp()
-  Merchant_users Merchant_users[]
-  capabilities role_capablities[]
-  permissions  dashboard_permissions[]
+  ID             String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ROLENAME       String                  @db.VarChar(100)
+  description    String?                 @db.Text
+  VALUE1         String?                 @db.Text
+  VALUE2         String?                 @db.Text
+  VALUE3         String?                 @db.Text
+  INSERTUSERID   String?                 @db.Text
+  UPDATEUSERID   String?                 @db.Text
+  INSERTDATE     DateTime?               @default(now()) @db.Timestamp()
+  UPDATEDATE     DateTime?               @default(now()) @db.Timestamp()
+  Merchant_users Merchant_users[]        @relation("MerchantUsersToRoles")
+  SystemUsers    SystemUsers[]
+  capabilities   role_capablities[]
+  permissions    dashboard_permissions[]
 
   @@map("Roles")
 }
 
 model dashboard_permissions {
-  id     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  page   String
-  roleId String   @db.Uuid
-  role   Roles    @relation(fields: [roleId], references: [ID], onDelete: Cascade)
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  page      String
+  roleId    String   @db.Uuid
+  role      Roles    @relation(fields: [roleId], references: [ID], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -381,3 +397,4 @@ model voucher_codess {
 
   @@map("voucher_codess")
 }
+    
