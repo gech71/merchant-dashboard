@@ -68,6 +68,10 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
       sortableItems.sort((a, b) => {
         const valA = a[sortConfig.key];
         const valB = b[sortConfig.key];
+        
+        if (valA === null || valA === undefined) return 1;
+        if (valB === null || valB === undefined) return -1;
+
         if (sortConfig.key === 'PARENT') {
           const boolA = valA ?? false;
           const boolB = valB ?? false;
@@ -118,11 +122,12 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
             <TableHeader>
               <TableRow>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('roleName')} className="px-2">Role Name{getSortIndicator('roleName')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('MENUNAME')} className="px-2">MENUNAME{getSortIndicator('MENUNAME')}</Button></TableHead>
-                <TableHead>MENUNAME_am</TableHead>
-                <TableHead>ADDRESS</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('PARENT')} className="px-2">PARENT{getSortIndicator('PARENT')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('MENUORDER')} className="px-2">ORDER{getSortIndicator('MENUORDER')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('MENUNAME')} className="px-2">Menu Name{getSortIndicator('MENUNAME')}</Button></TableHead>
+                <TableHead>Menu Name (Amharic)</TableHead>
+                <TableHead>Address</TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('PARENT')} className="px-2">Parent{getSortIndicator('PARENT')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('MENUORDER')} className="px-2">Menu Order{getSortIndicator('MENUORDER')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('SUBMENUORDER')} className="px-2">Sub-Menu Order{getSortIndicator('SUBMENUORDER')}</Button></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -138,12 +143,13 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
                         {item.PARENT ? 'Yes' : 'No'}
                       </Badge>
                     </TableCell>
-                    <TableCell>{item.PARENT ? item.MENUORDER : `${item.MENUORDER}.${item.SUBMENUORDER}`}</TableCell>
+                    <TableCell>{item.MENUORDER}</TableCell>
+                    <TableCell>{item.SUBMENUORDER ?? 'N/A'}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">No capabilities found.</TableCell>
+                  <TableCell colSpan={7} className="h-24 text-center">No capabilities found.</TableCell>
                 </TableRow>
               )}
             </TableBody>
