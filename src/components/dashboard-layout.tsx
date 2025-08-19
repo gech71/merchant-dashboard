@@ -24,6 +24,7 @@ import {
   Megaphone,
   LogOut,
   UserCog,
+  Shield,
 } from 'lucide-react';
 
 import {
@@ -67,6 +68,7 @@ const ALL_NAV_ITEMS = [
   { group: 'System Settings', href: '/dashboard/core-integration-settings', icon: Settings, label: 'Core Integration Settings' },
   { group: 'System Settings', href: '/dashboard/stream-pay-settings', icon: Settings, label: 'StreamPay Settings' },
   { group: 'System Settings', href: '/dashboard/ussd-push-settings', icon: Smartphone, label: 'USSD Push Settings' },
+  { group: 'System Settings', href: '/dashboard/role-capabilities', icon: Shield, label: 'Legacy Role Capabilities' },
   { group: 'Approvals', href: '/dashboard/approvals/allowed_companies', icon: Building, label: 'Allowed Companies' },
   { group: 'Administration', href: '/dashboard/role-management', icon: UserCog, label: 'Role Management' },
 ];
