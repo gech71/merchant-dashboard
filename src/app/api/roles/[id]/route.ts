@@ -15,7 +15,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     // Use a transaction to update role and its permissions
-    const [, updatedRole] = await prisma.$transaction([
+    await prisma.$transaction([
         // Delete old permissions
         prisma.dashboard_permissions.deleteMany({
             where: { roleId: id }
@@ -33,24 +33,32 @@ export async function PUT(request: Request, { params }: { params: { id: string }
             data: {
                 ROLENAME,
                 description,
-            },
-            include: {
-                permissions: true,
             }
         })
     ]);
+
+    // Fetch the updated role with its new permissions *after* the transaction
+    const updatedRole = await prisma.Roles.findUnique({
+        where: { ID: id },
+        include: { permissions: true, capabilities: true }
+    });
+    
+    if (!updatedRole) {
+        return NextResponse.json({ message: 'Role not found after update' }, { status: 404 });
+    }
 
 
      const updatedRoleSerializable = {
         ...updatedRole,
         INSERTDATE: updatedRole.INSERTDATE?.toISOString() ?? null,
         UPDATEDATE: updatedRole.UPDATEDATE?.toISOString() ?? null,
-        permissions: updatedRole.permissions.map(p => ({...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString()}))
+        permissions: updatedRole.permissions.map(p => ({...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString()})),
+        capabilities: updatedRole.capabilities.map(c => ({...c, INSERTDATE: c.INSERTDATE?.toISOString() ?? null, UPDATEDATE: c.UPDATEDATE?.toISOString() ?? null, PARENT: c.PARENT ?? false, PARENTID: c.PARENTID ?? null}))
     }
 
     return NextResponse.json(updatedRoleSerializable, { status: 200 });
   } catch (error) {
-    console.error(`Error updating role ${params.id}:`, error);
+    console.error(`Error updating role:`, error);
     return NextResponse.json({ message: 'Something went wrong!' }, { status: 500 });
   }
 }
