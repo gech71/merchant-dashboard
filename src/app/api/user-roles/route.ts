@@ -18,13 +18,13 @@ export async function POST(request: Request) {
       updatedUser = await prisma.merchant_users.update({
         where: { ID: userId },
         data: { roleId },
-        include: { DashBoardRoles: true, ApplicationRole: true },
+        include: { ApplicationRole: true },
       });
-    } else if (userType === 'branch') {
-      updatedUser = await prisma.branchUser.update({
+    } else if (userType === 'system') {
+      updatedUser = await prisma.systemUser.update({
         where: { id: userId },
         data: { roleId },
-        include: { DashBoardRoles: true },
+        include: { role: true },
       });
     } else {
       return NextResponse.json({ message: 'Invalid user type' }, { status: 400 });
@@ -36,5 +36,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Something went wrong!' }, { status: 500 });
   }
 }
-
-    

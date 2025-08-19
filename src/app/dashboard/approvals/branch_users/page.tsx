@@ -1,14 +1,14 @@
 
 'use client'
-import BranchUserList from '@/components/branch-user-list';
+import SystemUserList from '@/components/system-user-list';
 import { useDataContext } from '@/context/data-context';
 import { Prisma } from '@prisma/client';
 
-type BranchUserWithRelations = Prisma.BranchUserGetPayload<{
+type SystemUserWithRelations = Prisma.SystemUserGetPayload<{
   include: {}
 }>
 
-export default function BranchUsersApprovalPage() {
-  const { branchUsers } = useDataContext();
-  return <BranchUserList branchUsers={branchUsers as unknown as BranchUserWithRelations[]} approvalView={true} />;
+export default function SystemUsersApprovalPage() {
+  const { systemUsers } = useDataContext();
+  return <SystemUserList systemUsers={systemUsers as unknown as SystemUserWithRelations[]} approvalView={true} />;
 }

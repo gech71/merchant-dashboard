@@ -17,47 +17,47 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useDataContext } from '@/context/data-context';
 
-const branchUserFormSchema = z.object({
+const systemUserFormSchema = z.object({
   name: z.string().min(2, 'Full name must be at least 2 characters.'),
   email: z.string().email('Please enter a valid email address.'),
-  branch: z.string({ required_error: 'Please select a branch.' }),
+  password: z.string().min(6, 'Password must be at least 6 characters.'),
 });
 
-type BranchUserFormValues = z.infer<typeof branchUserFormSchema>;
+type SystemUserFormValues = z.infer<typeof systemUserFormSchema>;
 
-export function AddBranchUserForm({ 
+export function AddSystemUserForm({ 
   setOpen, 
 }: { 
   setOpen: (open: boolean) => void,
 }) {
   const { toast } = useToast();
-  const { branches, addBranchUser } = useDataContext();
+  const { addSystemUser } = useDataContext();
   const [isLoading, setIsLoading] = React.useState(false);
   
-  const form = useForm<BranchUserFormValues>({
-    resolver: zodResolver(branchUserFormSchema),
+  const form = useForm<SystemUserFormValues>({
+    resolver: zodResolver(systemUserFormSchema),
     defaultValues: {
       name: '',
       email: '',
+      password: '',
     },
   });
 
-  async function onSubmit(data: BranchUserFormValues) {
+  async function onSubmit(data: SystemUserFormValues) {
     setIsLoading(true);
     try {
-      await addBranchUser(data);
+      await addSystemUser(data);
       toast({
-        title: 'Branch User Submitted for Approval',
+        title: 'System User Submitted for Approval',
         description: `${data.name} has been successfully submitted and is awaiting verification.`,
       });
       setOpen(false);
     } catch (error: any) {
         toast({
             variant: 'destructive',
-            title: 'Failed to Add Branch User',
+            title: 'Failed to Add System User',
             description: error.message || 'An error occurred while trying to add the user.',
         });
     } finally {
@@ -88,7 +88,7 @@ export function AddBranchUserForm({
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="user@branch.com" {...field} />
+                <Input placeholder="user@system.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -96,22 +96,13 @@ export function AddBranchUserForm({
         />
         <FormField
           control={form.control}
-          name="branch"
+          name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Branch</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a branch" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {branches.map(branch => (
-                     <SelectItem key={branch.id} value={branch.name}>{branch.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="******" {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -124,5 +115,3 @@ export function AddBranchUserForm({
     </Form>
   );
 }
-
-    

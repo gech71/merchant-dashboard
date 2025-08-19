@@ -7,28 +7,41 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, branch } = body;
+    const { name, email, password } = body;
 
-    if (!name || !email || !branch) {
+    if (!name || !email || !password) {
       return NextResponse.json(
         { message: 'Missing required fields' },
         { status: 400 }
       );
     }
+    
+    const existingUser = await prisma.systemUser.findUnique({ where: { email }});
+    if (existingUser) {
+        return NextResponse.json({ message: 'A user with this email already exists.' }, { status: 409 });
+    }
 
-    const newUser = await prisma.BranchUser.create({
+    const newUser = await prisma.systemUser.create({
       data: {
         name,
         email,
-        branch,
+        password, // In a real app, this should be hashed
         status: 'Pending', // Default status
-        password: 'password123', // Add a default password
       },
+      include: {
+        role: true
+      }
     });
+    
+    const newUserSerializable = {
+        ...newUser,
+        createdAt: newUser.createdAt.toISOString(),
+        updatedAt: newUser.updatedAt.toISOString(),
+    }
 
-    return NextResponse.json(newUser, { status: 201 });
+    return NextResponse.json(newUserSerializable, { status: 201 });
   } catch (error) {
-    console.error('Error creating branch user:', error);
+    console.error('Error creating system user:', error);
     // Check for unique constraint violation
     if ((error as any).code === 'P2002' && (error as any).meta?.target?.includes('email')) {
         return NextResponse.json({ message: 'A user with this email already exists.' }, { status: 409 });

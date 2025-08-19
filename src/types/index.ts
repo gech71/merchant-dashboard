@@ -100,4 +100,14 @@ export type Roles = Omit<Prisma.RolesGetPayload<{ include: { capabilities: true,
     UPDATEDATE: string | null;
 };
 
-export type EditableItem = allowed_companies | Merchant_users | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | Roles | null;
+export type SystemUser = Omit<Prisma.SystemUserGetPayload<{ include: { role: true } }>, 'createdAt' | 'updatedAt'> & {
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Branch = Omit<Prisma.BranchGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
+  INSERTDATE: string | null;
+  UPDATEDATE: string | null;
+};
+
+export type EditableItem = allowed_companies | Merchant_users | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | Roles | SystemUser | Branch | null;

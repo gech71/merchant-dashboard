@@ -12,28 +12,36 @@ export async function PUT(
     const { id } = params;
 
     const body = await request.json();
-    const { name, email, branch, status } = body;
+    const { name, email, password, status } = body;
 
-    if (!name || !email || !branch || !status) {
-      return NextResponse.json(
-        { message: 'Missing required fields' },
-        { status: 400 }
-      );
+    const dataToUpdate: any = {};
+    if (name) dataToUpdate.name = name;
+    if (email) dataToUpdate.email = email;
+    if (password) dataToUpdate.password = password; // In a real app, hash this
+    if (status) dataToUpdate.status = status;
+
+
+    if (Object.keys(dataToUpdate).length === 0) {
+        return NextResponse.json({ message: 'No fields to update' }, { status: 400 });
     }
-    
-    const updatedUser = await prisma.BranchUser.update({
+
+    const updatedUser = await prisma.systemUser.update({
       where: { id: id },
-      data: {
-        name,
-        email,
-        branch,
-        status,
-      },
+      data: dataToUpdate,
+      include: {
+        role: true,
+      }
     });
 
-    return NextResponse.json(updatedUser, { status: 200 });
+    const userSerializable = {
+        ...updatedUser,
+        createdAt: updatedUser.createdAt.toISOString(),
+        updatedAt: updatedUser.updatedAt.toISOString(),
+    };
+
+    return NextResponse.json(userSerializable, { status: 200 });
   } catch (error) {
-    console.error(`Error updating branch user ${params.id}:`, error);
+    console.error(`Error updating system user ${params.id}:`, error);
     return NextResponse.json({ message: 'Something went wrong!' }, { status: 500 });
   }
 }

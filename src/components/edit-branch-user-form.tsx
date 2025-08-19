@@ -17,51 +17,54 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import type { BranchUser } from '@/types';
+import type { SystemUser } from '@/types';
 import { useDataContext } from '@/context/data-context';
 
-const branchUserFormSchema = z.object({
+const systemUserFormSchema = z.object({
   name: z.string().min(2, 'Full name must be at least 2 characters.'),
   email: z.string().email('Please enter a valid email address.'),
-  branch: z.string({ required_error: 'Please select a branch.' }),
+  password: z.string().min(6, 'Password must be at least 6 characters.').or(z.literal('')),
 });
 
-type BranchUserFormValues = z.infer<typeof branchUserFormSchema>;
+type SystemUserFormValues = z.infer<typeof systemUserFormSchema>;
 
-export function EditBranchUserForm({
+export function EditSystemUserForm({
   user,
   setOpen,
 }: {
-  user: BranchUser;
+  user: SystemUser;
   setOpen: (open: boolean) => void;
 }) {
   const { toast } = useToast();
-  const { branches, updateBranchUser } = useDataContext();
+  const { updateSystemUser } = useDataContext();
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const form = useForm<BranchUserFormValues>({
-    resolver: zodResolver(branchUserFormSchema),
+  const form = useForm<SystemUserFormValues>({
+    resolver: zodResolver(systemUserFormSchema),
     defaultValues: {
       name: user.name,
       email: user.email,
-      branch: user.branch,
+      password: '',
     },
   });
 
-  async function onSubmit(data: BranchUserFormValues) {
+  async function onSubmit(data: SystemUserFormValues) {
     setIsLoading(true);
     try {
-        await updateBranchUser({ ...user, ...data });
+        const dataToUpdate: any = { ...user, name: data.name, email: data.email };
+        if (data.password) {
+            dataToUpdate.password = data.password;
+        }
+        await updateSystemUser(dataToUpdate);
         toast({
-            title: 'Branch User Updated',
+            title: 'System User Updated',
             description: `${data.name} has been successfully updated.`,
         });
         setOpen(false);
     } catch (error) {
          toast({
             variant: 'destructive',
-            title: 'Failed to Update Branch User',
+            title: 'Failed to Update System User',
             description: 'An error occurred while trying to update the user.',
         });
     } finally {
@@ -92,7 +95,7 @@ export function EditBranchUserForm({
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="user@branch.com" {...field} />
+                <Input placeholder="user@system.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -100,24 +103,13 @@ export function EditBranchUserForm({
         />
         <FormField
           control={form.control}
-          name="branch"
+          name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Branch</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a branch" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {branches.map((branch) => (
-                    <SelectItem key={branch.id} value={branch.name}>
-                      {branch.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormLabel>New Password</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="Leave blank to keep current password" {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

@@ -11,11 +11,11 @@ const secret = new TextEncoder().encode(JWT_SECRET);
 
 type UserPayload = {
     userId: string;
-    userType: 'merchant';
+    userType: 'merchant' | 'system';
     role: string;
     name: string;
     email: string;
-    accountNumber: string | null;
+    accountNumber?: string | null;
     permissions: string[];
 };
 
@@ -26,32 +26,58 @@ export async function getCurrentUser(token: string | undefined): Promise<UserPay
 
   try {
     const { payload } = await jwtVerify(token, secret);
-    const { userId } = payload as { userId: string };
+    const { userId, userType } = payload as { userId: string, userType: 'merchant' | 'system' };
     
     let user: any = null;
     let role: any = null;
     
-    user = await prisma.merchant_users.findUnique({
-        where: { ID: userId },
-        include: { ApplicationRole: { include: { permissions: true } } },
-    });
-    role = user?.ApplicationRole;
-    
-    if (!user || !role) {
-      return null;
+    if (userType === 'system') {
+        user = await prisma.systemUser.findUnique({
+            where: { id: userId },
+            include: { role: { include: { permissions: true } } },
+        });
+        role = user?.role;
+
+         if (!user || !role) {
+            return null;
+        }
+
+        const permissions = role.permissions.map((p: { page: string }) => p.page);
+
+        return {
+            userId: user.id,
+            userType: 'system',
+            role: role.ROLENAME,
+            name: user.name,
+            email: user.email,
+            permissions,
+        };
+
+    } else if (userType === 'merchant') {
+        user = await prisma.merchant_users.findUnique({
+            where: { ID: userId },
+            include: { ApplicationRole: { include: { permissions: true } } },
+        });
+        role = user?.ApplicationRole;
+
+        if (!user || !role) {
+          return null;
+        }
+        
+        const permissions = role.permissions.map((p: { page: string }) => p.page);
+        
+        return {
+            userId: user.ID,
+            userType: 'merchant',
+            role: role.ROLENAME,
+            name: user.FULLNAME,
+            email: user.PHONENUMBER,
+            accountNumber: user.ACCOUNTNUMBER,
+            permissions: permissions,
+        };
+    } else {
+        return null;
     }
-    
-    const permissions = role.permissions.map((p: { page: string }) => p.page);
-    
-    return {
-        userId: user.ID,
-        userType: 'merchant',
-        role: role.ROLENAME,
-        name: user.FULLNAME,
-        email: user.PHONENUMBER,
-        accountNumber: user.ACCOUNTNUMBER,
-        permissions: permissions,
-    };
 
   } catch (err) {
     console.error('Failed to verify JWT:', err);
