@@ -34,10 +34,11 @@ type InitialData = {
     branches: Branch[];
 }
 
-type DataContextType = Omit<InitialData, 'systemUsers'> & {
+type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings'> & {
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
   systemUsers: SystemUser[];
+  ussdPushSettings: ussd_push_settings[];
   addRole: (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions' | 'SystemUsers' | 'Merchant_users'> & { pages: string[] }) => Promise<void>;
   updateRole: (role: { id: string; ROLENAME: string; description?: string | null; pages: string[] }) => Promise<void>;
   deleteRole: (roleId: string) => Promise<void>;
@@ -54,6 +55,7 @@ type DataContextType = Omit<InitialData, 'systemUsers'> & {
   updateBranch: (branch: Branch) => Promise<void>;
   deleteRoleCapability: (id: string) => Promise<void>;
   updateRoleCapability: (capability: role_capablities) => Promise<void>;
+  updateUssdPushSetting: (setting: ussd_push_settings) => Promise<void>;
 };
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
@@ -68,6 +70,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const [systemUsers, setSystemUsers] = React.useState<SystemUser[]>(initialData.systemUsers);
   const [branches, setBranches] = React.useState<Branch[]>(initialData.branches);
   const [roleCapabilities, setRoleCapabilities] = React.useState<role_capablities[]>(initialData.roleCapabilities);
+  const [ussdPushSettings, setUssdPushSettings] = React.useState<ussd_push_settings[]>(initialData.ussdPushSettings);
 
 
   React.useEffect(() => {
@@ -101,7 +104,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         return initialData.allowedCompanies.filter(c => c.ACCOUNTNUMBER === userAccountNumber);
     }
     return allowedCompanies;
-  }, [userAccountNumber, allowedCompanies]);
+  }, [userAccountNumber, allowedCompanies, initialData.allowedCompanies]);
 
   const filteredMerchants = React.useMemo(() => {
       if (isSystemUser) {
@@ -406,6 +409,19 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setRoleCapabilities((prev) => prev.map((rc) => (rc.ID === updatedCapability.ID ? updatedCapability : rc)));
   };
 
+  const updateUssdPushSetting = async (setting: ussd_push_settings) => {
+    const response = await fetch(`/api/ussd-push-settings/${setting.ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(setting),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update USSD Push Setting');
+    }
+    const updatedSetting = await response.json();
+    setUssdPushSettings((prev) => prev.map((s) => (s.ID === updatedSetting.ID ? updatedSetting : s)));
+  };
+
   const value: DataContextType = {
     ...initialData,
     allowedCompanies: filteredAllowedCompanies,
@@ -420,6 +436,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     systemUsers,
     branches,
     roleCapabilities,
+    ussdPushSettings,
     currentUser,
     setCurrentUser,
     addAllowedCompany,
@@ -438,6 +455,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     updateBranch,
     deleteRoleCapability,
     updateRoleCapability,
+    updateUssdPushSetting,
   };
 
   if (loading) {
