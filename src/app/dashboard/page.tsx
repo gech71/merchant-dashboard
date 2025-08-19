@@ -55,7 +55,7 @@ export default function DashboardPage() {
   const pendingMerchants = merchants.filter(m => m.STATUS === 'Pending').length;
   const totalPending = pendingCompanies + pendingMerchants;
 
-  const successfulTxns = merchantTxns.filter(t => t.STATUS === 'Completed');
+  const successfulTxns = merchantTxns.filter(t => t.STATUS !== 'Failed');
   const totalTxnVolume = successfulTxns.reduce((acc, txn) => acc + txn.AMOUNT, 0);
   const totalTxnCount = successfulTxns.length;
 
