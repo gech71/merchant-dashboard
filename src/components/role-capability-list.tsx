@@ -24,17 +24,24 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from './ui/badge';
+import { useDataContext } from '@/context/data-context';
 
-type SortableKeys = 'ROLEID' | 'MENUNAME' | 'PARENT' | 'MENUORDER' | 'SUBMENUORDER';
+type SortableKeys = 'roleName' | 'MENUNAME' | 'PARENT' | 'MENUORDER' | 'SUBMENUORDER';
 const ITEMS_PER_PAGE = 15;
 
 export default function RoleCapabilityList({ roleCapabilities: initialCapabilities }: { roleCapabilities: role_capablities[] }) {
+  const { roles } = useDataContext();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'MENUORDER', direction: 'ascending' });
   const [currentPage, setCurrentPage] = React.useState(1);
+
+  const getRoleName = React.useCallback((roleId: string) => {
+    const role = roles.find(r => r.ID === roleId);
+    return role ? role.ROLENAME : roleId;
+  }, [roles]);
 
   const requestSort = (key: SortableKeys) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -45,7 +52,10 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
   };
 
   const filteredAndSortedItems = React.useMemo(() => {
-    let sortableItems = [...initialCapabilities];
+    let sortableItems = [...initialCapabilities].map(item => ({
+        ...item,
+        roleName: getRoleName(item.ROLEID)
+    }));
 
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
@@ -76,7 +86,7 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
     }
 
     return sortableItems;
-  }, [initialCapabilities, searchTerm, sortConfig]);
+  }, [initialCapabilities, searchTerm, sortConfig, getRoleName]);
 
   const paginatedItems = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -107,7 +117,7 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('ROLEID')} className="px-2">ROLEID{getSortIndicator('ROLEID')}</Button></TableHead>
+                <TableHead><Button variant="ghost" onClick={() => requestSort('roleName')} className="px-2">Role Name{getSortIndicator('roleName')}</Button></TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('MENUNAME')} className="px-2">MENUNAME{getSortIndicator('MENUNAME')}</Button></TableHead>
                 <TableHead>MENUNAME_am</TableHead>
                 <TableHead>ADDRESS</TableHead>
@@ -119,7 +129,7 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
               {paginatedItems.length > 0 ? (
                 paginatedItems.map((item) => (
                   <TableRow key={item.ID}>
-                    <TableCell className="font-medium">{item.ROLEID}</TableCell>
+                    <TableCell className="font-medium">{item.roleName}</TableCell>
                     <TableCell>{item.MENUNAME}</TableCell>
                     <TableCell>{item.MENUNAME_am}</TableCell>
                     <TableCell>{item.ADDRESS}</TableCell>
