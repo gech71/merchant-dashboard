@@ -122,6 +122,7 @@ const ALL_PAGES = [
   '/dashboard/approvals/allowed_companies',
   '/dashboard/role-management',
   '/dashboard/system-users',
+  '/dashboard/audit-log',
 ];
 
 const ADMIN_PAGES = [
@@ -147,6 +148,7 @@ async function main() {
     console.log(`Start seeding ...`);
 
     // Deleting data
+    await prisma.auditLog.deleteMany({});
     await prisma.dashboard_permissions.deleteMany({});
     await prisma.role_capablities.deleteMany({});
     await prisma.promo_adds.deleteMany({});
@@ -168,19 +170,27 @@ async function main() {
 
 
     // Create default roles
+    const superAdminRole = await prisma.roles.create({ data: { ROLENAME: 'Super Admin' }});
     const systemAdminRole = await prisma.roles.create({ data: { ROLENAME: 'System Admin' }});
     const adminRole = await prisma.roles.create({ data: { ROLENAME: 'Admin' }});
     const salesRole = await prisma.roles.create({ data: { ROLENAME: 'Sales' }});
     
-    console.log('Seeded 3 default roles.');
+    console.log('Seeded 4 default roles.');
 
     // Seed permissions for roles
     for (const page of ALL_PAGES) {
       await prisma.dashboard_permissions.create({
+        data: { page, roleId: superAdminRole.ID }
+      });
+    }
+    console.log(`Seeded ${ALL_PAGES.length} permissions for Super Admin role.`);
+
+    for (const page of ALL_PAGES.filter(p => p !== '/dashboard/audit-log')) {
+      await prisma.dashboard_permissions.create({
         data: { page, roleId: systemAdminRole.ID }
       });
     }
-    console.log(`Seeded ${ALL_PAGES.length} permissions for System Admin role.`);
+    console.log(`Seeded ${ALL_PAGES.length - 1} permissions for System Admin role.`);
 
     for (const page of ADMIN_PAGES) {
       await prisma.dashboard_permissions.create({
@@ -199,6 +209,16 @@ async function main() {
     // Seed a default system admin user
     await prisma.systemUsers.create({
       data: {
+        name: 'Super Admin',
+        email: 'super@system.com',
+        password: 'password', // In a real app, HASH THIS!
+        status: 'Active',
+        roleId: superAdminRole.ID
+      }
+    });
+
+    await prisma.systemUsers.create({
+      data: {
         name: 'System Admin',
         email: 'admin@system.com',
         password: 'password', // In a real app, HASH THIS!
@@ -206,7 +226,7 @@ async function main() {
         roleId: systemAdminRole.ID
       }
     });
-    console.log('Seeded 1 default system admin user.');
+    console.log('Seeded 2 default system admin users.');
 
 
     for (const c of MOCK_ALLOWED_COMPANIES) {

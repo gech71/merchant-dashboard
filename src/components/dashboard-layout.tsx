@@ -25,6 +25,7 @@ import {
   LogOut,
   UserCog,
   Shield,
+  History,
 } from 'lucide-react';
 
 import {
@@ -70,6 +71,7 @@ const ALL_NAV_ITEMS = [
   { group: 'System Settings', href: '/dashboard/role-capabilities', icon: Shield, label: 'Legacy Role Capabilities' },
   { group: 'Approvals', href: '/dashboard/approvals/allowed_companies', icon: Building, label: 'Allowed Companies' },
   { group: 'Administration', href: '/dashboard/role-management', icon: UserCog, label: 'Role Management' },
+  { group: 'Administration', href: '/dashboard/audit-log', icon: History, label: 'Audit Log' },
 ];
 
 const NAV_GROUPS = [
