@@ -1,9 +1,8 @@
-
 'use client';
 
 import * as React from 'react';
 import type { AuditLog } from '@/types';
-import { ArrowUpDown, Eye } from 'lucide-react';
+import { ArrowUpDown, Eye, History } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
@@ -29,19 +28,42 @@ import { useDataContext } from '@/context/data-context';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import JSONPretty from 'react-json-pretty';
 import 'react-json-pretty/themes/monikai.css';
+import { useToast } from '@/hooks/use-toast';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
 
 
 type SortableKeys = 'tableName' | 'recordId' | 'action' | 'changedBy' | 'changedAt';
 const ITEMS_PER_PAGE = 20;
 
 export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLogs: AuditLog[] }) {
-  const { systemUsers, merchants } = useDataContext();
+  const { systemUsers, merchants, auditLogs, restoreFromAuditLog } = useDataContext();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'changedAt', direction: 'descending' });
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [logToRestore, setLogToRestore] = React.useState<AuditLog | null>(null);
+
+  const handleRestore = async () => {
+    if (!logToRestore) return;
+    try {
+      await restoreFromAuditLog(logToRestore.id);
+      toast({
+        title: 'Record Restored',
+        description: `The record from ${logToRestore.tableName} has been successfully restored.`,
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Restore Failed',
+        description: 'An error occurred while trying to restore the record.',
+      });
+    } finally {
+      setLogToRestore(null);
+    }
+  };
 
   const getUserName = (userId: string) => {
     const systemUser = systemUsers.find(u => u.id === userId);
@@ -71,7 +93,7 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
   };
 
   const filteredAndSortedLogs = React.useMemo(() => {
-    let sortableItems = [...initialAuditLogs];
+    let sortableItems = [...auditLogs];
 
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
@@ -92,7 +114,7 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
     }
 
     return sortableItems;
-  }, [initialAuditLogs, searchTerm, sortConfig]);
+  }, [auditLogs, searchTerm, sortConfig]);
 
   const paginatedLogs = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -105,6 +127,7 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
   };
 
   return (
+    <>
     <Card>
       <CardHeader>
         <CardTitle>Audit Log</CardTitle>
@@ -128,7 +151,7 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
                 <TableHead><Button variant="ghost" onClick={() => requestSort('action')} className="px-2">Action{getSortIndicator('action')}</Button></TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('changedBy')} className="px-2">Changed By{getSortIndicator('changedBy')}</Button></TableHead>
                 <TableHead><Button variant="ghost" onClick={() => requestSort('recordId')} className="px-2">Record ID{getSortIndicator('recordId')}</Button></TableHead>
-                <TableHead>Details</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -140,7 +163,7 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
                     <TableCell><Badge variant={getActionVariant(log.action)}>{log.action}</Badge></TableCell>
                     <TableCell>{getUserName(log.changedBy)}</TableCell>
                     <TableCell className="font-mono text-xs">{log.recordId}</TableCell>
-                    <TableCell>
+                    <TableCell className="flex gap-2">
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="icon"><Eye className="h-4 w-4" /></Button>
@@ -172,6 +195,11 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
                           </div>
                         </DialogContent>
                       </Dialog>
+                      {log.action === 'DELETE' && (
+                        <Button variant="outline" size="icon" onClick={() => setLogToRestore(log)}>
+                          <History className="h-4 w-4" />
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
@@ -208,5 +236,20 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
         </div>
       </CardFooter>
     </Card>
+    <AlertDialog open={!!logToRestore} onOpenChange={(open) => !open && setLogToRestore(null)}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure you want to restore this record?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    This will recreate the deleted record from the table: <strong>{logToRestore?.tableName}</strong>. This action cannot be undone.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleRestore}>Restore</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

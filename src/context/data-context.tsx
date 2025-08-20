@@ -34,15 +34,10 @@ type InitialData = {
     auditLogs: AuditLog[];
 }
 
-type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 'streamPaySettings' | 'coreIntegrationSettings' | 'controllersConfigs' | 'arifpayEndpoints'> & {
+type DataContextType = Omit<InitialData, 'systemUsers'> & {
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
   systemUsers: SystemUser[];
-  ussdPushSettings: ussd_push_settings[];
-  streamPaySettings: stream_pay_settings[];
-  coreIntegrationSettings: core_integration_settings[];
-  controllersConfigs: controllersconfigs[];
-  arifpayEndpoints: arifpay_endpoints[];
   addRole: (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions' | 'SystemUsers' | 'Merchant_users'> & { pages: string[] }) => Promise<void>;
   updateRole: (role: { id: string; ROLENAME: string; description?: string | null; pages: string[] }) => Promise<void>;
   deleteRole: (roleId: string) => Promise<void>;
@@ -66,6 +61,7 @@ type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 's
   addPromoAd: (ad: Omit<promo_adds, 'ID' | 'INSERTUSERID' | 'UPDATEUSERID' | 'INSERTDATE' | 'UPDATEDATE'>) => Promise<void>;
   updatePromoAd: (ad: promo_adds) => Promise<void>;
   deletePromoAd: (id: string) => Promise<void>;
+  restoreFromAuditLog: (auditLogId: string) => Promise<void>;
 };
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
@@ -116,10 +112,10 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
 
   const filteredAllowedCompanies = React.useMemo(() => {
     if (userAccountNumber) {
-        return initialData.allowedCompanies.filter(c => c.ACCOUNTNUMBER === userAccountNumber);
+        return allowedCompanies.filter(c => c.ACCOUNTNUMBER === userAccountNumber);
     }
     return allowedCompanies;
-  }, [userAccountNumber, allowedCompanies, initialData.allowedCompanies]);
+  }, [userAccountNumber, allowedCompanies]);
 
   const filteredMerchants = React.useMemo(() => {
       if (isSystemUser) {
@@ -494,6 +490,29 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         setAuditLogs(prev => [auditLog, ...prev]);
     };
 
+  const restoreFromAuditLog = async (auditLogId: string) => {
+    const response = await fetch('/api/audit-log/restore', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ auditLogId }),
+    });
+    if (!response.ok) throw new Error('Failed to restore record');
+    const { restoredRecord, auditLog } = await response.json();
+    
+    // This is a simplified way to update state. A more robust solution
+    // might involve a switch statement on the table name.
+    // For now, we'll just refetch all data or handle the most common cases.
+    if (restoredRecord.tableName === 'arifpay_endpoints') {
+        setArifpayEndpoints(prev => [...prev, restoredRecord]);
+    } else if (restoredRecord.tableName === 'promo_adds') {
+        setPromoAdds(prev => [...prev, restoredRecord]);
+    }
+    // Add other cases as needed...
+
+    // Add the new 'RESTORE' audit log
+    setAuditLogs(prev => [auditLog, ...prev]);
+  };
+
 
   const value: DataContextType = {
     ...initialData,
@@ -538,7 +557,8 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     deleteArifpayEndpoint,
     addPromoAd,
     updatePromoAd,
-    deletePromoAd
+    deletePromoAd,
+    restoreFromAuditLog,
   };
 
   if (loading) {
