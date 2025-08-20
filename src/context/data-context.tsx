@@ -35,13 +35,14 @@ type InitialData = {
     branches: Branch[];
 }
 
-type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 'streamPaySettings' | 'coreIntegrationSettings'> & {
+type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 'streamPaySettings' | 'coreIntegrationSettings' | 'controllersConfigs'> & {
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
   systemUsers: SystemUser[];
   ussdPushSettings: ussd_push_settings[];
   streamPaySettings: stream_pay_settings[];
   coreIntegrationSettings: core_integration_settings[];
+  controllersConfigs: controllersconfigs[];
   addRole: (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions' | 'SystemUsers' | 'Merchant_users'> & { pages: string[] }) => Promise<void>;
   updateRole: (role: { id: string; ROLENAME: string; description?: string | null; pages: string[] }) => Promise<void>;
   deleteRole: (roleId: string) => Promise<void>;
@@ -61,6 +62,7 @@ type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 's
   updateUssdPushSetting: (setting: ussd_push_settings) => Promise<void>;
   updateStreamPaySetting: (setting: stream_pay_settings) => Promise<void>;
   updateCoreIntegrationSetting: (setting: core_integration_settings) => Promise<void>;
+  updateControllersConfig: (config: controllersconfigs) => Promise<void>;
 };
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
@@ -78,6 +80,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const [ussdPushSettings, setUssdPushSettings] = React.useState<ussd_push_settings[]>(initialData.ussdPushSettings);
   const [streamPaySettings, setStreamPaySettings] = React.useState<stream_pay_settings[]>(initialData.streamPaySettings);
   const [coreIntegrationSettings, setCoreIntegrationSettings] = React.useState<core_integration_settings[]>(initialData.coreIntegrationSettings);
+  const [controllersConfigs, setControllersConfigs] = React.useState<controllersconfigs[]>(initialData.controllersConfigs);
 
 
   React.useEffect(() => {
@@ -455,6 +458,19 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setCoreIntegrationSettings((prev) => prev.map((s) => (s.ID === updatedSetting.ID ? updatedSetting : s)));
   };
 
+  const updateControllersConfig = async (config: controllersconfigs) => {
+    const response = await fetch(`/api/controllers-configs/${config.ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update controller config');
+    }
+    const updatedConfig = await response.json();
+    setControllersConfigs((prev) => prev.map((c) => (c.ID === updatedConfig.ID ? updatedConfig : c)));
+  };
+
 
   const value: DataContextType = {
     ...initialData,
@@ -473,6 +489,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     ussdPushSettings,
     streamPaySettings,
     coreIntegrationSettings,
+    controllersConfigs,
     currentUser,
     setCurrentUser,
     addAllowedCompany,
@@ -494,6 +511,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     updateUssdPushSetting,
     updateStreamPaySetting,
     updateCoreIntegrationSetting,
+    updateControllersConfig,
   };
 
   if (loading) {

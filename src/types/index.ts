@@ -1,4 +1,5 @@
 
+
 import { Prisma } from '@prisma/client';
 
 export type arif_requests = Omit<Prisma.arif_requestsGetPayload<{}>, 'AMOUNT' | 'DATESEND1' | 'DATERECIVED1' | 'DATESEND2' | 'DATERECIVED2' | 'DATESEND3' | 'DATERECIVED3' | 'WEBHOOKRECEIVEDDATE'> & {
@@ -110,6 +111,6 @@ export type Branch = Omit<Prisma.BranchGetPayload<{}>, 'INSERTDATE' | 'UPDATEDAT
   UPDATEDATE: string | null;
 };
 
-export type EditableItem = allowed_companies | Merchant_users | controllersconfigs | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | Roles | SystemUser | Branch | role_capablities | null;
+export type EditableItem = allowed_companies | Merchant_users | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | Roles | SystemUser | Branch | role_capablities | controllersconfigs | null;
 
     
