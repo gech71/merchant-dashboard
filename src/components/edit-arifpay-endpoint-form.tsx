@@ -56,7 +56,7 @@ export function EditArifpayEndpointForm({
   setOpen: (open: boolean) => void;
 }) {
   const { toast } = useToast();
-  const { updateArifpayEndpoint } = useDataContext();
+  const { updateArifpayEndpoint, arifpayEndpoints } = useDataContext();
   const [isLoading, setIsLoading] = React.useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
   const [changes, setChanges] = React.useState<Change[]>([]);
@@ -97,6 +97,15 @@ export function EditArifpayEndpointForm({
   };
   
   function onFormSubmit(data: FormValues) {
+    const isOrderTaken = arifpayEndpoints.some(e => e.ORDER === data.ORDER && e.ID !== endpoint.ID);
+    if (isOrderTaken) {
+        form.setError('ORDER', {
+            type: 'manual',
+            message: 'This display order is already taken by another endpoint.'
+        });
+        return;
+    }
+
     const detectedChanges = getChanges(data);
     if (detectedChanges.length === 0) {
         toast({
@@ -345,8 +354,8 @@ export function EditArifpayEndpointForm({
                     {changes.map(change => (
                         <TableRow key={change.field}>
                             <TableCell className="font-medium">{change.field}</TableCell>
-                            <TableCell>{change.before}</TableCell>
-                            <TableCell className="text-primary">{change.after}</TableCell>
+                            <TableCell>{String(change.before)}</TableCell>
+                            <TableCell className="text-primary">{String(change.after)}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
