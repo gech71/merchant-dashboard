@@ -21,6 +21,9 @@ import { arifpay_endpoints } from '@/types';
 import { useDataContext } from '@/context/data-context';
 import { Switch } from './ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+
 
 const formSchema = z.object({
   BANK: z.string().min(1, 'Bank name is required.'),
@@ -43,6 +46,7 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+type Change = { field: string; before: any; after: any };
 
 export function EditArifpayEndpointForm({
   endpoint,
@@ -54,6 +58,9 @@ export function EditArifpayEndpointForm({
   const { toast } = useToast();
   const { updateArifpayEndpoint } = useDataContext();
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
+  const [changes, setChanges] = React.useState<Change[]>([]);
+  const [formData, setFormData] = React.useState<FormValues | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -70,10 +77,46 @@ export function EditArifpayEndpointForm({
     },
   });
 
-  async function onSubmit(data: FormValues) {
+  const getChanges = (data: FormValues): Change[] => {
+    const changes: Change[] = [];
+    const fields: (keyof FormValues)[] = [
+        'BANK', 'DISPLAYNAME', 'OTPLENGTH', 'ORDER', 'ENDPOINT1', 'ENDPOINT2', 'ENDPOINT3',
+        'CANCELURL', 'ERRORURL', 'SUCCESSURL', 'NOTIFYURL', 'IMAGEURL', 'ISTWOSTEP', 'ISOTP',
+        'TRANSACTIONTYPE', 'BENEFICIARYACCOUNT', 'BENEFICIARYBANK'
+    ];
+
+    fields.forEach(field => {
+        const originalValue = endpoint[field] ?? '';
+        const newValue = data[field] ?? '';
+        if (String(originalValue) !== String(newValue)) {
+            changes.push({ field, before: String(originalValue), after: String(newValue) });
+        }
+    });
+
+    return changes;
+  };
+  
+  function onFormSubmit(data: FormValues) {
+    const detectedChanges = getChanges(data);
+    if (detectedChanges.length === 0) {
+        toast({
+            title: "No Changes Detected",
+            description: "You haven't made any changes.",
+        });
+        return;
+    }
+    setChanges(detectedChanges);
+    setFormData(data);
+    setIsConfirmOpen(true);
+  }
+
+  async function handleConfirmUpdate() {
+    if (!formData) return;
     setIsLoading(true);
+    setIsConfirmOpen(false);
+    
     try {
-      await updateArifpayEndpoint({ ...endpoint, ...data });
+      await updateArifpayEndpoint({ ...endpoint, ...formData });
       toast({
         title: 'Endpoint Updated',
         description: 'The ArifPay endpoint has been successfully updated.',
@@ -91,8 +134,9 @@ export function EditArifpayEndpointForm({
   }
 
   return (
+    <>
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto p-1 pr-4">
+      <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto p-1 pr-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <FormField
             control={form.control}
@@ -280,5 +324,42 @@ export function EditArifpayEndpointForm({
         </div>
       </form>
     </Form>
+     <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Your Changes</AlertDialogTitle>
+            <AlertDialogDescription>
+              Please review your changes below. Do you want to apply these updates?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="max-h-60 overflow-y-auto rounded-md border">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Field</TableHead>
+                        <TableHead>Before</TableHead>
+                        <TableHead>After</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {changes.map(change => (
+                        <TableRow key={change.field}>
+                            <TableCell className="font-medium">{change.field}</TableCell>
+                            <TableCell>{change.before}</TableCell>
+                            <TableCell className="text-primary">{change.after}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmUpdate} disabled={isLoading}>
+              {isLoading ? 'Updating...' : 'Confirm'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
