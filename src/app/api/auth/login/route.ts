@@ -13,12 +13,20 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { identifier, password, loginType } = body;
 
-    if (!identifier || !password) {
+    if (!identifier) {
       return NextResponse.json(
-        { isSuccess: false, message: 'Identifier and password are required' },
+        { isSuccess: false, message: 'Identifier is required' },
         { status: 400 }
       );
     }
+    
+    if (loginType !== 'merchantSales' && !password) {
+        return NextResponse.json(
+            { isSuccess: false, message: 'Password is required' },
+            { status: 400 }
+        );
+    }
+
 
     let user: any = null;
     let userPayload: any = null;
@@ -46,26 +54,28 @@ export async function POST(request: Request) {
         };
 
     } else if (loginType === 'merchantAdmin' || loginType === 'merchantSales') {
+        let whereClause;
+        if (loginType === 'merchantAdmin') {
+            whereClause = { ACCOUNTNUMBER: identifier, PHONENUMBER: password };
+        } else { // merchantSales
+            whereClause = { PHONENUMBER: identifier };
+        }
+
         const merchantUser = await prisma.merchant_users.findFirst({
-            where: { PHONENUMBER: loginType === 'merchantSales' ? identifier : password },
+            where: whereClause,
             include: { ApplicationRole: { include: { permissions: true } } },
         });
 
         if (!merchantUser) {
-            return NextResponse.json({ isSuccess: false, message: 'Merchant user not found.' }, { status: 404 });
+            return NextResponse.json({ isSuccess: false, message: 'Merchant user not found or credentials invalid.' }, { status: 404 });
         }
 
-        if (loginType === 'merchantAdmin') {
-            if (merchantUser.ApplicationRole?.ROLENAME !== 'Admin') {
-                return NextResponse.json({ isSuccess: false, message: 'This user is not an Admin. Please use the Sales login.' }, { status: 403 });
-            }
-            if (merchantUser.ACCOUNTNUMBER !== identifier) {
-                return NextResponse.json({ isSuccess: false, message: 'Invalid Account Number for the given Phone Number.' }, { status: 401 });
-            }
-        } else if (loginType === 'merchantSales') {
-            if (merchantUser.ApplicationRole?.ROLENAME !== 'Sales') {
-                return NextResponse.json({ isSuccess: false, message: 'This user is not a Sales user. Please use the Admin login.' }, { status: 403 });
-            }
+        if (loginType === 'merchantAdmin' && merchantUser.ApplicationRole?.ROLENAME !== 'Admin') {
+            return NextResponse.json({ isSuccess: false, message: 'This user is not an Admin. Please use the Sales login.' }, { status: 403 });
+        }
+        
+        if (loginType === 'merchantSales' && merchantUser.ApplicationRole?.ROLENAME !== 'Sales') {
+            return NextResponse.json({ isSuccess: false, message: 'This user is not a Sales user. Please use the Admin login.' }, { status: 403 });
         }
 
         user = merchantUser;
