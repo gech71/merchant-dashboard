@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -128,6 +127,17 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
     if (sortConfig?.key !== key) return <ArrowUpDown className="ml-2 h-4 w-4 opacity-30" />;
     return <ArrowUpDown className="ml-2 h-4 w-4" />;
   };
+  
+  const parseJsonData = (data: any) => {
+    if (typeof data === 'string') {
+        try {
+            return JSON.parse(data);
+        } catch (e) {
+            return data; // Return original string if parsing fails
+        }
+    }
+    return data;
+  }
 
   return (
     <>
@@ -182,14 +192,14 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
                             <div>
                                 <h3 className="font-semibold mb-2">Old Value</h3>
                                 <div className="p-2 border rounded-md bg-muted/50 text-xs">
-                                    <JSONPretty data={log.oldValue} themeClassName="bg-transparent p-0" />
+                                    <JSONPretty data={parseJsonData(log.oldValue)} themeClassName="bg-transparent p-0" />
                                 </div>
                             </div>
                             <div>
                                 <h3 className="font-semibold mb-2">New Value</h3>
                                 <div className="p-2 border rounded-md bg-muted/50 text-xs">
                                 {log.newValue ? (
-                                    <JSONPretty data={log.newValue} themeClassName="bg-transparent p-0" />
+                                    <JSONPretty data={parseJsonData(log.newValue)} themeClassName="bg-transparent p-0" />
                                 ) : (
                                     <p className="text-muted-foreground">N/A (Record Deleted)</p>
                                 )}
