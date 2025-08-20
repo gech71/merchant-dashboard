@@ -7,17 +7,16 @@ import { getCurrentUser } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import type { Prisma } from '@prisma/client';
 
-type TableName = keyof typeof prisma;
+type TableName = Exclude<keyof typeof prisma, `$${string}` | symbol>;
 
 const isValidTableName = (tableName: string): tableName is TableName => {
-  return tableName in prisma;
+  return Object.keys(prisma).includes(tableName) && !tableName.startsWith('$');
 };
 
+
 const getSanitizedData = (tableName: string, data: any) => {
-    // Remove fields that should not be re-inserted, like auto-incrementing IDs or read-only fields
     const sanitizedData = { ...data };
 
-    // These fields are common and should often be excluded
     delete sanitizedData.id;
     delete sanitizedData.ID;
     delete sanitizedData.Oid;
@@ -57,14 +56,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid or non-deletable audit log entry' }, { status: 400 });
     }
 
-    const tableName = auditLogEntry.tableName;
+    const tableName = auditLogEntry.tableName as TableName;
     if (!isValidTableName(tableName)) {
       return NextResponse.json({ message: 'Invalid table name in audit log' }, { status: 500 });
     }
 
     const prismaModel = prisma[tableName] as any;
     
-    // Ensure oldValue is treated as a plain object
     const restoredData = getSanitizedData(tableName, auditLogEntry.oldValue as object);
 
     const [restoredRecord, newAuditLog] = await prisma.$transaction(async (tx) => {

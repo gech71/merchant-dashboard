@@ -30,7 +30,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import JSONPretty from 'react-json-pretty';
 import 'react-json-pretty/themes/monikai.css';
 import { useToast } from '@/hooks/use-toast';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 
 
 type SortableKeys = 'tableName' | 'recordId' | 'action' | 'changedBy' | 'changedAt';
