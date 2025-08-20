@@ -27,7 +27,6 @@ export default async function RootLayout({
   const paystreamTxns = await prisma.paystream_txns.findMany();
   const streamPaySettings = await prisma.stream_pay_settings.findMany();
   const ussdPushSettings = await prisma.ussd_push_settings.findMany();
-  const qrPayments = await prisma.qr_payments.findMany();
   const accountInfos = await prisma.account_infos.findMany();
   const promoAdds = await prisma.promo_adds.findMany();
   const roles = await prisma.roles.findMany({ include: { capabilities: true, permissions: true }});
@@ -46,7 +45,6 @@ export default async function RootLayout({
     paystreamTxns: paystreamTxns.map(item => ({ ...item, AMOUNT: parseFloat(item.AMOUNT || '0'), INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     streamPaySettings: streamPaySettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     ussdPushSettings: ussdPushSettings.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
-    qrPayments: qrPayments.map(item => ({ ...item, AMOUNT: item.AMOUNT.toNumber(), EXPIRETIME: item.EXPIRETIME?.toISOString() ?? null, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     accountInfos: accountInfos.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     promoAdds: promoAdds.map(item => ({ ...item, INSERTDATE: item.INSERTDATE?.toISOString() ?? null, UPDATEDATE: item.UPDATEDATE?.toISOString() ?? null })),
     roles: roles.map(role => ({ ...role, capabilities: role.capabilities.map(c => ({...c, INSERTDATE: c.INSERTDATE?.toISOString() ?? null, UPDATEDATE: c.UPDATEDATE?.toISOString() ?? null, PARENT: c.PARENT ?? null, PARENTID: c.PARENTID ?? null})), permissions: role.permissions.map(p => ({...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString()})), INSERTDATE: role.INSERTDATE?.toISOString() ?? null, UPDATEDATE: role.UPDATEDATE?.toISOString() ?? null })),
@@ -72,5 +70,3 @@ export default async function RootLayout({
     </html>
   );
 }
-
-    

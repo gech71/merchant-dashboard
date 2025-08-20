@@ -87,14 +87,6 @@ const MOCK_USSD_PUSH_SETTINGS = [
     { ID: randomUUID(), ADDRESS: 'https://fifth-ussd.gateway.com/request', RESULTURL: 'https://api.myapp.com/ussd/callback5', USERNAME: 'ussd_user5', PASSWORD: 'UssdPassword202', INSERTDATE: new Date('2023-09-05'), UPDATEDATE: new Date('2023-09-05'), INSERTUSER: 'system', UPDATEUSER: 'system' },
 ];
 
-const MOCK_QR_PAYMENTS = [
-    { ID: randomUUID(), DEBITACCOUNT: 'D001', CREDITACCOUNT: 'C001', SALERPHONENUMBER: '666-777-8888', AMOUNT: 50.00, EXPIRETIME: new Date('2023-10-31T23:59:59Z'), QRCODE: 'dummy-qr-code-1', ISUSED: false, INSERTDATE: new Date('2023-10-01'), UPDATEDATE: new Date('2023-10-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: randomUUID(), DEBITACCOUNT: 'D002', CREDITACCOUNT: 'C002', SALERPHONENUMBER: '777-888-9999', AMOUNT: 150.75, EXPIRETIME: new Date('2023-11-15T12:00:00Z'), QRCODE: 'dummy-qr-code-2', ISUSED: true, INSERTDATE: new Date('2023-10-02'), UPDATEDATE: new Date('2023-10-02'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: randomUUID(), DEBITACCOUNT: 'D003', CREDITACCOUNT: 'C001', SALERPHONENUMBER: '888-999-0000', AMOUNT: 25.00, EXPIRETIME: new Date('2023-11-01T08:30:00Z'), QRCODE: 'dummy-qr-code-3', ISUSED: false, INSERTDATE: new Date('2023-10-03'), UPDATEDATE: new Date('2023-10-03'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: randomUUID(), DEBITACCOUNT: 'D004', CREDITACCOUNT: 'C003', SALERPHONENUMBER: '111-000-1111', AMOUNT: 10.00, EXPIRETIME: new Date('2023-11-05T10:00:00Z'), QRCODE: 'dummy-qr-code-4', ISUSED: false, INSERTDATE: new Date('2023-10-04'), UPDATEDATE: new Date('2023-10-04'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-    { ID: randomUUID(), DEBITACCOUNT: 'D005', CREDITACCOUNT: 'C004', SALERPHONENUMBER: '333-222-1111', AMOUNT: 99.99, EXPIRETIME: new Date('2023-11-20T18:00:00Z'), QRCODE: 'dummy-qr-code-5', ISUSED: true, INSERTDATE: new Date('2023-10-05'), UPDATEDATE: new Date('2023-10-05'), INSERTUSER: 'system', UPDATEUSER: 'system' },
-]
-
 const MOCK_ACCOUNT_INFOS = [
     { ID: randomUUID(), ACCOUNTNUMBER: 'ACC001', PHONENUMBER: '111-222-3333', FULLNAME: 'The Corner Cafe Admin', GENDER: 'N/A', VALUE1: null, VALUE2: null, INSERTDATE: new Date('2023-01-15'), UPDATEDATE: new Date('2023-01-15'), INSERTUSER: 'system', UPDATEUSER: 'system' },
     { ID: randomUUID(), ACCOUNTNUMBER: 'CUST001', PHONENUMBER: '123-456-7890', FULLNAME: 'Customer A', GENDER: 'Male', VALUE1: 'VIP', VALUE2: null, INSERTDATE: new Date('2023-06-01'), UPDATEDATE: new Date('2023-06-01'), INSERTUSER: 'system', UPDATEUSER: 'system' },
@@ -121,7 +113,6 @@ const ALL_PAGES = [
   '/dashboard/merchant-txns',
   '/dashboard/arif-requests',
   '/dashboard/paystream-txns',
-  '/dashboard/qr-payments',
   '/dashboard/arifpay-endpoints',
   '/dashboard/controllers-configs',
   '/dashboard/core-integration-settings',
@@ -143,7 +134,6 @@ const ADMIN_PAGES = [
   '/dashboard/merchant-txns',
   '/dashboard/arif-requests',
   '/dashboard/paystream-txns',
-  '/dashboard/qr-payments',
   '/dashboard/approvals/allowed_companies',
 ];
 
@@ -282,11 +272,6 @@ async function main() {
     }
     console.log(`Seeded ${MOCK_USSD_PUSH_SETTINGS.length} ussd push settings.`);
 
-    for (const qp of MOCK_QR_PAYMENTS) {
-        await prisma.qr_payments.create({ data: qp });
-    }
-    console.log(`Seeded ${MOCK_QR_PAYMENTS.length} qr payments.`);
-
     for (const ai of MOCK_ACCOUNT_INFOS) {
         await prisma.account_infos.create({ data: ai });
     }
@@ -309,4 +294,3 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-    

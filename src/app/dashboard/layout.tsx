@@ -68,5 +68,3 @@ export default function DashboardLayout({
 
   return <Layout>{children}</Layout>;
 }
-
-    

@@ -70,13 +70,6 @@ export type ussd_push_settings = Omit<Prisma.ussd_push_settingsGetPayload<{}>, '
     UPDATEDATE: string | null;
 };
 
-export type qr_payments = Omit<Prisma.qr_paymentsGetPayload<{}>, 'AMOUNT' | 'EXPIRETIME' | 'INSERTDATE' | 'UPDATEDATE'> & {
-    AMOUNT: number;
-    EXPIRETIME: string | null;
-    INSERTDATE: string | null;
-    UPDATEDATE: string | null;
-};
-
 export type account_infos = Omit<Prisma.account_infosGetPayload<{}>, 'INSERTDATE' | 'UPDATEDATE'> & {
   INSERTDATE: string | null;
   UPDATEDATE: string | null;
@@ -111,6 +104,4 @@ export type Branch = Omit<Prisma.BranchGetPayload<{}>, 'INSERTDATE' | 'UPDATEDAT
   UPDATEDATE: string | null;
 };
 
-export type EditableItem = allowed_companies | Merchant_users | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | qr_payments | account_infos | promo_adds | Roles | SystemUser | Branch | role_capablities | controllersconfigs | arifpay_endpoints | null;
-
-    
+export type EditableItem = allowed_companies | Merchant_users | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | account_infos | promo_adds | Roles | SystemUser | Branch | role_capablities | controllersconfigs | arifpay_endpoints | null;

@@ -62,7 +62,6 @@ const ALL_NAV_ITEMS = [
   { group: 'Transactions', href: '/dashboard/merchant-txns', icon: Receipt, label: 'Merchant Transactions' },
   { group: 'Transactions', href: '/dashboard/arif-requests', icon: Send, label: 'Arif Requests' },
   { group: 'Transactions', href: '/dashboard/paystream-txns', icon: Repeat, label: 'PayStream Transactions' },
-  { group: 'Transactions', href: '/dashboard/qr-payments', icon: QrCode, label: 'QR Payments' },
   { group: 'System Settings', href: '/dashboard/arifpay-endpoints', icon: Link2, label: 'ArifPay Endpoints' },
   { group: 'System Settings', href: '/dashboard/controllers-configs', icon: KeyRound, label: 'Controller Configs' },
   { group: 'System Settings', href: '/dashboard/core-integration-settings', icon: Settings, label: 'Core Integration Settings' },

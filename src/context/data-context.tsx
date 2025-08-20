@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import type { allowed_companies, Merchant_users, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, qr_payments, account_infos, promo_adds, Roles, role_capablities, SystemUser, Branch } from '@/types';
+import type { allowed_companies, Merchant_users, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, account_infos, promo_adds, Roles, role_capablities, SystemUser, Branch } from '@/types';
 
 type CurrentUser = {
     userId: string;
@@ -26,7 +26,6 @@ type InitialData = {
     paystreamTxns: paystream_txns[];
     streamPaySettings: stream_pay_settings[];
     ussdPushSettings: ussd_push_settings[];
-    qrPayments: qr_payments[];
     accountInfos: account_infos[];
     promoAdds: promo_adds[];
     roles: Roles[];
@@ -66,6 +65,9 @@ type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 's
   updateControllersConfig: (config: controllersconfigs) => Promise<void>;
   updateArifpayEndpoint: (endpoint: arifpay_endpoints) => Promise<void>;
   deleteArifpayEndpoint: (id: string) => Promise<void>;
+  addPromoAd: (ad: Omit<promo_adds, 'ID' | 'INSERTUSERID' | 'UPDATEUSERID' | 'INSERTDATE' | 'UPDATEDATE'>) => Promise<void>;
+  updatePromoAd: (ad: promo_adds) => Promise<void>;
+  deletePromoAd: (id: string) => Promise<void>;
 };
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
@@ -85,6 +87,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const [coreIntegrationSettings, setCoreIntegrationSettings] = React.useState<core_integration_settings[]>(initialData.coreIntegrationSettings);
   const [controllersConfigs, setControllersConfigs] = React.useState<controllersconfigs[]>(initialData.controllersConfigs);
   const [arifpayEndpoints, setArifpayEndpoints] = React.useState<arifpay_endpoints[]>(initialData.arifpayEndpoints);
+  const [promoAdds, setPromoAdds] = React.useState<promo_adds[]>(initialData.promoAdds);
 
 
   React.useEffect(() => {
@@ -180,20 +183,6 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     }
     return [];
   }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, isSystemUser, initialData.paystreamTxns, merchants]);
-
-  const qrPayments = React.useMemo(() => {
-    if (isSystemUser) return initialData.qrPayments;
-    if (userAccountNumber) {
-        const companySalerPhones = merchants.filter(m => m.ACCOUNTNUMBER === userAccountNumber).map(m => m.PHONENUMBER);
-        if (isMerchantAdmin) {
-            return initialData.qrPayments.filter(qp => qp.SALERPHONENUMBER && companySalerPhones.includes(qp.SALERPHONENUMBER));
-        }
-        if (isMerchantSales) {
-            return initialData.qrPayments.filter(qp => qp.SALERPHONENUMBER === currentUser?.email);
-        }
-    }
-    return [];
-  }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, isSystemUser, merchants, initialData.qrPayments]);
 
   const accountInfos = React.useMemo(() => {
     if (isSystemUser) return initialData.accountInfos;
@@ -498,6 +487,36 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         setArifpayEndpoints((prev) => prev.filter((e) => e.ID !== id));
     };
 
+    const addPromoAd = async (ad: Omit<promo_adds, 'ID' | 'INSERTUSERID' | 'UPDATEUSERID' | 'INSERTDATE' | 'UPDATEDATE'>) => {
+        const response = await fetch('/api/promo-adds', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ad),
+        });
+        if (!response.ok) throw new Error('Failed to create promo ad');
+        const newAd = await response.json();
+        setPromoAdds((prev) => [...prev, newAd]);
+    };
+
+    const updatePromoAd = async (ad: promo_adds) => {
+        const response = await fetch(`/api/promo-adds/${ad.ID}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ad),
+        });
+        if (!response.ok) throw new Error('Failed to update promo ad');
+        const updatedAd = await response.json();
+        setPromoAdds((prev) => prev.map((a) => (a.ID === updatedAd.ID ? updatedAd : a)));
+    };
+
+    const deletePromoAd = async (id: string) => {
+        const response = await fetch(`/api/promo-adds/${id}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) throw new Error('Failed to delete promo ad');
+        setPromoAdds((prev) => prev.filter((a) => a.ID !== id));
+    };
+
 
   const value: DataContextType = {
     ...initialData,
@@ -507,7 +526,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     merchantTxns,
     arifRequests,
     paystreamTxns,
-    qrPayments,
+    promoAdds,
     accountInfos,
     roles,
     systemUsers,
@@ -542,6 +561,9 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     updateControllersConfig,
     updateArifpayEndpoint,
     deleteArifpayEndpoint,
+    addPromoAd,
+    updatePromoAd,
+    deletePromoAd
   };
 
   if (loading) {
