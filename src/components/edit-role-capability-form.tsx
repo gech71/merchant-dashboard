@@ -46,7 +46,7 @@ export function EditRoleCapabilityForm({
   setOpen: (open: boolean) => void;
 }) {
   const { toast } = useToast();
-  const { roles, updateRoleCapability } = useDataContext();
+  const { roles, roleCapabilities, updateRoleCapability } = useDataContext();
   const [isLoading, setIsLoading] = React.useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
   const [changes, setChanges] = React.useState<Change[]>([]);
@@ -95,6 +95,25 @@ export function EditRoleCapabilityForm({
   }
   
   function onFormSubmit(data: EditRoleCapabilityFormValues) {
+    const isOrderTaken = roleCapabilities.some(rc => 
+        rc.ID !== capability.ID &&
+        rc.ROLEID === data.ROLEID &&
+        rc.MENUORDER === data.MENUORDER &&
+        rc.SUBMENUORDER === data.SUBMENUORDER
+    );
+
+    if (isOrderTaken) {
+        form.setError('MENUORDER', {
+            type: 'manual',
+            message: 'This menu/sub-menu order is already taken for this role.'
+        });
+        form.setError('SUBMENUORDER', {
+            type: 'manual',
+            message: 'This menu/sub-menu order is already taken for this role.'
+        });
+        return;
+    }
+    
     const detectedChanges = getChanges(data);
     if(detectedChanges.length === 0) {
       toast({
