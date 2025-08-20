@@ -85,6 +85,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const [controllersConfigs, setControllersConfigs] = React.useState<controllersconfigs[]>(initialData.controllersConfigs);
   const [arifpayEndpoints, setArifpayEndpoints] = React.useState<arifpay_endpoints[]>(initialData.arifpayEndpoints);
   const [promoAdds, setPromoAdds] = React.useState<promo_adds[]>(initialData.promoAdds);
+  const [auditLogs, setAuditLogs] = React.useState<AuditLog[]>(initialData.auditLogs);
 
 
   React.useEffect(() => {
@@ -297,8 +298,9 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
       body: JSON.stringify(role),
     });
     if (!response.ok) throw new Error('Failed to update role');
-    const updatedRole = await response.json();
+    const { role: updatedRole, auditLog } = await response.json();
     setRoles(prev => prev.map(r => r.ID === updatedRole.ID ? updatedRole : r));
+    setAuditLogs(prev => [auditLog, ...prev]);
   };
 
   const deleteRole = async (roleId: string) => {
@@ -306,7 +308,9 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
       method: 'DELETE',
     });
     if (!response.ok) throw new Error('Failed to delete role');
+    const { auditLog } = await response.json();
     setRoles(prev => prev.filter(r => r.ID !== roleId));
+    setAuditLogs(prev => [auditLog, ...prev]);
   };
 
   const addSystemUser = async (user: Omit<SystemUser, 'id' | 'role' | 'createdAt' | 'updatedAt'>) => {
@@ -393,11 +397,10 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(setting),
     });
-    if (!response.ok) {
-        throw new Error('Failed to update USSD Push Setting');
-    }
-    const updatedSetting = await response.json();
+    if (!response.ok) throw new Error('Failed to update USSD Push Setting');
+    const { setting: updatedSetting, auditLog } = await response.json();
     setUssdPushSettings((prev) => prev.map((s) => (s.ID === updatedSetting.ID ? updatedSetting : s)));
+    setAuditLogs(prev => [auditLog, ...prev]);
   };
 
   const updateStreamPaySetting = async (setting: stream_pay_settings) => {
@@ -406,11 +409,10 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(setting),
     });
-    if (!response.ok) {
-        throw new Error('Failed to update StreamPay Setting');
-    }
-    const updatedSetting = await response.json();
+    if (!response.ok) throw new Error('Failed to update StreamPay Setting');
+    const { setting: updatedSetting, auditLog } = await response.json();
     setStreamPaySettings((prev) => prev.map((s) => (s.ID === updatedSetting.ID ? updatedSetting : s)));
+    setAuditLogs(prev => [auditLog, ...prev]);
   };
   
   const updateCoreIntegrationSetting = async (setting: core_integration_settings) => {
@@ -419,11 +421,10 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(setting),
     });
-    if (!response.ok) {
-        throw new Error('Failed to update Core Integration Setting');
-    }
-    const updatedSetting = await response.json();
+    if (!response.ok) throw new Error('Failed to update Core Integration Setting');
+    const { setting: updatedSetting, auditLog } = await response.json();
     setCoreIntegrationSettings((prev) => prev.map((s) => (s.ID === updatedSetting.ID ? updatedSetting : s)));
+    setAuditLogs(prev => [auditLog, ...prev]);
   };
 
   const updateControllersConfig = async (config: controllersconfigs) => {
@@ -432,11 +433,10 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(config),
     });
-    if (!response.ok) {
-        throw new Error('Failed to update controller config');
-    }
-    const updatedConfig = await response.json();
+    if (!response.ok) throw new Error('Failed to update controller config');
+    const { config: updatedConfig, auditLog } = await response.json();
     setControllersConfigs((prev) => prev.map((c) => (c.ID === updatedConfig.ID ? updatedConfig : c)));
+    setAuditLogs(prev => [auditLog, ...prev]);
   };
 
   const updateArifpayEndpoint = async (endpoint: arifpay_endpoints) => {
@@ -445,21 +445,20 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(endpoint),
     });
-    if (!response.ok) {
-        throw new Error('Failed to update ArifPay endpoint');
-    }
-    const updatedEndpoint = await response.json();
+    if (!response.ok) throw new Error('Failed to update ArifPay endpoint');
+    const { endpoint: updatedEndpoint, auditLog } = await response.json();
     setArifpayEndpoints((prev) => prev.map((e) => (e.ID === updatedEndpoint.ID ? updatedEndpoint : e)));
+    setAuditLogs(prev => [auditLog, ...prev]);
     };
 
     const deleteArifpayEndpoint = async (id: string) => {
         const response = await fetch(`/api/arifpay-endpoints/${id}`, {
             method: 'DELETE',
         });
-        if (!response.ok) {
-            throw new Error('Failed to delete ArifPay endpoint');
-        }
+        if (!response.ok) throw new Error('Failed to delete ArifPay endpoint');
+        const { auditLog } = await response.json();
         setArifpayEndpoints((prev) => prev.filter((e) => e.ID !== id));
+        setAuditLogs(prev => [auditLog, ...prev]);
     };
 
     const addPromoAd = async (ad: Omit<promo_adds, 'ID' | 'INSERTUSERID' | 'UPDATEUSERID' | 'INSERTDATE' | 'UPDATEDATE'>) => {
@@ -480,8 +479,9 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
             body: JSON.stringify(ad),
         });
         if (!response.ok) throw new Error('Failed to update promo ad');
-        const updatedAd = await response.json();
+        const { ad: updatedAd, auditLog } = await response.json();
         setPromoAdds((prev) => prev.map((a) => (a.ID === updatedAd.ID ? updatedAd : a)));
+        setAuditLogs(prev => [auditLog, ...prev]);
     };
 
     const deletePromoAd = async (id: string) => {
@@ -489,7 +489,9 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
             method: 'DELETE',
         });
         if (!response.ok) throw new Error('Failed to delete promo ad');
+        const { auditLog } = await response.json();
         setPromoAdds((prev) => prev.filter((a) => a.ID !== id));
+        setAuditLogs(prev => [auditLog, ...prev]);
     };
 
 
@@ -511,6 +513,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     coreIntegrationSettings,
     controllersConfigs,
     arifpayEndpoints,
+    auditLogs,
     currentUser,
     setCurrentUser,
     addAllowedCompany,

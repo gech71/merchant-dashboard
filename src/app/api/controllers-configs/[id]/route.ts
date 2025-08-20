@@ -27,7 +27,7 @@ export async function PUT(
       return NextResponse.json({ message: 'APIKEY is a required field' }, { status: 400 });
     }
     
-    const [_, updatedConfig] = await prisma.$transaction(async (tx) => {
+    const [_, updatedConfig, auditLog] = await prisma.$transaction(async (tx) => {
         const oldValue = await tx.controllersconfigs.findUnique({
             where: { ID: id },
         });
@@ -45,7 +45,7 @@ export async function PUT(
           },
         });
 
-        await tx.auditLog.create({
+        const newAuditLog = await tx.auditLog.create({
             data: {
                 tableName: 'controllersconfigs',
                 recordId: id,
@@ -56,7 +56,7 @@ export async function PUT(
             }
         });
 
-        return [oldValue, updatedConfig];
+        return [oldValue, updatedConfig, newAuditLog];
     });
     
     const serializableConfig = {
@@ -64,8 +64,16 @@ export async function PUT(
         INSERTDATE: updatedConfig.INSERTDATE?.toISOString() ?? null,
         UPDATEDATE: updatedConfig.UPDATEDATE?.toISOString() ?? null,
     };
+    
+     const serializableAuditLog = {
+      ...auditLog,
+      changedAt: auditLog.changedAt.toISOString(),
+      oldValue: auditLog.oldValue as object,
+      newValue: auditLog.newValue as object
+    };
 
-    return NextResponse.json(serializableConfig, { status: 200 });
+
+    return NextResponse.json({ config: serializableConfig, auditLog: serializableAuditLog }, { status: 200 });
   } catch (error) {
     console.error(`Error updating Controllers Config setting ${params.id}:`, error);
      if (error instanceof Error && error.message === 'Config not found') {

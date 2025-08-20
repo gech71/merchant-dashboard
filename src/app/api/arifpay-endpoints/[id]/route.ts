@@ -41,7 +41,7 @@ export async function PUT(
         IMAGEURL,
     } = body;
     
-    const [_, updatedEndpoint] = await prisma.$transaction(async (tx) => {
+    const [_, updatedEndpoint, auditLog] = await prisma.$transaction(async (tx) => {
       const oldValue = await tx.arifpay_endpoints.findUnique({
         where: { ID: id },
       });
@@ -75,7 +75,7 @@ export async function PUT(
         },
       });
 
-      await tx.auditLog.create({
+      const newAuditLog = await tx.auditLog.create({
         data: {
           tableName: 'arifpay_endpoints',
           recordId: id,
@@ -86,7 +86,7 @@ export async function PUT(
         },
       });
 
-      return [oldValue, updatedEndpoint];
+      return [oldValue, updatedEndpoint, newAuditLog];
     });
 
 
@@ -95,8 +95,16 @@ export async function PUT(
       INSERTDATE: updatedEndpoint.INSERTDATE?.toISOString() ?? null,
       UPDATEDATE: updatedEndpoint.UPDATEDATE?.toISOString() ?? null,
     };
+    
+    const serializableAuditLog = {
+      ...auditLog,
+      changedAt: auditLog.changedAt.toISOString(),
+      oldValue: auditLog.oldValue as object,
+      newValue: auditLog.newValue as object
+    };
 
-    return NextResponse.json(serializableEndpoint, { status: 200 });
+
+    return NextResponse.json({ endpoint: serializableEndpoint, auditLog: serializableAuditLog }, { status: 200 });
   } catch (error) {
     console.error(`Error updating ArifPay endpoint ${params.id}:`, error);
     if (error instanceof Error && error.message === 'Endpoint not found') {
@@ -121,7 +129,7 @@ export async function DELETE(
 
     const { id } = params;
 
-    await prisma.$transaction(async (tx) => {
+    const auditLog = await prisma.$transaction(async (tx) => {
       const oldValue = await tx.arifpay_endpoints.findUnique({
         where: { ID: id },
       });
@@ -134,7 +142,7 @@ export async function DELETE(
         where: { ID: id },
       });
 
-      await tx.auditLog.create({
+      return await tx.auditLog.create({
         data: {
           tableName: 'arifpay_endpoints',
           recordId: id,
@@ -144,8 +152,16 @@ export async function DELETE(
         },
       });
     });
+    
+    const serializableAuditLog = {
+      ...auditLog,
+      changedAt: auditLog.changedAt.toISOString(),
+      oldValue: auditLog.oldValue as object,
+      newValue: auditLog.newValue as object
+    };
 
-    return NextResponse.json({ message: 'Endpoint deleted successfully' }, { status: 200 });
+
+    return NextResponse.json({ message: 'Endpoint deleted successfully', auditLog: serializableAuditLog }, { status: 200 });
   } catch (error) {
     console.error(`Error deleting ArifPay endpoint ${params.id}:`, error);
     if (error instanceof Error && error.message === 'Endpoint not found') {

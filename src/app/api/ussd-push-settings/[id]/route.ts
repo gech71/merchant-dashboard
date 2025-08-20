@@ -27,7 +27,7 @@ export async function PUT(
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
     
-    const [_, updatedSetting] = await prisma.$transaction(async (tx) => {
+    const [_, updatedSetting, auditLog] = await prisma.$transaction(async (tx) => {
         const oldValue = await tx.ussd_push_settings.findUnique({
             where: { ID: id },
         });
@@ -53,7 +53,7 @@ export async function PUT(
           data: dataToUpdate,
         });
 
-        await tx.auditLog.create({
+        const newAuditLog = await tx.auditLog.create({
             data: {
                 tableName: 'ussd_push_settings',
                 recordId: id,
@@ -64,7 +64,7 @@ export async function PUT(
             }
         });
 
-        return [oldValue, updatedSetting];
+        return [oldValue, updatedSetting, newAuditLog];
     });
     
     const serializableSetting = {
@@ -72,8 +72,16 @@ export async function PUT(
         INSERTDATE: updatedSetting.INSERTDATE?.toISOString() ?? null,
         UPDATEDATE: updatedSetting.UPDATEDATE?.toISOString() ?? null,
     };
+    
+    const serializableAuditLog = {
+      ...auditLog,
+      changedAt: auditLog.changedAt.toISOString(),
+      oldValue: auditLog.oldValue as object,
+      newValue: auditLog.newValue as object
+    };
 
-    return NextResponse.json(serializableSetting, { status: 200 });
+
+    return NextResponse.json({ setting: serializableSetting, auditLog: serializableAuditLog }, { status: 200 });
   } catch (error) {
     console.error(`Error updating USSD push setting ${params.id}:`, error);
     if (error instanceof Error && error.message === 'Setting not found') {

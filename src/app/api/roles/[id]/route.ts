@@ -24,7 +24,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    const [oldValue, updatedRole] = await prisma.$transaction(async (tx) => {
+    const [oldValue, updatedRole, auditLog] = await prisma.$transaction(async (tx) => {
         const oldValue = await tx.roles.findUnique({
             where: { ID: id },
             include: { permissions: true }
@@ -57,7 +57,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
             include: { permissions: true, capabilities: true }
         });
         
-        await tx.auditLog.create({
+        const newAuditLog = await tx.auditLog.create({
             data: {
                 tableName: 'Roles',
                 recordId: id,
@@ -68,7 +68,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
             }
         });
 
-        return [oldValue, updatedRoleData];
+        return [oldValue, updatedRoleData, newAuditLog];
     });
 
 
@@ -79,8 +79,16 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         permissions: updatedRole.permissions.map(p => ({...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString()})),
         capabilities: updatedRole.capabilities.map(c => ({...c, INSERTDATE: c.INSERTDATE?.toISOString() ?? null, UPDATEDATE: c.UPDATEDATE?.toISOString() ?? null, PARENT: c.PARENT ?? false, PARENTID: c.PARENTID ?? null}))
     }
+    
+    const serializableAuditLog = {
+      ...auditLog,
+      changedAt: auditLog.changedAt.toISOString(),
+      oldValue: auditLog.oldValue as object,
+      newValue: auditLog.newValue as object
+    };
 
-    return NextResponse.json(updatedRoleSerializable, { status: 200 });
+
+    return NextResponse.json({ role: updatedRoleSerializable, auditLog: serializableAuditLog }, { status: 200 });
   } catch (error) {
     console.error(`Error updating role:`, error);
     if (error instanceof Error && error.message === 'Role not found') {
@@ -102,7 +110,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     
     const { id } = params;
     
-    await prisma.$transaction(async (tx) => {
+    const auditLog = await prisma.$transaction(async (tx) => {
         const oldValue = await tx.roles.findUnique({
             where: { ID: id }
         });
@@ -113,7 +121,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
         await tx.roles.delete({ where: { ID: id } });
 
-        await tx.auditLog.create({
+        return await tx.auditLog.create({
             data: {
                 tableName: 'Roles',
                 recordId: id,
@@ -124,7 +132,14 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         });
     });
 
-    return NextResponse.json({ message: 'Role deleted successfully' }, { status: 200 });
+    const serializableAuditLog = {
+      ...auditLog,
+      changedAt: auditLog.changedAt.toISOString(),
+      oldValue: auditLog.oldValue as object,
+      newValue: auditLog.newValue as object
+    };
+
+    return NextResponse.json({ message: 'Role deleted successfully', auditLog: serializableAuditLog }, { status: 200 });
   } catch (error) {
     console.error(`Error deleting role ${params.id}:`, error);
     if (error instanceof Error && error.message === 'Role not found') {

@@ -29,7 +29,7 @@ export async function PUT(
       ORDER,
     } = body;
     
-    const [oldValue, updatedAd] = await prisma.$transaction(async (tx) => {
+    const [oldValue, updatedAd, auditLog] = await prisma.$transaction(async (tx) => {
         const oldValue = await tx.promo_adds.findUnique({
             where: { ID: id }
         });
@@ -51,7 +51,7 @@ export async function PUT(
             },
         });
 
-        await tx.auditLog.create({
+        const newAuditLog = await tx.auditLog.create({
             data: {
                 tableName: 'promo_adds',
                 recordId: id,
@@ -62,7 +62,7 @@ export async function PUT(
             }
         });
         
-        return [oldValue, updatedAd];
+        return [oldValue, updatedAd, newAuditLog];
     });
 
 
@@ -71,8 +71,16 @@ export async function PUT(
       INSERTDATE: updatedAd.INSERTDATE?.toISOString() ?? null,
       UPDATEDATE: updatedAd.UPDATEDATE?.toISOString() ?? null,
     };
+    
+    const serializableAuditLog = {
+      ...auditLog,
+      changedAt: auditLog.changedAt.toISOString(),
+      oldValue: auditLog.oldValue as object,
+      newValue: auditLog.newValue as object
+    };
 
-    return NextResponse.json(serializableAd, { status: 200 });
+
+    return NextResponse.json({ ad: serializableAd, auditLog: serializableAuditLog }, { status: 200 });
   } catch (error) {
     console.error(`Error updating promo ad ${params.id}:`, error);
     if (error instanceof Error && error.message === 'Ad not found') {
@@ -97,7 +105,7 @@ export async function DELETE(
 
     const { id } = params;
 
-    await prisma.$transaction(async (tx) => {
+    const auditLog = await prisma.$transaction(async (tx) => {
         const oldValue = await tx.promo_adds.findUnique({
             where: { ID: id }
         });
@@ -110,7 +118,7 @@ export async function DELETE(
             where: { ID: id },
         });
 
-        await tx.auditLog.create({
+        return await tx.auditLog.create({
             data: {
                 tableName: 'promo_adds',
                 recordId: id,
@@ -120,8 +128,15 @@ export async function DELETE(
             }
         });
     });
+    
+     const serializableAuditLog = {
+      ...auditLog,
+      changedAt: auditLog.changedAt.toISOString(),
+      oldValue: auditLog.oldValue as object,
+      newValue: auditLog.newValue as object
+    };
 
-    return NextResponse.json({ message: 'Ad deleted successfully' }, { status: 200 });
+    return NextResponse.json({ message: 'Ad deleted successfully', auditLog: serializableAuditLog }, { status: 200 });
   } catch (error) {
     console.error(`Error deleting promo ad ${params.id}:`, error);
      if (error instanceof Error && error.message === 'Ad not found') {
