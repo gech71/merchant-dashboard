@@ -82,12 +82,20 @@ export default function PromoAddList({ promoAdds }: { promoAdds: promo_adds[] })
             <CardTitle className="text-3xl">Promotional Ads</CardTitle>
             <CardDescription>A list of current promotional advertisements.</CardDescription>
           </div>
-          <DialogTrigger asChild>
-            <Button onClick={() => setIsAddDialogOpen(true)} size="sm" className="h-9 gap-1">
-              <PlusCircle className="h-4 w-4" />
-              <span>Add New Ad</span>
-            </Button>
-          </DialogTrigger>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="h-9 gap-1">
+                <PlusCircle className="h-4 w-4" />
+                <span>Add New Ad</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Promotional Ad</DialogTitle>
+              </DialogHeader>
+              <AddPromoAdForm setOpen={setIsAddDialogOpen} />
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -139,14 +147,6 @@ export default function PromoAddList({ promoAdds }: { promoAdds: promo_adds[] })
           ))}
         </div>
       </div>
-       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Promotional Ad</DialogTitle>
-          </DialogHeader>
-          <AddPromoAdForm setOpen={setIsAddDialogOpen} />
-        </DialogContent>
-      </Dialog>
       
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
