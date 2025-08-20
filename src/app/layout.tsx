@@ -51,7 +51,7 @@ export default async function RootLayout({
     roles: roles.map(role => ({ ...role, capabilities: role.capabilities.map(c => ({...c, INSERTDATE: c.INSERTDATE?.toISOString() ?? null, UPDATEDATE: c.UPDATEDATE?.toISOString() ?? null, PARENT: c.PARENT ?? null, PARENTID: c.PARENTID ?? null})), permissions: role.permissions.map(p => ({...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString()})), INSERTDATE: role.INSERTDATE?.toISOString() ?? null, UPDATEDATE: role.UPDATEDATE?.toISOString() ?? null })),
     roleCapabilities: roleCapabilities.map(rc => ({...rc, INSERTDATE: rc.INSERTDATE?.toISOString() ?? null, UPDATEDATE: rc.UPDATEDATE?.toISOString() ?? null, PARENT: rc.PARENT ?? false, PARENTID: rc.PARENTID ?? null})),
     systemUsers: systemUsers.map(user => ({ ...user, createdAt: user.createdAt.toISOString(), updatedAt: user.updatedAt.toISOString(), role: user.role ? { ...user.role, permissions: user.role.permissions.map(p => ({ ...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString() })) } : null })),
-    auditLogs: auditLogs.map(log => ({ ...log, changedAt: log.changedAt.toISOString() })),
+    auditLogs: auditLogs.map(log => ({ ...log, changedAt: log.changedAt.toISOString(), oldValue: log.oldValue as object, newValue: log.newValue as object })),
   }
 
   return (

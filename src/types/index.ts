@@ -104,8 +104,10 @@ export type Branch = Omit<Prisma.BranchGetPayload<{}>, 'INSERTDATE' | 'UPDATEDAT
   UPDATEDATE: string | null;
 };
 
-export type AuditLog = Omit<Prisma.AuditLogGetPayload<{}>, 'changedAt'> & {
+export type AuditLog = Omit<Prisma.AuditLogGetPayload<{}>, 'changedAt' | 'oldValue' | 'newValue'> & {
   changedAt: string;
+  oldValue: object | null;
+  newValue: object | null;
 };
 
 export type EditableItem = allowed_companies | Merchant_users | core_integration_settings | paystream_txns | stream_pay_settings | ussd_push_settings | account_infos | promo_adds | Roles | SystemUser | Branch | role_capablities | controllersconfigs | arifpay_endpoints | null;
