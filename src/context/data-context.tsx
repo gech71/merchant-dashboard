@@ -35,7 +35,7 @@ type InitialData = {
     branches: Branch[];
 }
 
-type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 'streamPaySettings' | 'coreIntegrationSettings' | 'controllersConfigs'> & {
+type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 'streamPaySettings' | 'coreIntegrationSettings' | 'controllersConfigs' | 'arifpayEndpoints'> & {
   currentUser: CurrentUser | null;
   setCurrentUser: (user: CurrentUser | null) => void;
   systemUsers: SystemUser[];
@@ -43,6 +43,7 @@ type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 's
   streamPaySettings: stream_pay_settings[];
   coreIntegrationSettings: core_integration_settings[];
   controllersConfigs: controllersconfigs[];
+  arifpayEndpoints: arifpay_endpoints[];
   addRole: (role: Omit<Roles, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'capabilities' | 'permissions' | 'SystemUsers' | 'Merchant_users'> & { pages: string[] }) => Promise<void>;
   updateRole: (role: { id: string; ROLENAME: string; description?: string | null; pages: string[] }) => Promise<void>;
   deleteRole: (roleId: string) => Promise<void>;
@@ -63,6 +64,8 @@ type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 's
   updateStreamPaySetting: (setting: stream_pay_settings) => Promise<void>;
   updateCoreIntegrationSetting: (setting: core_integration_settings) => Promise<void>;
   updateControllersConfig: (config: controllersconfigs) => Promise<void>;
+  updateArifpayEndpoint: (endpoint: arifpay_endpoints) => Promise<void>;
+  deleteArifpayEndpoint: (id: string) => Promise<void>;
 };
 
 const DataContext = React.createContext<DataContextType | undefined>(undefined);
@@ -81,6 +84,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const [streamPaySettings, setStreamPaySettings] = React.useState<stream_pay_settings[]>(initialData.streamPaySettings);
   const [coreIntegrationSettings, setCoreIntegrationSettings] = React.useState<core_integration_settings[]>(initialData.coreIntegrationSettings);
   const [controllersConfigs, setControllersConfigs] = React.useState<controllersconfigs[]>(initialData.controllersConfigs);
+  const [arifpayEndpoints, setArifpayEndpoints] = React.useState<arifpay_endpoints[]>(initialData.arifpayEndpoints);
 
 
   React.useEffect(() => {
@@ -471,6 +475,29 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setControllersConfigs((prev) => prev.map((c) => (c.ID === updatedConfig.ID ? updatedConfig : c)));
   };
 
+  const updateArifpayEndpoint = async (endpoint: arifpay_endpoints) => {
+    const response = await fetch(`/api/arifpay-endpoints/${endpoint.ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(endpoint),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update ArifPay endpoint');
+    }
+    const updatedEndpoint = await response.json();
+    setArifpayEndpoints((prev) => prev.map((e) => (e.ID === updatedEndpoint.ID ? updatedEndpoint : e)));
+    };
+
+    const deleteArifpayEndpoint = async (id: string) => {
+        const response = await fetch(`/api/arifpay-endpoints/${id}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) {
+            throw new Error('Failed to delete ArifPay endpoint');
+        }
+        setArifpayEndpoints((prev) => prev.filter((e) => e.ID !== id));
+    };
+
 
   const value: DataContextType = {
     ...initialData,
@@ -490,6 +517,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     streamPaySettings,
     coreIntegrationSettings,
     controllersConfigs,
+    arifpayEndpoints,
     currentUser,
     setCurrentUser,
     addAllowedCompany,
@@ -512,6 +540,8 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     updateStreamPaySetting,
     updateCoreIntegrationSetting,
     updateControllersConfig,
+    updateArifpayEndpoint,
+    deleteArifpayEndpoint,
   };
 
   if (loading) {
