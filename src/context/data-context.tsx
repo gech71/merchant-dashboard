@@ -496,16 +496,20 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ auditLogId }),
     });
-    if (!response.ok) throw new Error('Failed to restore record');
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to restore record');
+    }
     const { restoredRecord, auditLog } = await response.json();
     
     // This is a simplified way to update state. A more robust solution
     // might involve a switch statement on the table name.
-    // For now, we'll just refetch all data or handle the most common cases.
-    if (restoredRecord.tableName === 'arifpay_endpoints') {
+    if (auditLog.tableName === 'arifpay_endpoints') {
         setArifpayEndpoints(prev => [...prev, restoredRecord]);
-    } else if (restoredRecord.tableName === 'promo_adds') {
+    } else if (auditLog.tableName === 'promo_adds') {
         setPromoAdds(prev => [...prev, restoredRecord]);
+    } else if (auditLog.tableName === 'Roles') {
+        setRoles(prev => [...prev, restoredRecord]);
     }
     // Add other cases as needed...
 
