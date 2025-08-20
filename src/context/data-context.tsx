@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import type { allowed_companies, Merchant_users, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, account_infos, promo_adds, Roles, role_capablities, SystemUser, Branch } from '@/types';
+import type { allowed_companies, Merchant_users, merchants_daily_balances, merchant_txns, arif_requests, arifpay_endpoints, controllersconfigs, core_integration_settings, paystream_txns, stream_pay_settings, ussd_push_settings, account_infos, promo_adds, Roles, role_capablities, SystemUser, Branch, AuditLog } from '@/types';
 
 type CurrentUser = {
     userId: string;
@@ -31,7 +31,7 @@ type InitialData = {
     roles: Roles[];
     roleCapabilities: role_capablities[];
     systemUsers: SystemUser[];
-    branches: Branch[];
+    auditLogs: AuditLog[];
 }
 
 type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 'streamPaySettings' | 'coreIntegrationSettings' | 'controllersConfigs' | 'arifpayEndpoints'> & {
@@ -55,8 +55,6 @@ type DataContextType = Omit<InitialData, 'systemUsers' | 'ussdPushSettings' | 's
   updateSystemUserStatus: (userId: string, status: 'Active' | 'Inactive') => Promise<void>;
   addSystemUser: (user: Omit<SystemUser, 'id' | 'role' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateUserRole: (userId: string, roleId: string, userType: 'merchant' | 'system') => Promise<void>;
-  addBranch: (branch: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => Promise<void>;
-  updateBranch: (branch: Branch) => Promise<void>;
   deleteRoleCapability: (id: string) => Promise<void>;
   updateRoleCapability: (capability: role_capablities) => Promise<void>;
   updateUssdPushSetting: (setting: ussd_push_settings) => Promise<void>;
@@ -80,7 +78,6 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   const [merchants, setMerchants] = React.useState(initialData.merchants);
   const [roles, setRoles] = React.useState<Roles[]>(initialData.roles);
   const [systemUsers, setSystemUsers] = React.useState<SystemUser[]>(initialData.systemUsers);
-  const [branches, setBranches] = React.useState<Branch[]>(initialData.branches);
   const [roleCapabilities, setRoleCapabilities] = React.useState<role_capablities[]>(initialData.roleCapabilities);
   const [ussdPushSettings, setUssdPushSettings] = React.useState<ussd_push_settings[]>(initialData.ussdPushSettings);
   const [streamPaySettings, setStreamPaySettings] = React.useState<stream_pay_settings[]>(initialData.streamPaySettings);
@@ -367,28 +364,6 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     }
   };
 
-  const addBranch = async (branch: Omit<Branch, 'id' | 'status' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord'>) => {
-    const response = await fetch('/api/branches', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(branch),
-    });
-    if (!response.ok) throw new Error('Failed to add branch');
-    const newBranch = await response.json();
-    setBranches(prev => [...prev, newBranch]);
-  };
-  
-  const updateBranch = async (branch: Branch) => {
-    const response = await fetch(`/api/branches/${branch.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(branch),
-    });
-    if (!response.ok) throw new Error('Failed to update branch');
-    const updatedBranch = await response.json();
-    setBranches(prev => prev.map(b => b.id === updatedBranch.id ? updatedBranch : b));
-  };
-
   const deleteRoleCapability = async (id: string) => {
     const response = await fetch(`/api/role-capabilities/${id}`, {
       method: 'DELETE',
@@ -530,7 +505,6 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     accountInfos,
     roles,
     systemUsers,
-    branches,
     roleCapabilities,
     ussdPushSettings,
     streamPaySettings,
@@ -551,8 +525,6 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     updateSystemUser,
     updateSystemUserStatus,
     updateUserRole,
-    addBranch,
-    updateBranch,
     deleteRoleCapability,
     updateRoleCapability,
     updateUssdPushSetting,

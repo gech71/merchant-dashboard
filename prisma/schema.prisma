@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,15 +11,15 @@ datasource db {
 }
 
 model allowed_companies {
-  Oid                   String    @id @default(uuid())
-  ID                    String    @unique
-  ACCOUNTNUMBER         String
+  Oid                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ID                    String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ACCOUNTNUMBER         String   @unique
   FIELDNAME             String
   APPROVEUSER           String?
-  APPROVED              Boolean   @default(false)
-  STATUS                Boolean   @default(false)
-  INSERTDATE            DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE            DateTime? @default(now()) @db.Timestamp(6)
+  APPROVED              Boolean
+  STATUS                Boolean
+  INSERTDATE            DateTime? @default(now()) @db.Timestamptz(6)
+  UPDATEDATE            DateTime? @default(now()) @db.Timestamptz(6)
   INSERTUSER            String?
   UPDATEUSER            String?
   OptimisticLockField   Int?
@@ -31,105 +28,105 @@ model allowed_companies {
 }
 
 model merchant_users {
-  ID                 String    @id @default(uuid())
-  FULLNAME           String?
-  ROLE               String?
-  STATUS             String?
-  ACCOUNTNUMBER      String
-  ACCOUNTTYPE        String?
-  PHONENUMBER        String    @unique
-  DEVICENAME         String?
-  ENCRYPTIONKEY      String?
-  iV                 String?
-  ISLOGGEDIN         Boolean?
-  authenticationkey  String?
-  FAILEDATTMEPTS     Int?
-  LASTLOGINATTEMPT   DateTime? @db.Timestamp(6)
-  ISLOCKED           Boolean?
-  UNLOCKEDTIME       DateTime? @db.Timestamp(6)
-  VALUE3             String?
-  INSERTUSERID       String?
-  UPDATEUSERID       String?
-  INSERTDATE         DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE         DateTime? @default(now()) @db.Timestamp(6)
-  ApplicationRole    Roles?    @relation(fields: [roleId], references: [ID])
-  roleId             String?
+  ID                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  FULLNAME            String?
+  ROLE                String?
+  STATUS              String?
+  ACCOUNTNUMBER       String
+  ACCOUNTTYPE         String?
+  PHONENUMBER         String?
+  DEVICENAME          String?
+  ENCRYPTIONKEY       String?
+  iV                  String?
+  ISLOGGEDIN          Boolean
+  authenticationkey   String?
+  FAILEDATTMEPTS      Int?
+  LASTLOGINATTEMPT    DateTime?
+  ISLOCKED            Boolean
+  UNLOCKEDTIME        DateTime?
+  VALUE3              String?
+  INSERTUSERID        String?
+  UPDATEUSERID        String?
+  INSERTDATE          DateTime? @default(now())
+  UPDATEDATE          DateTime? @default(now())
+  roleId              String?   @db.Uuid
+  ApplicationRole     Roles?    @relation(fields: [roleId], references: [ID])
 }
 
 model merchants_daily_balances {
-  ID              String    @id @default(uuid())
+  ID              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   MERCHANTACCOUNT String?
   MERCHANTPHONE   String?
-  DAILYBALANCE    Decimal?  @db.Decimal(18, 2)
+  DAILYBALANCE    Decimal?
   DAILYTXNCOUNT   Int?
-  BALANCEDATE     DateTime? @db.Timestamp(6)
-  INSERTDATE      DateTime? @db.Timestamp(6)
-  UPDATEDATE      DateTime? @db.Timestamp(6)
+  BALANCEDATE     DateTime?
+  INSERTDATE      DateTime? @default(now())
+  UPDATEDATE      DateTime? @default(now())
   INSERTUSER      String?
   UPDATEUSER      String?
 }
 
 model merchant_txns {
-  ID                   String    @id @default(uuid())
+  ID                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   MERCHANTACCOUNT      String?
   MERCHANTPHONE        String?
-  AMOUNT               Decimal   @db.Decimal(18, 2)
-  TXNID                String?
+  AMOUNT               Decimal?
+  TXNID                String?   @unique
   CUSTOMERNAME         String?
   CUSTOMERACCOUNT      String?
   T24USER              String?
-  T2TRANSACTIONDATE    DateTime? @db.Timestamp(6)
+  T2TRANSACTIONDATE    DateTime?
   STATUS               String?
   TRANSACTIONCHANNEL   String?
   TRANSACTIONSERVICE   String?
   VALUE1               String?
   VALUE2               String?
   VALUE3               String?
-  INSERTDATE           DateTime? @db.Timestamp(6)
-  UPDATEDATE           DateTime? @db.Timestamp(6)
+  INSERTDATE           DateTime? @default(now())
+  UPDATEDATE           DateTime? @default(now())
   INSERTUSER           String?
   UPDATEUSER           String?
 }
 
 model arif_requests {
-  ID                       String    @id @default(uuid())
-  NONCEID                  String    @unique
-  SESSIONID                String
+  ID                       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  NONCEID                  String   @unique
+  SESSIONID                String   @unique
   DEBITACCOUNT             String
   CREDITACCOUNT            String
-  AMOUNT                   Decimal   @db.Decimal(18, 2)
   MERCHANTACCOUNT          String
+  AMOUNT                   Decimal
   ARIFPAYTRANSACTIONID     String?
-  ARIFPAYTRANSACTIONSTATUS String?
   T24TRANSACTIONID         String?
+  ARIFPAYTRANSACTIONSTATUS String?
   T24TRANSACTIONSTATUS     String?
+  SALESPHONE               String?
   WEBHOOKRESPONSE          String?
   REQUEST1                 String?
   RESPONSE1                String?
-  ERROR1                   String?
-  MESSAGE1                 String?
-  DATESEND1                DateTime? @db.Timestamp(6)
-  DATERECIVED1             DateTime? @db.Timestamp(6)
   REQUEST2                 String?
   RESPONSE2                String?
-  ERROR2                   String?
-  MESSAGE2                 String?
-  DATESEND2                DateTime? @db.Timestamp(6)
-  DATERECIVED2             DateTime? @db.Timestamp(6)
   REQUEST3                 String?
   RESPONSE3                String?
+  ERROR1                   String?
+  MESSAGE1                 String?
+  ERROR2                   String?
+  MESSAGE2                 String?
   ERROR3                   String?
   MESSAGE3                 String?
-  DATESEND3                DateTime? @db.Timestamp(6)
-  DATERECIVED3             DateTime? @db.Timestamp(6)
-  SALESPHONE               String?
-  WEBHOOKRECEIVEDDATE      DateTime? @db.Timestamp(6)
+  DATESEND1                DateTime?
+  DATERECIVED1             DateTime?
+  DATESEND2                DateTime?
+  DATERECIVED2             DateTime?
+  DATESEND3                DateTime?
+  DATERECIVED3             DateTime?
+  WEBHOOKRECEIVEDDATE      DateTime?
   INSERTUSER               String?
   UPDATEUSER               String?
 }
 
 model arifpay_endpoints {
-  ID                 String    @id @default(uuid())
+  ID                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   BANK               String
   DISPLAYNAME        String
   OTPLENGTH          Int
@@ -147,105 +144,105 @@ model arifpay_endpoints {
   BENEFICIARYACCOUNT String
   BENEFICIARYBANK    String
   IMAGEURL           String
-  INSERTDATE         DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE         DateTime? @default(now()) @db.Timestamp(6)
+  INSERTDATE         DateTime? @default(now())
+  UPDATEDATE         DateTime? @default(now())
   INSERTUSER         String?
   UPDATEUSER         String?
 }
 
 model controllersconfigs {
-  ID            String    @id @default(uuid())
-  CONTROLLERKEY String    @unique
+  ID            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  CONTROLLERKEY String
   APIKEY        String
-  INSERTDATE    DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE    DateTime? @default(now()) @db.Timestamp(6)
+  INSERTDATE    DateTime? @default(now())
+  UPDATEDATE    DateTime? @default(now())
   INSERTUSER    String?
   UPDATEUSER    String?
 }
 
 model core_integration_settings {
-  ID         String    @id @default(uuid())
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   UNIQUEKEY  String    @unique
   ADDRESS    String
   USERNAME   String
   PASSWORD   String
-  INSERTDATE DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE DateTime? @default(now()) @db.Timestamp(6)
+  INSERTDATE DateTime? @default(now())
+  UPDATEDATE DateTime? @default(now())
   INSERTUSER String?
   UPDATEUSER String?
 }
 
 model paystream_txns {
-  ID                    String    @id @default(uuid())
+  ID                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   MERCHANTACCOUNTNUMBER String
   SALERPHONENUMBER      String
   TICKET                String
   ISCOMPLETED           Boolean
-  AMOUNT                String
+  AMOUNT                String?
   PAYERACCOUNT          String?
-  INSERTDATE            DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE            DateTime? @default(now()) @db.Timestamp(6)
+  INSERTDATE            DateTime? @default(now())
+  UPDATEDATE            DateTime? @default(now())
   INSERTUSER            String?
   UPDATEUSER            String?
 }
 
 model stream_pay_settings {
-  ID         String    @id @default(uuid())
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ADDRESS    String
   IV         String
   KEY        String
   HV         String
   USERNAME   String
   PASSWORD   String
-  INSERTDATE DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE DateTime? @default(now()) @db.Timestamp(6)
+  INSERTDATE DateTime? @default(now())
+  UPDATEDATE DateTime? @default(now())
   INSERTUSER String?
   UPDATEUSER String?
 }
 
 model ussd_push_settings {
-  ID         String    @id @default(uuid())
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ADDRESS    String
   RESULTURL  String
   USERNAME   String
   PASSWORD   String
-  INSERTDATE DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE DateTime? @default(now()) @db.Timestamp(6)
+  INSERTDATE DateTime? @default(now())
+  UPDATEDATE DateTime? @default(now())
   INSERTUSER String?
   UPDATEUSER String?
 }
 
 model qr_payments {
-  ID               String    @id @default(uuid())
+  ID               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   DEBITACCOUNT     String
   CREDITACCOUNT    String
   SALERPHONENUMBER String
-  AMOUNT           Decimal   @db.Decimal(18, 2)
+  AMOUNT           Decimal
   QRCODE           String
   ISUSED           Boolean
-  EXPIRETIME       DateTime? @db.Timestamp(6)
-  INSERTDATE       DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE       DateTime? @default(now()) @db.Timestamp(6)
+  EXPIRETIME       DateTime
+  INSERTDATE       DateTime? @default(now())
+  UPDATEDATE       DateTime? @default(now())
   INSERTUSER       String?
   UPDATEUSER       String?
 }
 
 model account_infos {
-  ID            String    @id @default(uuid())
+  ID            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ACCOUNTNUMBER String
   PHONENUMBER   String
   FULLNAME      String
   GENDER        String
   VALUE1        String?
   VALUE2        String?
-  INSERTDATE    DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE    DateTime? @default(now()) @db.Timestamp(6)
+  INSERTDATE    DateTime? @default(now())
+  UPDATEDATE    DateTime? @default(now())
   INSERTUSER    String?
   UPDATEUSER    String?
 }
 
 model promo_adds {
-  ID           String    @id @default(uuid())
+  ID           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ADDTITLE     String
   ADDSUBTITLE  String
   ADDADDRESS   String
@@ -253,56 +250,55 @@ model promo_adds {
   ORDER        Int       @unique
   INSERTUSERID String?
   UPDATEUSERID String?
-  INSERTDATE   DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE   DateTime? @default(now()) @db.Timestamp(6)
-}
-
-model Roles {
-  ID           String    @id @default(uuid())
-  ROLENAME     String    @unique
-  description  String?
-  INSERTDATE   DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE   DateTime? @default(now()) @db.Timestamp(6)
-
-  SystemUsers  SystemUsers[]
-  Merchant_users merchant_users[]
-  capabilities role_capablities[]
-  permissions dashboard_permissions[]
+  INSERTDATE   DateTime? @default(now())
+  UPDATEDATE   DateTime? @default(now())
 }
 
 model role_capablities {
-  ID           String    @id @default(uuid())
+  ID           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   MENUNAME     String?
   MENUNAME_am  String?
   ADDRESS      String?
   MENUORDER    Int?
   SUBMENUORDER Int?
   PARENT       Boolean?
-  PARENTID     String?
-  ROLEID       String
+  PARENTID     String?   @db.Uuid
+  ROLEID       String    @db.Uuid
+  INSERTDATE   DateTime? @default(now())
+  UPDATEDATE   DateTime? @default(now())
   role         Roles     @relation(fields: [ROLEID], references: [ID], onDelete: Cascade)
-  INSERTDATE   DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE   DateTime? @default(now()) @db.Timestamp(6)
 
   @@unique([ROLEID, MENUORDER, SUBMENUORDER])
 }
 
+model Roles {
+  ID             String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ROLENAME       String                @unique
+  description    String?
+  INSERTDATE     DateTime?             @default(now())
+  UPDATEDATE     DateTime?             @default(now())
+  capabilities   role_capablities[]
+  permissions    dashboard_permissions[]
+  SystemUsers    SystemUsers[]
+  Merchant_users merchant_users[]
+}
+
 model SystemUsers {
-  id        String   @id @default(uuid())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String
   email     String   @unique
   password  String
   status    String
-  roleId    String?
-  role      Roles?   @relation(fields: [roleId], references: [ID])
+  roleId    String?  @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  role      Roles?   @relation(fields: [roleId], references: [ID])
 }
 
 model dashboard_permissions {
-  id        String   @id @default(uuid())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   page      String
-  roleId    String
+  roleId    String   @db.Uuid
   role      Roles    @relation(fields: [roleId], references: [ID], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -310,26 +306,13 @@ model dashboard_permissions {
   @@unique([page, roleId])
 }
 
-model Branch {
-  id                  String   @id @default(uuid())
-  name                String   @unique
-  code                String   @unique
-  address             String
-  contact             String
-  status              String
-  INSERTDATE          DateTime? @default(now()) @db.Timestamp(6)
-  UPDATEDATE          DateTime? @default(now()) @db.Timestamp(6)
-}
-
 model AuditLog {
-  id         String   @id @default(uuid())
-  tableName  String
-  recordId   String
-  action     String // e.g., 'UPDATE', 'DELETE'
-  oldValue   Json?
-  newValue   Json?
-  changedBy  String
-  changedAt  DateTime @default(now())
-
-  @@index([tableName, recordId])
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tableName   String
+  recordId    String
+  action      String // e.g., CREATE, UPDATE, DELETE
+  oldValue    Json?
+  newValue    Json?
+  changedBy   String
+  changedAt   DateTime @default(now())
 }
