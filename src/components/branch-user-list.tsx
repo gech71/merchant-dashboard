@@ -1,336 +1,412 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
 
-'use client';
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-import * as React from 'react';
-import type { BranchUser, EditableItem } from '@/types';
-import { ArrowUpDown, UserPlus, MoreHorizontal, CheckCircle, XCircle } from 'lucide-react';
+model AuditLog {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tableName String
+  recordId  String
+  action    String
+  oldValue  Json?
+  newValue  Json?
+  changedBy String
+  changedAt DateTime @default(now())
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AddBranchUserForm } from './add-branch-user-form';
-import { EditBranchUserForm } from './edit-branch-user-form';
-import { useDataContext } from '@/context/data-context';
-import { useToast } from '@/hooks/use-toast';
+  @@map("audit_log")
+}
 
-type SortableKeys = 'name' | 'email' | 'branch' | 'status';
-const ITEMS_PER_PAGE = 15;
+model SystemUsers {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  email     String   @unique
+  password  String
+  status    String   @default("Pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  roleId    String?  @db.Uuid
+  role      Roles?   @relation(fields: [roleId], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_system_users_roles")
 
-export default function BranchUserList({ branchUsers: initialBranchUsers, approvalView = false }: { branchUsers: BranchUser[], approvalView?: boolean }) {
-  const { branchUsers: contextBranchUsers, updateBranchUserStatus } = useDataContext();
-  const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [sortConfig, setSortConfig] = React.useState<{
-    key: SortableKeys;
-    direction: 'ascending' | 'descending';
-  } | null>({ key: 'name', direction: 'ascending' });
-  const [isAddUserOpen, setIsAddUserOpen] = React.useState(false);
-  const [isEditUserOpen, setIsEditUserOpen] = React.useState(false);
-  const [selectedUser, setSelectedUser] = React.useState<EditableItem>(null);
-  const [activeTab, setActiveTab] = React.useState(approvalView ? 'pending' : 'all');
-  const [currentPage, setCurrentPage] = React.useState(1);
+  @@map("system_users")
+}
 
-  const handleStatusChange = async (userId: string, status: 'Active' | 'Inactive') => {
-    try {
-      await updateBranchUserStatus(userId, status);
-      toast({
-          title: 'User Status Updated',
-          description: `The user has been ${status === 'Active' ? 'approved' : 'rejected'}.`,
-      });
-    } catch (error) {
-       toast({
-            variant: 'destructive',
-            title: 'Update Failed',
-            description: 'Could not update the user status.',
-        });
-    }
-  };
-  
-  const handleEdit = (user: BranchUser) => {
-    setSelectedUser(user);
-    setIsEditUserOpen(true);
-  };
+model Manage_otps {
+  ID            String    @id @db.Uuid
+  ACCOUNTNUMBER String    @db.VarChar(50)
+  PHONENUMBER   String    @db.VarChar(15)
+  FULLNAME      String?   @db.VarChar(100)
+  OTPSENT       DateTime  @db.Timestamp()
+  OTPEXPIRE     DateTime  @db.Timestamp()
+  SENTCHANNEL   String?   @db.VarChar(10)
+  OTPCODE       String    @default("") @db.Text
+  VALUE2        String?   @db.Text
+  VALUE3        String?   @db.Text
+  INSERTDATE    DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER    String?   @default("system") @db.Text
+  UPDATEUSER    String?   @default("system") @db.Text
 
-  const requestSort = (key: SortableKeys) => {
-    let direction: 'ascending' | 'descending' = 'ascending';
-    if (
-      sortConfig &&
-      sortConfig.key === key &&
-      sortConfig.direction === 'ascending'
-    ) {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  };
-  
-  const usersSource = approvalView ? contextBranchUsers : initialBranchUsers;
+  @@map("Manage_otps")
+}
 
-  const filteredAndSortedUsers = React.useMemo(() => {
-    let sortableItems = [...usersSource];
+model Merchant_users {
+  ID                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ACCOUNTNUMBER     String    @db.VarChar(20)
+  FULLNAME          String?   @db.VarChar(100)
+  ACCOUNTTYPE       String?   @db.VarChar(20)
+  PHONENUMBER       String?   @unique @db.VarChar(15)
+  ROLE              String?   @db.VarChar(20)
+  DEVICENAME        String?   @db.VarChar(100)
+  ENCRYPTIONKEY     String?   @db.Text
+  iV                String?   @db.Text
+  ISLOGGEDIN        Boolean?
+  authenticationkey String?   @db.Text
+  STATUS            String?   @db.VarChar(100)
+  FAILEDATTMEPTS    Int?      @default(0)
+  LASTLOGINATTEMPT  DateTime? @default(now()) @db.Timestamp()
+  ISLOCKED          Boolean?  @default(false)
+  UNLOCKEDTIME      DateTime? @default(now()) @db.Timestamp()
+  VALUE3            String?   @db.Text
+  INSERTUSERID      String?   @default("system") @db.Text
+  UPDATEUSERID      String?   @default("system") @db.Text
+  INSERTDATE        DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE        DateTime? @default(now()) @db.Timestamp()
+  roleId            String?   @db.Uuid
+  ApplicationRole   Roles?    @relation("MerchantUsersToRoles", fields: [roleId], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_merchant_users_roles")
 
-    if (approvalView) {
-      sortableItems = sortableItems.filter(u => u.status === 'Pending');
-    } else if (activeTab !== 'all') {
-      sortableItems = sortableItems.filter(
-        (user) => user.status.toLowerCase() === activeTab
-      );
-    }
+  @@map("Merchant_users")
+}
 
-    if (searchTerm) {
-      const lowercasedTerm = searchTerm.toLowerCase();
-      sortableItems = sortableItems.filter((user) =>
-        Object.values(user).some(
-          (value) =>
-            typeof value === 'string' &&
-            value.toLowerCase().includes(lowercasedTerm)
-        )
-      );
-    }
+model Roles {
+  ID             String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ROLENAME       String                  @db.VarChar(100)
+  description    String?                 @db.Text
+  VALUE1         String?                 @db.Text
+  VALUE2         String?                 @db.Text
+  VALUE3         String?                 @db.Text
+  INSERTUSERID   String?                 @db.Text
+  UPDATEUSERID   String?                 @db.Text
+  INSERTDATE     DateTime?               @default(now()) @db.Timestamp()
+  UPDATEDATE     DateTime?               @default(now()) @db.Timestamp()
+  Merchant_users Merchant_users[]        @relation("MerchantUsersToRoles")
+  SystemUsers    SystemUsers[]
+  capabilities   role_capablities[]
+  permissions    dashboard_permissions[]
 
-    if (sortConfig !== null) {
-      sortableItems.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
+  @@map("Roles")
+}
 
-    return sortableItems;
-  }, [usersSource, searchTerm, sortConfig, activeTab, approvalView]);
+model dashboard_permissions {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  page      String
+  roleId    String   @db.Uuid
+  role      Roles    @relation(fields: [roleId], references: [ID], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  const paginatedUsers = React.useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    return filteredAndSortedUsers.slice(startIndex, endIndex);
-  }, [filteredAndSortedUsers, currentPage]);
+  @@unique([roleId, page])
+  @@map("dashboard_permissions")
+}
 
-  const getSortIndicator = (key: SortableKeys) => {
-    if (sortConfig?.key !== key) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 opacity-30" />;
-    }
-    return sortConfig.direction === 'ascending' ? (
-      <ArrowUpDown className="ml-2 h-4 w-4" />
-    ) : (
-      <ArrowUpDown className="ml-2 h-4 w-4" />
-    );
-  };
-  
-  const getStatusVariant = (status: BranchUser['status']) => {
-    switch (status) {
-      case 'Active':
-        return 'default';
-      case 'Pending':
-        return 'secondary';
-      case 'Inactive':
-        return 'destructive';
-      default:
-        return 'outline';
-    }
-  };
 
-  return (
-    <>
-    <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
-      <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
-        <div className="flex items-center">
-          {!approvalView && (
-            <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="active">Active</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
-              <TabsTrigger value="inactive">Inactive</TabsTrigger>
-            </TabsList>
-          )}
-          <div className="ml-auto flex items-center gap-2">
-            <Input
-              placeholder="Search branch users..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-8 w-[150px] lg:w-[250px]"
-            />
-            {!approvalView && (
-              <DialogTrigger asChild>
-                <Button size="sm" className="h-8 gap-1">
-                  <UserPlus className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Add Branch User
-                  </span>
-                </Button>
-              </DialogTrigger>
-            )}
-          </div>
-        </div>
-        <TabsContent value={activeTab}>
-          <Card>
-            <CardHeader>
-              <CardTitle>{approvalView ? 'Branch User Approvals' : 'Branch Users'}</CardTitle>
-              <CardDescription>
-                {approvalView ? 'Review and approve pending branch users.' : 'Manage all registered branch users.'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>
-                        <Button variant="ghost" onClick={() => requestSort('name')} className="px-2">
-                          Name
-                          {getSortIndicator('name')}
-                        </Button>
-                      </TableHead>
-                      <TableHead>
-                        <Button variant="ghost" onClick={() => requestSort('email')} className="px-2">
-                          Email
-                          {getSortIndicator('email')}
-                        </Button>
-                      </TableHead>
-                      <TableHead>
-                        <Button variant="ghost" onClick={() => requestSort('branch')} className="px-2">
-                          Branch
-                          {getSortIndicator('branch')}
-                        </Button>
-                      </TableHead>
-                      <TableHead>
-                        <Button variant="ghost" onClick={() => requestSort('status')} className="px-2">
-                          Status
-                          {getSortIndicator('status')}
-                        </Button>
-                      </TableHead>
-                      <TableHead>
-                        <span className="sr-only">Actions</span>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedUsers.length > 0 ? (
-                      paginatedUsers.map((user) => (
-                        <TableRow key={user.id}>
-                          <TableCell className="font-medium">{user.name}</TableCell>
-                          <TableCell className="hidden md:table-cell">{user.email}</TableCell>
-                          <TableCell>{user.branch}</TableCell>
-                          <TableCell>
-                            <Badge variant={getStatusVariant(user.status)}>{user.status}</Badge>
-                          </TableCell>
-                          <TableCell>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button aria-haspopup="true" size="icon" variant="ghost">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                  <span className="sr-only">Toggle menu</span>
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                {!approvalView && <DropdownMenuItem onClick={() => handleEdit(user)}>Edit</DropdownMenuItem>}
-                                {approvalView && user.status === 'Pending' && (
-                                  <>
-                                    <DropdownMenuItem onClick={() => handleStatusChange(user.id, 'Active')}>
-                                      <CheckCircle className="mr-2 h-4 w-4" />
-                                      Approve
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleStatusChange(user.id, 'Inactive')}>
-                                      <XCircle className="mr-2 h-4 w-4" />
-                                      Reject
-                                    </DropdownMenuItem>
-                                  </>
-                                )}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={5} className="h-24 text-center">
-                          No branch users found.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-            <CardFooter>
-                <div className="text-xs text-muted-foreground">
-                    Showing <strong>{paginatedUsers.length}</strong> of <strong>{filteredAndSortedUsers.length}</strong> users
-                </div>
-                <div className="ml-auto flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                    >
-                        Previous
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setCurrentPage(prev => prev + 1)}
-                        disabled={currentPage * ITEMS_PER_PAGE >= filteredAndSortedUsers.length}
-                    >
-                        Next
-                    </Button>
-                </div>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-      </Tabs>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add New Branch User</DialogTitle>
-        </DialogHeader>
-        <AddBranchUserForm setOpen={setIsAddUserOpen} />
-      </DialogContent>
-    </Dialog>
-    <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
-        <DialogContent>
-            <DialogHeader>
-                <DialogTitle>Edit Branch User</DialogTitle>
-            </DialogHeader>
-            {selectedUser && selectedUser.hasOwnProperty('branch') && (
-                <EditBranchUserForm
-                    user={selectedUser as BranchUser}
-                    setOpen={setIsEditUserOpen}
-                />
-            )}
-        </DialogContent>
-    </Dialog>
-    </>
-  );
+model account_infos {
+  ID            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ACCOUNTNUMBER String    @db.VarChar(50)
+  PHONENUMBER   String    @db.VarChar(15)
+  FULLNAME      String?   @db.VarChar(100)
+  GENDER        String?   @db.Text
+  VALUE1        String?   @db.Text
+  VALUE2        String?   @db.Text
+  INSERTDATE    DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER    String?   @db.Text
+  UPDATEUSER    String?   @db.Text
+
+  @@map("account_infos")
+}
+
+model allowed_companies {
+  Oid                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ID                  String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ACCOUNTNUMBER       String    @db.VarChar(50)
+  FIELDNAME           String?   @db.VarChar(100)
+  APPROVEUSER         String?   @db.VarChar(100)
+  APPROVED            Boolean   @default(false)
+  STATUS              Boolean   @default(true)
+  INSERTDATE          DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE          DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER          String?   @db.Text
+  UPDATEUSER          String?   @db.Text
+  OptimisticLockField Int?
+  GCRecord            Int?
+  branchName          String?   @db.VarChar(200)
+
+  @@map("allowed_companies")
+}
+
+model app_updates {
+  ID               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  COMPARINGVERSION Float     @db.DoublePrecision
+  LATESTVERSION    Float     @db.DoublePrecision
+  DESCRIPTION      String?   @db.VarChar(2000)
+  ISFORCED         Boolean?
+  INSERTDATE       DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE       DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER       String?   @db.Text
+  UPDATEUSER       String?   @db.Text
+
+  @@map("app_updates")
+}
+
+model arif_requests {
+  NONCEID                  String    @id @db.Uuid
+  SESSIONID                String?   @db.VarChar(500)
+  DEBITACCOUNT             String    @db.VarChar(30)
+  CREDITACCOUNT            String    @db.VarChar(30)
+  AMOUNT                   Decimal   @db.Decimal
+  MERCHANTACCOUNT          String    @db.VarChar(30)
+  SALESPHONE               String    @db.VarChar(20)
+  ARIFPAYTRANSACTIONID     String?   @db.VarChar(100)
+  ARIFPAYTRANSACTIONSTATUS String?   @db.VarChar(50)
+  T24TRANSACTIONSTATUS     String?   @db.VarChar(50)
+  REQUEST1                 String?   @db.Text
+  RESPONSE1                String?   @db.Text
+  REQUEST2                 String?   @db.Text
+  RESPONSE2                String?   @db.Text
+  REQUEST3                 String?   @db.Text
+  RESPONSE3                String?   @db.Text
+  WEBHOOKRESPONSE          String?   @db.Text
+  ERROR1                   String?   @db.VarChar(20)
+  MESSAGE1                 String?   @db.Text
+  ERROR2                   String?   @db.VarChar(20)
+  MESSAGE2                 String?   @db.Text
+  ERROR3                   String?   @db.VarChar(20)
+  MESSAGE3                 String?   @db.Text
+  DATESEND1                DateTime  @db.Timestamp()
+  DATERECIVED1             DateTime  @db.Timestamp()
+  DATESEND2                DateTime  @default(now()) @db.Timestamp()
+  DATERECIVED2             DateTime  @default(now()) @db.Timestamp()
+  DATESEND3                DateTime  @db.Timestamp()
+  DATERECIVED3             DateTime  @db.Timestamp()
+  WEBHOOKRECEIVEDDATE      DateTime  @db.Timestamp()
+  INSERTUSER               String?   @db.Text
+  UPDATEUSER               String?   @db.Text
+  T24TRANSACTIONID         String?   @db.VarChar(150)
+
+  @@map("arif_requests")
+}
+
+model arifpay_endpoints {
+  ID                 String    @id @db.Uuid
+  BANK               String    @db.Text
+  DISPLAYNAME        String    @db.VarChar(100)
+  OTPLENGTH          Int
+  ORDER              Int
+  ENDPOINT1          String?   @db.Text
+  ENDPOINT2          String?   @db.Text
+  ENDPOINT3          String?   @db.Text
+  CANCELURL          String    @db.Text
+  ERRORURL           String    @db.Text
+  SUCCESSURL         String    @db.Text
+  NOTIFYURL          String    @db.Text
+  ISTWOSTEP          Boolean
+  ISOTP              Boolean
+  TRANSACTIONTYPE    String?   @db.VarChar(500)
+  BENEFICIARYACCOUNT String    @db.VarChar(50)
+  BENEFICIARYBANK    String    @db.VarChar(100)
+  IMAGEURL           String?   @db.Text
+  INSERTDATE         DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE         DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER         String?   @db.Text
+  UPDATEUSER         String?   @db.Text
+
+  @@map("arifpay_endpoints")
+}
+
+model controllersconfigs {
+  ID            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  CONTROLLERKEY String    @db.Text
+  APIKEY        String?   @db.Text
+  INSERTDATE    DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER    String?   @db.Text
+  UPDATEUSER    String?   @db.Text
+
+  @@map("controllersconfigs")
+}
+
+model core_integration_settings {
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  UNIQUEKEY  String?   @db.VarChar(100)
+  ADDRESS    String    @db.Text
+  USERNAME   String    @db.VarChar(200)
+  PASSWORD   String?   @db.VarChar(500)
+  INSERTDATE DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER String?   @db.Text
+  UPDATEUSER String?   @db.Text
+
+  @@map("core_integration_settings")
+}
+
+model merchant_txns {
+  ID                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  MERCHANTACCOUNT    String    @db.VarChar(20)
+  MERCHANTPHONE      String    @db.VarChar(15)
+  AMOUNT             Decimal?  @db.Decimal
+  TXNID              String?   @db.VarChar(200)
+  CUSTOMERNAME       String?   @db.VarChar(100)
+  CUSTOMERACCOUNT    String?   @db.VarChar(50)
+  T24USER            String?   @db.VarChar(20)
+  T2TRANSACTIONDATE  DateTime? @db.Timestamp()
+  STATUS             String?   @db.VarChar(15)
+  TRANSACTIONCHANNEL String?   @db.VarChar(50)
+  TRANSACTIONSERVICE String?   @db.VarChar(50)
+  VALUE1             String?   @db.Text
+  VALUE2             String?   @db.Text
+  VALUE3             String?   @db.Text
+  INSERTDATE         DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE         DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER         String?   @db.Text
+  UPDATEUSER         String?   @db.Text
+
+  @@map("merchant_txns")
+}
+
+model merchants_daily_balances {
+  ID              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  MERCHANTACCOUNT String    @db.VarChar(50)
+  MERCHANTPHONE   String    @db.VarChar(15)
+  DAILYBALANCE    Decimal?  @db.Decimal
+  DAILYTXNCOUNT   BigInt    @default(0)
+  BALANCEDATE     DateTime? @db.Timestamp()
+  INSERTDATE      DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE      DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER      String?   @default("system") @db.Text
+  UPDATEUSER      String?   @default("system") @db.Text
+
+  @@map("merchants_daily_balances")
+}
+
+model paystream_txns {
+  ID                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  MERCHANTACCOUNTNUMBER String    @db.VarChar(50)
+  SALERPHONENUMBER      String    @db.VarChar(15)
+  TICKET                String?   @db.VarChar(500)
+  ISCOMPLETED           Boolean?
+  AMOUNT                String?   @db.Text
+  PAYERACCOUNT          String?   @db.VarChar(50)
+  INSERTDATE            DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE            DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER            String?   @default("system") @db.Text
+  UPDATEUSER            String?   @default("system") @db.Text
+
+  @@map("paystream_txns")
+}
+
+model promo_adds {
+  ID           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ADDTITLE     String    @db.VarChar(100)
+  ADDSUBTITLE  String?   @db.Text
+  ADDADDRESS   String?   @db.Text
+  IMAGEADDRESS String?   @db.Text
+  ORDER        Int?
+  INSERTUSERID String?   @default("system") @db.Text
+  UPDATEUSERID String?   @default("system") @db.Text
+  INSERTDATE   DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE   DateTime? @default(now()) @db.Timestamp()
+
+  @@map("promo_adds")
+}
+
+model qr_payments {
+  ID               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  DEBITACCOUNT     String    @db.VarChar(50)
+  CREDITACCOUNT    String?   @db.VarChar(50)
+  SALERPHONENUMBER String?   @db.VarChar(15)
+  AMOUNT           Decimal   @db.Decimal
+  EXPIRETIME       DateTime  @db.Timestamp()
+  QRCODE           String    @db.Text
+  ISUSED           Boolean   @default(false)
+  INSERTDATE       DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE       DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER       String?   @default("system") @db.Text
+  UPDATEUSER       String?   @default("system") @db.Text
+
+  @@map("qr_payments")
+}
+
+model role_capablities {
+  ID           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ROLEID       String    @db.Uuid
+  MENUORDER    Int?
+  SUBMENUORDER Int?
+  MENUNAME     String?   @db.VarChar(100)
+  MENUNAME_am  String?   @db.VarChar(100)
+  ADDRESS      String?   @db.Text
+  PARENT       Boolean?
+  PARENTID     String?   @db.Uuid
+  VALUE3       String?   @db.Text
+  INSERTUSERID String?   @default("system") @db.Text
+  UPDATEUSERID String?   @default("system") @db.Text
+  INSERTDATE   DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE   DateTime? @default(now()) @db.Timestamp()
+  role         Roles     @relation(fields: [ROLEID], references: [ID], onDelete: Cascade)
+
+
+  @@map("role_capablities")
+}
+
+model stream_pay_settings {
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ADDRESS    String    @db.Text
+  IV         String    @db.Text
+  KEY        String    @db.Text
+  HV         String?   @db.Text
+  USERNAME   String?   @db.Text
+  PASSWORD   String?   @db.Text
+  INSERTDATE DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER String?   @default("system") @db.Text
+  UPDATEUSER String?   @default("system") @db.Text
+
+  @@map("stream_pay_settings")
+}
+
+model ussd_push_settings {
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ADDRESS    String    @db.Text
+  RESULTURL  String?   @db.Text
+  USERNAME   String?   @db.Text
+  PASSWORD   String?   @db.Text
+  INSERTDATE DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER String?   @default("system") @db.Text
+  UPDATEUSER String?   @default("system") @db.Text
+
+  @@map("ussd_push_settings")
+}
+
+model voucher_codess {
+  ID                    String    @id @db.Uuid
+  MERCHANTACCOUNTNUMBER String    @db.VarChar(50)
+  SALERPHONENUMBER      String    @db.VarChar(15)
+  PAYERACCOUNTNUMBER    String    @db.VarChar(50)
+  PAYERNAME             String    @db.VarChar(200)
+  PAYERPHONENUMBER      String    @db.VarChar(15)
+  AMOUNT                Decimal   @default(0.0) @db.Decimal
+  VOCHERCODE            String    @db.Text
+  ISUSED                Boolean   @default(false)
+  EXPIRETIME            DateTime  @default(now()) @db.Timestamp()
+  INSERTDATE            DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE            DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER            String?   @default("system") @db.Text
+  UPDATEUSER            String?   @default("system") @db.Text
+
+  @@map("voucher_codess")
 }

@@ -41,7 +41,7 @@ export async function PUT(
         IMAGEURL,
     } = body;
     
-    const [oldValue, updatedEndpoint] = await prisma.$transaction(async (tx) => {
+    const [_, updatedEndpoint] = await prisma.$transaction(async (tx) => {
       const oldValue = await tx.arifpay_endpoints.findUnique({
         where: { ID: id },
       });

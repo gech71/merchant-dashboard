@@ -8,6 +8,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model AuditLog {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tableName String
+  recordId  String
+  action    String
+  oldValue  Json?
+  newValue  Json?
+  changedBy String
+  changedAt DateTime @default(now())
+
+  @@map("audit_log")
+}
+
 model SystemUsers {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String
@@ -46,7 +59,7 @@ model Merchant_users {
   ACCOUNTNUMBER     String    @db.VarChar(20)
   FULLNAME          String?   @db.VarChar(100)
   ACCOUNTTYPE       String?   @db.VarChar(20)
-  PHONENUMBER       String?   @db.VarChar(15)
+  PHONENUMBER       String?   @unique @db.VarChar(15)
   ROLE              String?   @db.VarChar(20)
   DEVICENAME        String?   @db.VarChar(100)
   ENCRYPTIONKEY     String?   @db.Text
@@ -396,17 +409,4 @@ model voucher_codess {
   UPDATEUSER            String?   @default("system") @db.Text
 
   @@map("voucher_codess")
-}
-
-model AuditLog {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tableName String
-  recordId  String
-  action    String
-  oldValue  Json?
-  newValue  Json?
-  changedBy String
-  changedAt DateTime @default(now())
-
-  @@map("audit_log")
 }

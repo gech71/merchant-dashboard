@@ -1,133 +1,412 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
 
-'use client';
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-import * as React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+model AuditLog {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tableName String
+  recordId  String
+  action    String
+  oldValue  Json?
+  newValue  Json?
+  changedBy String
+  changedAt DateTime @default(now())
 
-import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { useDataContext } from '@/context/data-context';
-import type { Branch } from '@/types';
+  @@map("audit_log")
+}
 
-const branchFormSchema = z.object({
-  name: z.string().min(2, 'Branch name must be at least 2 characters.'),
-  code: z.string().min(2, 'Branch code must be at least 2 characters.'),
-  address: z.string().min(10, 'Address must be at least 10 characters.'),
-  contact: z.string().min(10, 'Contact number must be at least 10 characters.'),
-});
+model SystemUsers {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  email     String   @unique
+  password  String
+  status    String   @default("Pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  roleId    String?  @db.Uuid
+  role      Roles?   @relation(fields: [roleId], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_system_users_roles")
 
-type BranchFormValues = z.infer<typeof branchFormSchema>;
+  @@map("system_users")
+}
 
-export function AddBranchForm({ 
-  setOpen, 
-}: { 
-  setOpen: (open: boolean) => void,
-}) {
-  const { toast } = useToast();
-  const { addBranch } = useDataContext();
-  const [isLoading, setIsLoading] = React.useState(false);
+model Manage_otps {
+  ID            String    @id @db.Uuid
+  ACCOUNTNUMBER String    @db.VarChar(50)
+  PHONENUMBER   String    @db.VarChar(15)
+  FULLNAME      String?   @db.VarChar(100)
+  OTPSENT       DateTime  @db.Timestamp()
+  OTPEXPIRE     DateTime  @db.Timestamp()
+  SENTCHANNEL   String?   @db.VarChar(10)
+  OTPCODE       String    @default("") @db.Text
+  VALUE2        String?   @db.Text
+  VALUE3        String?   @db.Text
+  INSERTDATE    DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER    String?   @default("system") @db.Text
+  UPDATEUSER    String?   @default("system") @db.Text
 
-  const form = useForm<BranchFormValues>({
-    resolver: zodResolver(branchFormSchema),
-    defaultValues: {
-      name: '',
-      code: '',
-      address: '',
-      contact: '',
-    },
-  });
+  @@map("Manage_otps")
+}
 
-  async function onSubmit(data: BranchFormValues) {
-    setIsLoading(true);
-    try {
-        await addBranch(data);
-        toast({
-          title: 'Branch Added',
-          description: `${data.name} has been successfully added.`,
-        });
-        setOpen(false);
-    } catch (error) {
-        toast({
-            variant: 'destructive',
-            title: 'Failed to Add Branch',
-            description: 'An error occurred while trying to add the branch.',
-        });
-    } finally {
-        setIsLoading(false);
-    }
-  }
+model Merchant_users {
+  ID                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ACCOUNTNUMBER     String    @db.VarChar(20)
+  FULLNAME          String?   @db.VarChar(100)
+  ACCOUNTTYPE       String?   @db.VarChar(20)
+  PHONENUMBER       String?   @unique @db.VarChar(15)
+  ROLE              String?   @db.VarChar(20)
+  DEVICENAME        String?   @db.VarChar(100)
+  ENCRYPTIONKEY     String?   @db.Text
+  iV                String?   @db.Text
+  ISLOGGEDIN        Boolean?
+  authenticationkey String?   @db.Text
+  STATUS            String?   @db.VarChar(100)
+  FAILEDATTMEPTS    Int?      @default(0)
+  LASTLOGINATTEMPT  DateTime? @default(now()) @db.Timestamp()
+  ISLOCKED          Boolean?  @default(false)
+  UNLOCKEDTIME      DateTime? @default(now()) @db.Timestamp()
+  VALUE3            String?   @db.Text
+  INSERTUSERID      String?   @default("system") @db.Text
+  UPDATEUSERID      String?   @default("system") @db.Text
+  INSERTDATE        DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE        DateTime? @default(now()) @db.Timestamp()
+  roleId            String?   @db.Uuid
+  ApplicationRole   Roles?    @relation("MerchantUsersToRoles", fields: [roleId], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_merchant_users_roles")
 
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Branch Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Downtown Branch" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="code"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Branch Code</FormLabel>
-              <FormControl>
-                <Input placeholder="DT001" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-         <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Address</FormLabel>
-              <FormControl>
-                <Input placeholder="123 Main St, Anytown, USA" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-         <FormField
-          control={form.control}
-          name="contact"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Contact</FormLabel>
-              <FormControl>
-                <Input placeholder="555-1234" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isLoading}>Cancel</Button>
-            <Button type="submit" disabled={isLoading}>{isLoading ? 'Adding...' : 'Add Branch'}</Button>
-        </div>
-      </form>
-    </Form>
-  );
+  @@map("Merchant_users")
+}
+
+model Roles {
+  ID             String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ROLENAME       String                  @db.VarChar(100)
+  description    String?                 @db.Text
+  VALUE1         String?                 @db.Text
+  VALUE2         String?                 @db.Text
+  VALUE3         String?                 @db.Text
+  INSERTUSERID   String?                 @db.Text
+  UPDATEUSERID   String?                 @db.Text
+  INSERTDATE     DateTime?               @default(now()) @db.Timestamp()
+  UPDATEDATE     DateTime?               @default(now()) @db.Timestamp()
+  Merchant_users Merchant_users[]        @relation("MerchantUsersToRoles")
+  SystemUsers    SystemUsers[]
+  capabilities   role_capablities[]
+  permissions    dashboard_permissions[]
+
+  @@map("Roles")
+}
+
+model dashboard_permissions {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  page      String
+  roleId    String   @db.Uuid
+  role      Roles    @relation(fields: [roleId], references: [ID], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([roleId, page])
+  @@map("dashboard_permissions")
+}
+
+
+model account_infos {
+  ID            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ACCOUNTNUMBER String    @db.VarChar(50)
+  PHONENUMBER   String    @db.VarChar(15)
+  FULLNAME      String?   @db.VarChar(100)
+  GENDER        String?   @db.Text
+  VALUE1        String?   @db.Text
+  VALUE2        String?   @db.Text
+  INSERTDATE    DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER    String?   @db.Text
+  UPDATEUSER    String?   @db.Text
+
+  @@map("account_infos")
+}
+
+model allowed_companies {
+  Oid                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ID                  String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ACCOUNTNUMBER       String    @db.VarChar(50)
+  FIELDNAME           String?   @db.VarChar(100)
+  APPROVEUSER         String?   @db.VarChar(100)
+  APPROVED            Boolean   @default(false)
+  STATUS              Boolean   @default(true)
+  INSERTDATE          DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE          DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER          String?   @db.Text
+  UPDATEUSER          String?   @db.Text
+  OptimisticLockField Int?
+  GCRecord            Int?
+  branchName          String?   @db.VarChar(200)
+
+  @@map("allowed_companies")
+}
+
+model app_updates {
+  ID               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  COMPARINGVERSION Float     @db.DoublePrecision
+  LATESTVERSION    Float     @db.DoublePrecision
+  DESCRIPTION      String?   @db.VarChar(2000)
+  ISFORCED         Boolean?
+  INSERTDATE       DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE       DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER       String?   @db.Text
+  UPDATEUSER       String?   @db.Text
+
+  @@map("app_updates")
+}
+
+model arif_requests {
+  NONCEID                  String    @id @db.Uuid
+  SESSIONID                String?   @db.VarChar(500)
+  DEBITACCOUNT             String    @db.VarChar(30)
+  CREDITACCOUNT            String    @db.VarChar(30)
+  AMOUNT                   Decimal   @db.Decimal
+  MERCHANTACCOUNT          String    @db.VarChar(30)
+  SALESPHONE               String    @db.VarChar(20)
+  ARIFPAYTRANSACTIONID     String?   @db.VarChar(100)
+  ARIFPAYTRANSACTIONSTATUS String?   @db.VarChar(50)
+  T24TRANSACTIONSTATUS     String?   @db.VarChar(50)
+  REQUEST1                 String?   @db.Text
+  RESPONSE1                String?   @db.Text
+  REQUEST2                 String?   @db.Text
+  RESPONSE2                String?   @db.Text
+  REQUEST3                 String?   @db.Text
+  RESPONSE3                String?   @db.Text
+  WEBHOOKRESPONSE          String?   @db.Text
+  ERROR1                   String?   @db.VarChar(20)
+  MESSAGE1                 String?   @db.Text
+  ERROR2                   String?   @db.VarChar(20)
+  MESSAGE2                 String?   @db.Text
+  ERROR3                   String?   @db.VarChar(20)
+  MESSAGE3                 String?   @db.Text
+  DATESEND1                DateTime  @db.Timestamp()
+  DATERECIVED1             DateTime  @db.Timestamp()
+  DATESEND2                DateTime  @default(now()) @db.Timestamp()
+  DATERECIVED2             DateTime  @default(now()) @db.Timestamp()
+  DATESEND3                DateTime  @db.Timestamp()
+  DATERECIVED3             DateTime  @db.Timestamp()
+  WEBHOOKRECEIVEDDATE      DateTime  @db.Timestamp()
+  INSERTUSER               String?   @db.Text
+  UPDATEUSER               String?   @db.Text
+  T24TRANSACTIONID         String?   @db.VarChar(150)
+
+  @@map("arif_requests")
+}
+
+model arifpay_endpoints {
+  ID                 String    @id @db.Uuid
+  BANK               String    @db.Text
+  DISPLAYNAME        String    @db.VarChar(100)
+  OTPLENGTH          Int
+  ORDER              Int
+  ENDPOINT1          String?   @db.Text
+  ENDPOINT2          String?   @db.Text
+  ENDPOINT3          String?   @db.Text
+  CANCELURL          String    @db.Text
+  ERRORURL           String    @db.Text
+  SUCCESSURL         String    @db.Text
+  NOTIFYURL          String    @db.Text
+  ISTWOSTEP          Boolean
+  ISOTP              Boolean
+  TRANSACTIONTYPE    String?   @db.VarChar(500)
+  BENEFICIARYACCOUNT String    @db.VarChar(50)
+  BENEFICIARYBANK    String    @db.VarChar(100)
+  IMAGEURL           String?   @db.Text
+  INSERTDATE         DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE         DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER         String?   @db.Text
+  UPDATEUSER         String?   @db.Text
+
+  @@map("arifpay_endpoints")
+}
+
+model controllersconfigs {
+  ID            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  CONTROLLERKEY String    @db.Text
+  APIKEY        String?   @db.Text
+  INSERTDATE    DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER    String?   @db.Text
+  UPDATEUSER    String?   @db.Text
+
+  @@map("controllersconfigs")
+}
+
+model core_integration_settings {
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  UNIQUEKEY  String?   @db.VarChar(100)
+  ADDRESS    String    @db.Text
+  USERNAME   String    @db.VarChar(200)
+  PASSWORD   String?   @db.VarChar(500)
+  INSERTDATE DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER String?   @db.Text
+  UPDATEUSER String?   @db.Text
+
+  @@map("core_integration_settings")
+}
+
+model merchant_txns {
+  ID                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  MERCHANTACCOUNT    String    @db.VarChar(20)
+  MERCHANTPHONE      String    @db.VarChar(15)
+  AMOUNT             Decimal?  @db.Decimal
+  TXNID              String?   @db.VarChar(200)
+  CUSTOMERNAME       String?   @db.VarChar(100)
+  CUSTOMERACCOUNT    String?   @db.VarChar(50)
+  T24USER            String?   @db.VarChar(20)
+  T2TRANSACTIONDATE  DateTime? @db.Timestamp()
+  STATUS             String?   @db.VarChar(15)
+  TRANSACTIONCHANNEL String?   @db.VarChar(50)
+  TRANSACTIONSERVICE String?   @db.VarChar(50)
+  VALUE1             String?   @db.Text
+  VALUE2             String?   @db.Text
+  VALUE3             String?   @db.Text
+  INSERTDATE         DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE         DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER         String?   @db.Text
+  UPDATEUSER         String?   @db.Text
+
+  @@map("merchant_txns")
+}
+
+model merchants_daily_balances {
+  ID              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  MERCHANTACCOUNT String    @db.VarChar(50)
+  MERCHANTPHONE   String    @db.VarChar(15)
+  DAILYBALANCE    Decimal?  @db.Decimal
+  DAILYTXNCOUNT   BigInt    @default(0)
+  BALANCEDATE     DateTime? @db.Timestamp()
+  INSERTDATE      DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE      DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER      String?   @default("system") @db.Text
+  UPDATEUSER      String?   @default("system") @db.Text
+
+  @@map("merchants_daily_balances")
+}
+
+model paystream_txns {
+  ID                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  MERCHANTACCOUNTNUMBER String    @db.VarChar(50)
+  SALERPHONENUMBER      String    @db.VarChar(15)
+  TICKET                String?   @db.VarChar(500)
+  ISCOMPLETED           Boolean?
+  AMOUNT                String?   @db.Text
+  PAYERACCOUNT          String?   @db.VarChar(50)
+  INSERTDATE            DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE            DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER            String?   @default("system") @db.Text
+  UPDATEUSER            String?   @default("system") @db.Text
+
+  @@map("paystream_txns")
+}
+
+model promo_adds {
+  ID           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ADDTITLE     String    @db.VarChar(100)
+  ADDSUBTITLE  String?   @db.Text
+  ADDADDRESS   String?   @db.Text
+  IMAGEADDRESS String?   @db.Text
+  ORDER        Int?
+  INSERTUSERID String?   @default("system") @db.Text
+  UPDATEUSERID String?   @default("system") @db.Text
+  INSERTDATE   DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE   DateTime? @default(now()) @db.Timestamp()
+
+  @@map("promo_adds")
+}
+
+model qr_payments {
+  ID               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  DEBITACCOUNT     String    @db.VarChar(50)
+  CREDITACCOUNT    String?   @db.VarChar(50)
+  SALERPHONENUMBER String?   @db.VarChar(15)
+  AMOUNT           Decimal   @db.Decimal
+  EXPIRETIME       DateTime  @db.Timestamp()
+  QRCODE           String    @db.Text
+  ISUSED           Boolean   @default(false)
+  INSERTDATE       DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE       DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER       String?   @default("system") @db.Text
+  UPDATEUSER       String?   @default("system") @db.Text
+
+  @@map("qr_payments")
+}
+
+model role_capablities {
+  ID           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ROLEID       String    @db.Uuid
+  MENUORDER    Int?
+  SUBMENUORDER Int?
+  MENUNAME     String?   @db.VarChar(100)
+  MENUNAME_am  String?   @db.VarChar(100)
+  ADDRESS      String?   @db.Text
+  PARENT       Boolean?
+  PARENTID     String?   @db.Uuid
+  VALUE3       String?   @db.Text
+  INSERTUSERID String?   @default("system") @db.Text
+  UPDATEUSERID String?   @default("system") @db.Text
+  INSERTDATE   DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE   DateTime? @default(now()) @db.Timestamp()
+  role         Roles     @relation(fields: [ROLEID], references: [ID], onDelete: Cascade)
+
+
+  @@map("role_capablities")
+}
+
+model stream_pay_settings {
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ADDRESS    String    @db.Text
+  IV         String    @db.Text
+  KEY        String    @db.Text
+  HV         String?   @db.Text
+  USERNAME   String?   @db.Text
+  PASSWORD   String?   @db.Text
+  INSERTDATE DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER String?   @default("system") @db.Text
+  UPDATEUSER String?   @default("system") @db.Text
+
+  @@map("stream_pay_settings")
+}
+
+model ussd_push_settings {
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ADDRESS    String    @db.Text
+  RESULTURL  String?   @db.Text
+  USERNAME   String?   @db.Text
+  PASSWORD   String?   @db.Text
+  INSERTDATE DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER String?   @default("system") @db.Text
+  UPDATEUSER String?   @default("system") @db.Text
+
+  @@map("ussd_push_settings")
+}
+
+model voucher_codess {
+  ID                    String    @id @db.Uuid
+  MERCHANTACCOUNTNUMBER String    @db.VarChar(50)
+  SALERPHONENUMBER      String    @db.VarChar(15)
+  PAYERACCOUNTNUMBER    String    @db.VarChar(50)
+  PAYERNAME             String    @db.VarChar(200)
+  PAYERPHONENUMBER      String    @db.VarChar(15)
+  AMOUNT                Decimal   @default(0.0) @db.Decimal
+  VOCHERCODE            String    @db.Text
+  ISUSED                Boolean   @default(false)
+  EXPIRETIME            DateTime  @default(now()) @db.Timestamp()
+  INSERTDATE            DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE            DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER            String?   @default("system") @db.Text
+  UPDATEUSER            String?   @default("system") @db.Text
+
+  @@map("voucher_codess")
 }

@@ -121,7 +121,6 @@ const ALL_PAGES = [
   '/dashboard/role-capabilities',
   '/dashboard/approvals/allowed_companies',
   '/dashboard/role-management',
-  '/dashboard/system-users',
   '/dashboard/audit-log',
 ];
 
@@ -296,3 +295,5 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
+    

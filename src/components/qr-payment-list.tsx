@@ -1,186 +1,412 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
 
-'use client';
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-import * as React from 'react';
-import type { qr_payments } from '@/types';
-import { ArrowUpDown } from 'lucide-react';
+model AuditLog {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tableName String
+  recordId  String
+  action    String
+  oldValue  Json?
+  newValue  Json?
+  changedBy String
+  changedAt DateTime @default(now())
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useDataContext } from '@/context/data-context';
+  @@map("audit_log")
+}
 
-type SortableKeys = 'DEBITACCOUNT' | 'CREDITACCOUNT' | 'SALERPHONENUMBER' | 'AMOUNT' | 'EXPIRETIME' | 'ISUSED';
-const ITEMS_PER_PAGE = 15;
+model SystemUsers {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  email     String   @unique
+  password  String
+  status    String   @default("Pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  roleId    String?  @db.Uuid
+  role      Roles?   @relation(fields: [roleId], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_system_users_roles")
 
-export default function QrPaymentList({ qrPayments: initialQrPayments }: { qrPayments: qr_payments[] }) {
-  const { merchants } = useDataContext();
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [sortConfig, setSortConfig] = React.useState<{
-    key: SortableKeys;
-    direction: 'ascending' | 'descending';
-  } | null>({ key: 'EXPIRETIME', direction: 'descending' });
-  const [currentPage, setCurrentPage] = React.useState(1);
-  
-  const getSalerName = (phoneNumber: string | null) => {
-    if (!phoneNumber) return 'N/A';
-    const merchant = merchants.find(m => m.PHONENUMBER === phoneNumber);
-    return merchant ? merchant.FULLNAME : 'N/A';
-  }
+  @@map("system_users")
+}
 
-  const requestSort = (key: SortableKeys) => {
-    let direction: 'ascending' | 'descending' = 'ascending';
-    if (
-      sortConfig &&
-      sortConfig.key === key &&
-      sortConfig.direction === 'ascending'
-    ) {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  };
+model Manage_otps {
+  ID            String    @id @db.Uuid
+  ACCOUNTNUMBER String    @db.VarChar(50)
+  PHONENUMBER   String    @db.VarChar(15)
+  FULLNAME      String?   @db.VarChar(100)
+  OTPSENT       DateTime  @db.Timestamp()
+  OTPEXPIRE     DateTime  @db.Timestamp()
+  SENTCHANNEL   String?   @db.VarChar(10)
+  OTPCODE       String    @default("") @db.Text
+  VALUE2        String?   @db.Text
+  VALUE3        String?   @db.Text
+  INSERTDATE    DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER    String?   @default("system") @db.Text
+  UPDATEUSER    String?   @default("system") @db.Text
 
-  const filteredAndSortedPayments = React.useMemo(() => {
-    let sortableItems = [...initialQrPayments];
+  @@map("Manage_otps")
+}
 
-    if (searchTerm) {
-        const lowercasedTerm = searchTerm.toLowerCase();
-        sortableItems = sortableItems.filter((payment) =>
-            Object.values(payment).some(val => String(val).toLowerCase().includes(lowercasedTerm)) ||
-            getSalerName(payment.SALERPHONENUMBER).toLowerCase().includes(lowercasedTerm)
-      );
-    }
+model Merchant_users {
+  ID                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ACCOUNTNUMBER     String    @db.VarChar(20)
+  FULLNAME          String?   @db.VarChar(100)
+  ACCOUNTTYPE       String?   @db.VarChar(20)
+  PHONENUMBER       String?   @unique @db.VarChar(15)
+  ROLE              String?   @db.VarChar(20)
+  DEVICENAME        String?   @db.VarChar(100)
+  ENCRYPTIONKEY     String?   @db.Text
+  iV                String?   @db.Text
+  ISLOGGEDIN        Boolean?
+  authenticationkey String?   @db.Text
+  STATUS            String?   @db.VarChar(100)
+  FAILEDATTMEPTS    Int?      @default(0)
+  LASTLOGINATTEMPT  DateTime? @default(now()) @db.Timestamp()
+  ISLOCKED          Boolean?  @default(false)
+  UNLOCKEDTIME      DateTime? @default(now()) @db.Timestamp()
+  VALUE3            String?   @db.Text
+  INSERTUSERID      String?   @default("system") @db.Text
+  UPDATEUSERID      String?   @default("system") @db.Text
+  INSERTDATE        DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE        DateTime? @default(now()) @db.Timestamp()
+  roleId            String?   @db.Uuid
+  ApplicationRole   Roles?    @relation("MerchantUsersToRoles", fields: [roleId], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_merchant_users_roles")
 
-    if (sortConfig !== null) {
-      sortableItems.sort((a, b) => {
-        const valA = a[sortConfig.key] ?? '';
-        const valB = b[sortConfig.key] ?? '';
-        
-        if (typeof valA === 'boolean' && typeof valB === 'boolean') {
-          return sortConfig.direction === 'ascending' ? (valA === valB ? 0 : valA ? -1 : 1) : (valA === valB ? 0 : valA ? 1 : -1)
-        }
+  @@map("Merchant_users")
+}
 
-        if (valA < valB) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (valA > valB) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
+model Roles {
+  ID             String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ROLENAME       String                  @db.VarChar(100)
+  description    String?                 @db.Text
+  VALUE1         String?                 @db.Text
+  VALUE2         String?                 @db.Text
+  VALUE3         String?                 @db.Text
+  INSERTUSERID   String?                 @db.Text
+  UPDATEUSERID   String?                 @db.Text
+  INSERTDATE     DateTime?               @default(now()) @db.Timestamp()
+  UPDATEDATE     DateTime?               @default(now()) @db.Timestamp()
+  Merchant_users Merchant_users[]        @relation("MerchantUsersToRoles")
+  SystemUsers    SystemUsers[]
+  capabilities   role_capablities[]
+  permissions    dashboard_permissions[]
 
-    return sortableItems;
-  }, [initialQrPayments, searchTerm, sortConfig, merchants]);
+  @@map("Roles")
+}
 
-  const paginatedPayments = React.useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    return filteredAndSortedPayments.slice(startIndex, endIndex);
-  }, [filteredAndSortedPayments, currentPage]);
+model dashboard_permissions {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  page      String
+  roleId    String   @db.Uuid
+  role      Roles    @relation(fields: [roleId], references: [ID], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  const getSortIndicator = (key: SortableKeys) => {
-    if (sortConfig?.key !== key) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 opacity-30" />;
-    }
-    return <ArrowUpDown className="ml-2 h-4 w-4" />;
-  };
-  
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>QR Payments</CardTitle>
-        <CardDescription>
-          A log of all generated QR code payments.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center justify-end gap-2 py-4">
-          <Input
-            placeholder="Search QR payments..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
-        </div>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('DEBITACCOUNT')} className="px-2">Debit Account{getSortIndicator('DEBITACCOUNT')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('CREDITACCOUNT')} className="px-2">Credit Account{getSortIndicator('CREDITACCOUNT')}</Button></TableHead>
-                <TableHead>Saler</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('SALERPHONENUMBER')} className="px-2">Saler Phone{getSortIndicator('SALERPHONENUMBER')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('AMOUNT')} className="px-2">Amount{getSortIndicator('AMOUNT')}</Button></TableHead>
-                <TableHead>QR Code</TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('ISUSED')} className="px-2">Is Used{getSortIndicator('ISUSED')}</Button></TableHead>
-                <TableHead><Button variant="ghost" onClick={() => requestSort('EXPIRETIME')} className="px-2">Expire Time{getSortIndicator('EXPIRETIME')}</Button></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedPayments.length > 0 ? (
-                paginatedPayments.map((payment) => (
-                  <TableRow key={payment.ID}>
-                    <TableCell>{payment.DEBITACCOUNT}</TableCell>
-                    <TableCell>{payment.CREDITACCOUNT}</TableCell>
-                    <TableCell>{getSalerName(payment.SALERPHONENUMBER)}</TableCell>
-                    <TableCell>{payment.SALERPHONENUMBER}</TableCell>
-                    <TableCell className="text-right">{payment.AMOUNT.toFixed(2)}</TableCell>
-                    <TableCell className="font-mono text-xs">{payment.QRCODE}</TableCell>
-                    <TableCell><Badge variant={payment.ISUSED ? 'default' : 'secondary'}>{payment.ISUSED ? 'Yes' : 'No'}</Badge></TableCell>
-                    <TableCell>{payment.EXPIRETIME ? new Date(payment.EXPIRETIME).toLocaleString() : 'N/A'}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={8} className="h-24 text-center">
-                    No QR payments found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-      <CardFooter>
-          <div className="text-xs text-muted-foreground">
-              Showing <strong>{paginatedPayments.length}</strong> of <strong>{filteredAndSortedPayments.length}</strong> payments
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-              <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-              >
-                  Previous
-              </Button>
-              <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(prev => prev + 1)}
-                  disabled={currentPage * ITEMS_PER_PAGE >= filteredAndSortedPayments.length}
-              >
-                  Next
-              </Button>
-          </div>
-      </CardFooter>
-    </Card>
-  );
+  @@unique([roleId, page])
+  @@map("dashboard_permissions")
+}
+
+
+model account_infos {
+  ID            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ACCOUNTNUMBER String    @db.VarChar(50)
+  PHONENUMBER   String    @db.VarChar(15)
+  FULLNAME      String?   @db.VarChar(100)
+  GENDER        String?   @db.Text
+  VALUE1        String?   @db.Text
+  VALUE2        String?   @db.Text
+  INSERTDATE    DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER    String?   @db.Text
+  UPDATEUSER    String?   @db.Text
+
+  @@map("account_infos")
+}
+
+model allowed_companies {
+  Oid                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ID                  String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ACCOUNTNUMBER       String    @db.VarChar(50)
+  FIELDNAME           String?   @db.VarChar(100)
+  APPROVEUSER         String?   @db.VarChar(100)
+  APPROVED            Boolean   @default(false)
+  STATUS              Boolean   @default(true)
+  INSERTDATE          DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE          DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER          String?   @db.Text
+  UPDATEUSER          String?   @db.Text
+  OptimisticLockField Int?
+  GCRecord            Int?
+  branchName          String?   @db.VarChar(200)
+
+  @@map("allowed_companies")
+}
+
+model app_updates {
+  ID               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  COMPARINGVERSION Float     @db.DoublePrecision
+  LATESTVERSION    Float     @db.DoublePrecision
+  DESCRIPTION      String?   @db.VarChar(2000)
+  ISFORCED         Boolean?
+  INSERTDATE       DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE       DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER       String?   @db.Text
+  UPDATEUSER       String?   @db.Text
+
+  @@map("app_updates")
+}
+
+model arif_requests {
+  NONCEID                  String    @id @db.Uuid
+  SESSIONID                String?   @db.VarChar(500)
+  DEBITACCOUNT             String    @db.VarChar(30)
+  CREDITACCOUNT            String    @db.VarChar(30)
+  AMOUNT                   Decimal   @db.Decimal
+  MERCHANTACCOUNT          String    @db.VarChar(30)
+  SALESPHONE               String    @db.VarChar(20)
+  ARIFPAYTRANSACTIONID     String?   @db.VarChar(100)
+  ARIFPAYTRANSACTIONSTATUS String?   @db.VarChar(50)
+  T24TRANSACTIONSTATUS     String?   @db.VarChar(50)
+  REQUEST1                 String?   @db.Text
+  RESPONSE1                String?   @db.Text
+  REQUEST2                 String?   @db.Text
+  RESPONSE2                String?   @db.Text
+  REQUEST3                 String?   @db.Text
+  RESPONSE3                String?   @db.Text
+  WEBHOOKRESPONSE          String?   @db.Text
+  ERROR1                   String?   @db.VarChar(20)
+  MESSAGE1                 String?   @db.Text
+  ERROR2                   String?   @db.VarChar(20)
+  MESSAGE2                 String?   @db.Text
+  ERROR3                   String?   @db.VarChar(20)
+  MESSAGE3                 String?   @db.Text
+  DATESEND1                DateTime  @db.Timestamp()
+  DATERECIVED1             DateTime  @db.Timestamp()
+  DATESEND2                DateTime  @default(now()) @db.Timestamp()
+  DATERECIVED2             DateTime  @default(now()) @db.Timestamp()
+  DATESEND3                DateTime  @db.Timestamp()
+  DATERECIVED3             DateTime  @db.Timestamp()
+  WEBHOOKRECEIVEDDATE      DateTime  @db.Timestamp()
+  INSERTUSER               String?   @db.Text
+  UPDATEUSER               String?   @db.Text
+  T24TRANSACTIONID         String?   @db.VarChar(150)
+
+  @@map("arif_requests")
+}
+
+model arifpay_endpoints {
+  ID                 String    @id @db.Uuid
+  BANK               String    @db.Text
+  DISPLAYNAME        String    @db.VarChar(100)
+  OTPLENGTH          Int
+  ORDER              Int
+  ENDPOINT1          String?   @db.Text
+  ENDPOINT2          String?   @db.Text
+  ENDPOINT3          String?   @db.Text
+  CANCELURL          String    @db.Text
+  ERRORURL           String    @db.Text
+  SUCCESSURL         String    @db.Text
+  NOTIFYURL          String    @db.Text
+  ISTWOSTEP          Boolean
+  ISOTP              Boolean
+  TRANSACTIONTYPE    String?   @db.VarChar(500)
+  BENEFICIARYACCOUNT String    @db.VarChar(50)
+  BENEFICIARYBANK    String    @db.VarChar(100)
+  IMAGEURL           String?   @db.Text
+  INSERTDATE         DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE         DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER         String?   @db.Text
+  UPDATEUSER         String?   @db.Text
+
+  @@map("arifpay_endpoints")
+}
+
+model controllersconfigs {
+  ID            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  CONTROLLERKEY String    @db.Text
+  APIKEY        String?   @db.Text
+  INSERTDATE    DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE    DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER    String?   @db.Text
+  UPDATEUSER    String?   @db.Text
+
+  @@map("controllersconfigs")
+}
+
+model core_integration_settings {
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  UNIQUEKEY  String?   @db.VarChar(100)
+  ADDRESS    String    @db.Text
+  USERNAME   String    @db.VarChar(200)
+  PASSWORD   String?   @db.VarChar(500)
+  INSERTDATE DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER String?   @db.Text
+  UPDATEUSER String?   @db.Text
+
+  @@map("core_integration_settings")
+}
+
+model merchant_txns {
+  ID                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  MERCHANTACCOUNT    String    @db.VarChar(20)
+  MERCHANTPHONE      String    @db.VarChar(15)
+  AMOUNT             Decimal?  @db.Decimal
+  TXNID              String?   @db.VarChar(200)
+  CUSTOMERNAME       String?   @db.VarChar(100)
+  CUSTOMERACCOUNT    String?   @db.VarChar(50)
+  T24USER            String?   @db.VarChar(20)
+  T2TRANSACTIONDATE  DateTime? @db.Timestamp()
+  STATUS             String?   @db.VarChar(15)
+  TRANSACTIONCHANNEL String?   @db.VarChar(50)
+  TRANSACTIONSERVICE String?   @db.VarChar(50)
+  VALUE1             String?   @db.Text
+  VALUE2             String?   @db.Text
+  VALUE3             String?   @db.Text
+  INSERTDATE         DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE         DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER         String?   @db.Text
+  UPDATEUSER         String?   @db.Text
+
+  @@map("merchant_txns")
+}
+
+model merchants_daily_balances {
+  ID              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  MERCHANTACCOUNT String    @db.VarChar(50)
+  MERCHANTPHONE   String    @db.VarChar(15)
+  DAILYBALANCE    Decimal?  @db.Decimal
+  DAILYTXNCOUNT   BigInt    @default(0)
+  BALANCEDATE     DateTime? @db.Timestamp()
+  INSERTDATE      DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE      DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER      String?   @default("system") @db.Text
+  UPDATEUSER      String?   @default("system") @db.Text
+
+  @@map("merchants_daily_balances")
+}
+
+model paystream_txns {
+  ID                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  MERCHANTACCOUNTNUMBER String    @db.VarChar(50)
+  SALERPHONENUMBER      String    @db.VarChar(15)
+  TICKET                String?   @db.VarChar(500)
+  ISCOMPLETED           Boolean?
+  AMOUNT                String?   @db.Text
+  PAYERACCOUNT          String?   @db.VarChar(50)
+  INSERTDATE            DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE            DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER            String?   @default("system") @db.Text
+  UPDATEUSER            String?   @default("system") @db.Text
+
+  @@map("paystream_txns")
+}
+
+model promo_adds {
+  ID           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ADDTITLE     String    @db.VarChar(100)
+  ADDSUBTITLE  String?   @db.Text
+  ADDADDRESS   String?   @db.Text
+  IMAGEADDRESS String?   @db.Text
+  ORDER        Int?
+  INSERTUSERID String?   @default("system") @db.Text
+  UPDATEUSERID String?   @default("system") @db.Text
+  INSERTDATE   DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE   DateTime? @default(now()) @db.Timestamp()
+
+  @@map("promo_adds")
+}
+
+model qr_payments {
+  ID               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  DEBITACCOUNT     String    @db.VarChar(50)
+  CREDITACCOUNT    String?   @db.VarChar(50)
+  SALERPHONENUMBER String?   @db.VarChar(15)
+  AMOUNT           Decimal   @db.Decimal
+  EXPIRETIME       DateTime  @db.Timestamp()
+  QRCODE           String    @db.Text
+  ISUSED           Boolean   @default(false)
+  INSERTDATE       DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE       DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER       String?   @default("system") @db.Text
+  UPDATEUSER       String?   @default("system") @db.Text
+
+  @@map("qr_payments")
+}
+
+model role_capablities {
+  ID           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ROLEID       String    @db.Uuid
+  MENUORDER    Int?
+  SUBMENUORDER Int?
+  MENUNAME     String?   @db.VarChar(100)
+  MENUNAME_am  String?   @db.VarChar(100)
+  ADDRESS      String?   @db.Text
+  PARENT       Boolean?
+  PARENTID     String?   @db.Uuid
+  VALUE3       String?   @db.Text
+  INSERTUSERID String?   @default("system") @db.Text
+  UPDATEUSERID String?   @default("system") @db.Text
+  INSERTDATE   DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE   DateTime? @default(now()) @db.Timestamp()
+  role         Roles     @relation(fields: [ROLEID], references: [ID], onDelete: Cascade)
+
+
+  @@map("role_capablities")
+}
+
+model stream_pay_settings {
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ADDRESS    String    @db.Text
+  IV         String    @db.Text
+  KEY        String    @db.Text
+  HV         String?   @db.Text
+  USERNAME   String?   @db.Text
+  PASSWORD   String?   @db.Text
+  INSERTDATE DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER String?   @default("system") @db.Text
+  UPDATEUSER String?   @default("system") @db.Text
+
+  @@map("stream_pay_settings")
+}
+
+model ussd_push_settings {
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ADDRESS    String    @db.Text
+  RESULTURL  String?   @db.Text
+  USERNAME   String?   @db.Text
+  PASSWORD   String?   @db.Text
+  INSERTDATE DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER String?   @default("system") @db.Text
+  UPDATEUSER String?   @default("system") @db.Text
+
+  @@map("ussd_push_settings")
+}
+
+model voucher_codess {
+  ID                    String    @id @db.Uuid
+  MERCHANTACCOUNTNUMBER String    @db.VarChar(50)
+  SALERPHONENUMBER      String    @db.VarChar(15)
+  PAYERACCOUNTNUMBER    String    @db.VarChar(50)
+  PAYERNAME             String    @db.VarChar(200)
+  PAYERPHONENUMBER      String    @db.VarChar(15)
+  AMOUNT                Decimal   @default(0.0) @db.Decimal
+  VOCHERCODE            String    @db.Text
+  ISUSED                Boolean   @default(false)
+  EXPIRETIME            DateTime  @default(now()) @db.Timestamp()
+  INSERTDATE            DateTime? @default(now()) @db.Timestamp()
+  UPDATEDATE            DateTime? @default(now()) @db.Timestamp()
+  INSERTUSER            String?   @default("system") @db.Text
+  UPDATEUSER            String?   @default("system") @db.Text
+
+  @@map("voucher_codess")
 }
