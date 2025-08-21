@@ -30,6 +30,7 @@ import JSONPretty from 'react-json-pretty';
 import 'react-json-pretty/themes/monikai.css';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 
 type SortableKeys = 'tableName' | 'recordId' | 'action' | 'changedBy' | 'changedAt';
@@ -39,6 +40,7 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
   const { systemUsers, merchants, auditLogs, restoreFromAuditLog } = useDataContext();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchField, setSearchField] = React.useState('all');
   const [sortConfig, setSortConfig] = React.useState<{
     key: SortableKeys;
     direction: 'ascending' | 'descending';
@@ -99,10 +101,17 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
 
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
-      sortableItems = sortableItems.filter((log) =>
-        Object.values(log).some(val => String(val).toLowerCase().includes(lowercasedTerm)) ||
-        getUserName(log.changedBy).toLowerCase().includes(lowercasedTerm)
-      );
+      sortableItems = sortableItems.filter((log) => {
+        if (searchField === 'all') {
+          return Object.values(log).some(val => String(val).toLowerCase().includes(lowercasedTerm)) ||
+                 getUserName(log.changedBy).toLowerCase().includes(lowercasedTerm);
+        }
+        if (searchField === 'changedBy') {
+          return getUserName(log.changedBy).toLowerCase().includes(lowercasedTerm);
+        }
+        const fieldValue = log[searchField as keyof AuditLog] as string;
+        return fieldValue?.toString().toLowerCase().includes(lowercasedTerm);
+      });
     }
 
     if (sortConfig !== null) {
@@ -116,7 +125,7 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
     }
 
     return sortableItems;
-  }, [auditLogs, searchTerm, sortConfig]);
+  }, [auditLogs, searchTerm, searchField, sortConfig]);
 
   const paginatedLogs = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -147,7 +156,19 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
         <CardDescription>A record of all data modifications in the system.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-end py-4">
+        <div className="flex items-center justify-end gap-2 py-4">
+           <Select value={searchField} onValueChange={setSearchField}>
+              <SelectTrigger className="h-9 w-[180px]">
+                <SelectValue placeholder="Search by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Fields</SelectItem>
+                <SelectItem value="tableName">Table Name</SelectItem>
+                <SelectItem value="action">Action</SelectItem>
+                <SelectItem value="recordId">Record ID</SelectItem>
+                <SelectItem value="changedBy">Changed By</SelectItem>
+              </SelectContent>
+            </Select>
           <Input
             placeholder="Search logs..."
             value={searchTerm}
@@ -188,14 +209,8 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
                               Change record for {log.tableName} at {format(new Date(log.changedAt), 'PPpp')}
                             </DialogDescription>
                           </DialogHeader>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
-                            <div>
-                                <h3 className="font-semibold mb-2">Old Value</h3>
-                                <div className="p-2 border rounded-md bg-muted/50 text-xs">
-                                    <JSONPretty data={parseJsonData(log.oldValue)} themeClassName="bg-transparent p-0" />
-                                </div>
-                            </div>
-                            <div>
+                          <div className="grid grid-cols-1 gap-4 max-h-[60vh] overflow-y-auto">
+                             <div>
                                 <h3 className="font-semibold mb-2">New Value</h3>
                                 <div className="p-2 border rounded-md bg-muted/50 text-xs">
                                 {log.newValue ? (
@@ -203,6 +218,12 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
                                 ) : (
                                     <p className="text-muted-foreground">N/A (Record Deleted)</p>
                                 )}
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="font-semibold mb-2">Old Value</h3>
+                                <div className="p-2 border rounded-md bg-muted/50 text-xs">
+                                    <JSONPretty data={parseJsonData(log.oldValue)} themeClassName="bg-transparent p-0" />
                                 </div>
                             </div>
                           </div>
