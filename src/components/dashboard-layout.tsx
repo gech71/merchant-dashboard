@@ -26,6 +26,7 @@ import {
   UserCog,
   Shield,
   History,
+  Users2,
 } from 'lucide-react';
 
 import {
@@ -70,6 +71,7 @@ const ALL_NAV_ITEMS = [
   { group: 'System Settings', href: '/dashboard/ussd-push-settings', icon: Smartphone, label: 'USSD Push Settings' },
   { group: 'System Settings', href: '/dashboard/role-capabilities', icon: Shield, label: 'Role Capabilities' },
   { group: 'Approvals', href: '/dashboard/approvals/allowed_companies', icon: Building, label: 'Allowed Companies' },
+  { group: 'Administration', href: '/dashboard/system-users', icon: Users2, label: 'System Users' },
   { group: 'Administration', href: '/dashboard/role-management', icon: UserCog, label: 'Role Management' },
   { group: 'Administration', href: '/dashboard/audit-log', icon: History, label: 'Audit Log' },
 ];
