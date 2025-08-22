@@ -57,6 +57,7 @@ type DataContextType = Omit<InitialData, 'systemUsers'> & {
   updateStreamPaySetting: (setting: stream_pay_settings) => Promise<void>;
   updateCoreIntegrationSetting: (setting: core_integration_settings) => Promise<void>;
   updateControllersConfig: (config: controllersconfigs) => Promise<void>;
+  addArifpayEndpoint: (endpoint: Omit<arifpay_endpoints, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER'>) => Promise<void>;
   updateArifpayEndpoint: (endpoint: arifpay_endpoints) => Promise<void>;
   deleteArifpayEndpoint: (id: string) => Promise<void>;
   addPromoAd: (ad: Omit<promo_adds, 'ID' | 'INSERTUSERID' | 'UPDATEUSERID' | 'INSERTDATE' | 'UPDATEDATE'>) => Promise<void>;
@@ -448,6 +449,18 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     setAuditLogs(prev => [auditLog, ...prev]);
   };
 
+  const addArifpayEndpoint = async (endpoint: Omit<arifpay_endpoints, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER'>) => {
+    const response = await fetch(`/api/arifpay-endpoints`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(endpoint),
+    });
+    if (!response.ok) throw new Error('Failed to create ArifPay endpoint');
+    const { endpoint: newEndpoint, auditLog } = await response.json();
+    setArifpayEndpoints((prev) => [...prev, newEndpoint]);
+    setAuditLogs(prev => [auditLog, ...prev]);
+  };
+
   const updateArifpayEndpoint = async (endpoint: arifpay_endpoints) => {
     const response = await fetch(`/api/arifpay-endpoints/${endpoint.ID}`, {
         method: 'PUT',
@@ -571,6 +584,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     updateStreamPaySetting,
     updateCoreIntegrationSetting,
     updateControllersConfig,
+    addArifpayEndpoint,
     updateArifpayEndpoint,
     deleteArifpayEndpoint,
     addPromoAd,

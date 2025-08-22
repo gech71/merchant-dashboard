@@ -1,9 +1,8 @@
-
 'use client';
 
 import * as React from 'react';
 import type { arifpay_endpoints } from '@/types';
-import { ArrowUpDown, Edit, MoreHorizontal, Trash2 } from 'lucide-react';
+import { ArrowUpDown, Edit, MoreHorizontal, Trash2, PlusCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,9 +28,10 @@ import Image from 'next/image';
 import { useDataContext } from '@/context/data-context';
 import { useToast } from '@/hooks/use-toast';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 import { EditArifpayEndpointForm } from './edit-arifpay-endpoint-form';
+import { AddArifpayEndpointForm } from './add-arifpay-endpoint-form';
 
 type SortableKeys = 'BANK' | 'DISPLAYNAME' | 'ORDER' | 'TRANSACTIONTYPE' | 'OTPLENGTH' | 'BENEFICIARYBANK';
 const ITEMS_PER_PAGE = 10;
@@ -46,6 +46,7 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
     direction: 'ascending' | 'descending';
   } | null>({ key: 'ORDER', direction: 'ascending' });
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [selectedEndpoint, setSelectedEndpoint] = React.useState<arifpay_endpoints | null>(null);
 
@@ -125,8 +126,26 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
     <>
       <Card>
         <CardHeader>
-          <CardTitle>ArifPay Endpoints</CardTitle>
-          <CardDescription>A list of all configured ArifPay payment gateway endpoints.</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>ArifPay Endpoints</CardTitle>
+              <CardDescription>A list of all configured ArifPay payment gateway endpoints.</CardDescription>
+            </div>
+             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <DialogTrigger asChild>
+                    <Button size="sm" className="h-9 gap-1">
+                        <PlusCircle className="h-4 w-4" />
+                        <span>Add New Endpoint</span>
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[800px]">
+                    <DialogHeader>
+                        <DialogTitle>Add New ArifPay Endpoint</DialogTitle>
+                    </DialogHeader>
+                    <AddArifpayEndpointForm setOpen={setIsAddDialogOpen} />
+                </DialogContent>
+            </Dialog>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-end py-4">
@@ -176,7 +195,7 @@ export default function ArifpayEndpointList({ arifpayEndpoints: initialArifpayEn
                       <TableRow key={endpoint.ID}>
                           <TableCell>
                               <div className="h-10 w-10 bg-muted rounded-full flex items-center justify-center overflow-hidden">
-                                  <Image src={endpoint.IMAGEURL} alt={endpoint.BANK} width={40} height={40} className="object-cover" data-ai-hint="bank logo" />
+                                  <Image src={endpoint.IMAGEURL ?? `https://placehold.co/40x40.png`} alt={endpoint.BANK} width={40} height={40} className="object-cover" data-ai-hint="bank logo" />
                               </div>
                           </TableCell>
                           <TableCell className="font-medium">{endpoint.BANK}</TableCell>
