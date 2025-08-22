@@ -26,13 +26,14 @@ export default function DashboardLayout({
     }
     
     if (currentUser) {
-        const authorized = currentUser.permissions?.includes(pathname) ?? false;
-        // The root dashboard page is always allowed if the user is logged in
-        if (pathname === '/dashboard') {
-            setIsAuthorized(true);
-        } else {
-            setIsAuthorized(authorized);
-        }
+      router.push('/login');
+        // const authorized = currentUser.permissions?.includes(pathname) ?? false;
+        // // The root dashboard page is always allowed if the user is logged in
+        // if (pathname === '/dashboard') {
+        //     setIsAuthorized(true);
+        // } else {
+        //     setIsAuthorized(authorized);
+        // }
     }
   }, [currentUser, pathname, router]);
 

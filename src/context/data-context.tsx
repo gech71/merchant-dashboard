@@ -50,6 +50,7 @@ type DataContextType = Omit<InitialData, 'systemUsers'> & {
   updateSystemUserStatus: (userId: string, status: 'Active' | 'Inactive') => Promise<void>;
   addSystemUser: (user: Omit<SystemUser, 'id' | 'role' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateUserRole: (userId: string, roleId: string, userType: 'merchant' | 'system') => Promise<void>;
+  addRoleCapability: (capability: Omit<role_capablities, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSERID' | 'UPDATEUSERID'>) => Promise<void>;
   deleteRoleCapability: (id: string) => Promise<void>;
   updateRoleCapability: (capability: role_capablities) => Promise<void>;
   updateUssdPushSetting: (setting: ussd_push_settings) => Promise<void>;
@@ -364,6 +365,18 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     }
   };
 
+  const addRoleCapability = async (capability: Omit<role_capablities, 'ID' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSERID' | 'UPDATEUSERID'>) => {
+    const response = await fetch('/api/role-capabilities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(capability),
+    });
+    if (!response.ok) throw new Error('Failed to create role capability');
+    const { capability: newCapability, auditLog } = await response.json();
+    setRoleCapabilities(prev => [...prev, newCapability]);
+    setAuditLogs(prev => [auditLog, ...prev]);
+  };
+
   const deleteRoleCapability = async (id: string) => {
     const response = await fetch(`/api/role-capabilities/${id}`, {
       method: 'DELETE',
@@ -551,6 +564,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
     updateSystemUser,
     updateSystemUserStatus,
     updateUserRole,
+    addRoleCapability,
     deleteRoleCapability,
     updateRoleCapability,
     updateUssdPushSetting,

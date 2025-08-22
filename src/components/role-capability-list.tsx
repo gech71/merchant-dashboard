@@ -1,8 +1,9 @@
+
 'use client';
 
 import * as React from 'react';
 import type { role_capablities } from '@/types';
-import { ArrowUpDown, Edit, MoreHorizontal, Trash2 } from 'lucide-react';
+import { ArrowUpDown, Edit, MoreHorizontal, Trash2, PlusCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,6 +44,7 @@ import { Badge } from './ui/badge';
 import { useDataContext } from '@/context/data-context';
 import { useToast } from '@/hooks/use-toast';
 import { EditRoleCapabilityForm } from './edit-role-capability-form';
+import { AddRoleCapabilityForm } from './add-role-capability-form';
 
 type SortableKeys = 'roleName' | 'MENUNAME' | 'PARENT' | 'MENUORDER' | 'SUBMENUORDER';
 const ITEMS_PER_PAGE = 15;
@@ -56,6 +58,7 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
     direction: 'ascending' | 'descending';
   } | null>({ key: 'MENUORDER', direction: 'ascending' });
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [selectedCapability, setSelectedCapability] = React.useState<role_capablities | null>(null);
 
@@ -149,8 +152,18 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Role Capabilities</CardTitle>
-          <CardDescription>A list of all role-based capabilities for sidebar navigation.</CardDescription>
+            <div className="flex items-center justify-between">
+                <div>
+                    <CardTitle>Role Capabilities</CardTitle>
+                    <CardDescription>A list of all role-based capabilities for sidebar navigation.</CardDescription>
+                </div>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="h-9 gap-1" onClick={() => setIsAddDialogOpen(true)}>
+                      <PlusCircle className="h-4 w-4" />
+                      <span>Add New Capability</span>
+                  </Button>
+                </DialogTrigger>
+            </div>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-end gap-2 py-4">
@@ -263,6 +276,14 @@ export default function RoleCapabilityList({ roleCapabilities: initialCapabiliti
           </div>
         </CardFooter>
       </Card>
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Add New Role Capability</DialogTitle>
+          </DialogHeader>
+          <AddRoleCapabilityForm setOpen={setIsAddDialogOpen} />
+        </DialogContent>
+      </Dialog>
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
