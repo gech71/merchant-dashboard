@@ -38,7 +38,7 @@ const PAGE_GROUPS = {
     { id: '/dashboard/core-integration-settings', label: 'Core Integration Settings' },
     { id: '/dashboard/stream-pay-settings', label: 'StreamPay Settings' },
     { id: '/dashboard/ussd-push-settings', label: 'USSD Push Settings' },
-    { id: '/dashboard/role-capabilities', label: 'Legacy Role Capabilities' },
+    { id: '/dashboard/role-capabilities', label: 'Role Capabilities' },
   ],
   "Administration": [
      { id: '/dashboard', label: 'Dashboard' },
