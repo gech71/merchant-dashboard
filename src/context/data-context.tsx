@@ -312,7 +312,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   };
 
   const addSystemUser = async (user: Omit<SystemUser, 'id' | 'role' | 'createdAt' | 'updatedAt'>) => {
-    const response = await fetch('/api/branch-users', {
+    const response = await fetch('/api/system-users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(user),
@@ -321,30 +321,39 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         const error = await response.json();
         throw new Error(error.message || 'Failed to add system user');
     }
-    const newUser = await response.json();
+    const { user: newUser, auditLog } = await response.json();
     setSystemUsers(prev => [...prev, newUser]);
+    setAuditLogs(prev => [auditLog, ...prev]);
   };
 
   const updateSystemUser = async (user: SystemUser) => {
-    const response = await fetch(`/api/branch-users/${user.id}`, {
+    const response = await fetch(`/api/system-users/${user.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(user),
     });
-    if (!response.ok) throw new Error('Failed to update system user');
-    const updatedUser = await response.json();
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update system user');
+    }
+    const { user: updatedUser, auditLog } = await response.json();
     setSystemUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+    setAuditLogs(prev => [auditLog, ...prev]);
   };
 
   const updateSystemUserStatus = async (userId: string, status: 'Active' | 'Inactive') => {
-    const response = await fetch(`/api/branch-users/${userId}`, {
+    const response = await fetch(`/api/system-users/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
     });
-    if (!response.ok) throw new Error('Failed to update user status');
-    const updatedUser = await response.json();
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update user status');
+    }
+    const { user: updatedUser, auditLog } = await response.json();
     setSystemUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+    setAuditLogs(prev => [auditLog, ...prev]);
   };
   
   const updateUserRole = async (userId: string, roleId: string, userType: 'merchant' | 'system') => {
