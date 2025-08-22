@@ -220,12 +220,14 @@ export default function AuditLogList({ auditLogs: initialAuditLogs }: { auditLog
                                 )}
                                 </div>
                             </div>
-                            <div>
-                                <h3 className="font-semibold mb-2">Old Value</h3>
-                                <div className="p-2 border rounded-md bg-muted/50 text-xs">
-                                    <JSONPretty data={parseJsonData(log.oldValue)} themeClassName="bg-transparent p-0" />
+                            {log.action !== 'CREATE' && (
+                                <div>
+                                    <h3 className="font-semibold mb-2">Old Value</h3>
+                                    <div className="p-2 border rounded-md bg-muted/50 text-xs">
+                                        <JSONPretty data={parseJsonData(log.oldValue)} themeClassName="bg-transparent p-0" />
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                           </div>
                         </DialogContent>
                       </Dialog>
