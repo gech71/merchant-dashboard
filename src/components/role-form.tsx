@@ -42,7 +42,9 @@ const PAGE_GROUPS = {
   ],
   "Administration": [
      { id: '/dashboard', label: 'Dashboard' },
+     { id: '/dashboard/system-users', label: 'System Users' },
      { id: '/dashboard/role-management', label: 'Role Management' },
+     { id: '/dashboard/audit-log', label: 'Audit Log' },
   ]
 };
 
