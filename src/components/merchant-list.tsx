@@ -61,10 +61,12 @@ const StatusBadge = ({ status }: { status: string }) => {
 
     switch (status?.toUpperCase()) {
         case 'ACTIVE':
+        case 'A':
             variant = 'success';
             text = 'Active';
             break;
         case 'PENDING':
+        case 'P':
             variant = 'secondary';
             text = 'Pending';
             break;
@@ -331,3 +333,5 @@ export default function MerchantList({ merchants: initialMerchants }: { merchant
     </>
   );
 }
+
+    
