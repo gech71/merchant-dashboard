@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       );
     }
     
-    if (loginType !== 'merchantSales' && !password) {
+    if (loginType !== 'merchantSaler' && !password) {
         return NextResponse.json(
             { isSuccess: false, message: 'Password is required' },
             { status: 400 }
@@ -53,11 +53,11 @@ export async function POST(request: Request) {
             permissions,
         };
 
-    } else if (loginType === 'merchantAdmin' || loginType === 'merchantSales') {
+    } else if (loginType === 'merchantAdmin' || loginType === 'merchantSaler') {
         let whereClause;
         if (loginType === 'merchantAdmin') {
             whereClause = { ACCOUNTNUMBER: identifier, PHONENUMBER: password };
-        } else { // merchantSales
+        } else { // merchantSaler
             whereClause = { PHONENUMBER: identifier };
         }
 
@@ -71,11 +71,11 @@ export async function POST(request: Request) {
         }
 
         if (loginType === 'merchantAdmin' && merchantUser.ApplicationRole?.ROLENAME !== 'Admin') {
-            return NextResponse.json({ isSuccess: false, message: 'This user is not an Admin. Please use the Sales login.' }, { status: 403 });
+            return NextResponse.json({ isSuccess: false, message: 'This user is not an Admin. Please use the Saler login.' }, { status: 403 });
         }
         
-        if (loginType === 'merchantSales' && merchantUser.ApplicationRole?.ROLENAME !== 'Sales') {
-            return NextResponse.json({ isSuccess: false, message: 'This user is not a Sales user. Please use the Admin login.' }, { status: 403 });
+        if (loginType === 'merchantSaler' && merchantUser.ApplicationRole?.ROLENAME !== 'Saler') {
+            return NextResponse.json({ isSuccess: false, message: 'This user is not a Saler user. Please use the Admin login.' }, { status: 403 });
         }
 
         user = merchantUser;

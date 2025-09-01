@@ -109,7 +109,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
   
   const userAccountNumber = currentUser?.userType === 'merchant' ? currentUser?.accountNumber : null;
   const isMerchantAdmin = currentUser?.role === 'Admin';
-  const isMerchantSales = currentUser?.role === 'Sales';
+  const isMerchantSaler = currentUser?.role === 'Saler';
   const isSystemUser = currentUser?.userType === 'system';
 
   const filteredAllowedCompanies = React.useMemo(() => {
@@ -127,12 +127,12 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
           if (isMerchantAdmin) {
               return merchants.filter(m => m.ACCOUNTNUMBER === userAccountNumber);
           }
-          if (isMerchantSales) {
+          if (isMerchantSaler) {
               return merchants.filter(m => m.ID === currentUser.userId);
           }
       }
       return [];
-  }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, isSystemUser, merchants]);
+  }, [currentUser, isMerchantAdmin, isMerchantSaler, userAccountNumber, isSystemUser, merchants]);
 
   const dailyBalances = React.useMemo(() => {
       if (isSystemUser) return initialData.dailyBalances;
@@ -149,12 +149,12 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
           if (isMerchantAdmin) {
               return initialData.merchantTxns.filter(txn => txn.MERCHANTACCOUNT === userAccountNumber);
           }
-          if (isMerchantSales) {
+          if (isMerchantSaler) {
               return initialData.merchantTxns.filter(txn => txn.MERCHANTPHONE === currentUser?.email);
           }
       }
       return [];
-  }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, isSystemUser, initialData.merchantTxns]);
+  }, [currentUser, isMerchantAdmin, isMerchantSaler, userAccountNumber, isSystemUser, initialData.merchantTxns]);
 
   const arifRequests = React.useMemo(() => {
     if (isSystemUser) return initialData.arifRequests;
@@ -170,7 +170,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         if (isMerchantAdmin) {
             return initialData.paystreamTxns.filter(pt => pt.MERCHANTACCOUNTNUMBER === userAccountNumber);
         }
-        if (isMerchantSales) {
+        if (isMerchantSaler) {
             const user = merchants.find(m => m.ID === currentUser?.userId);
             if (user) {
                 return initialData.paystreamTxns.filter(pt => pt.SALERPHONENUMBER === user.PHONENUMBER);
@@ -178,7 +178,7 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
         }
     }
     return [];
-  }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, isSystemUser, initialData.paystreamTxns, merchants]);
+  }, [currentUser, isMerchantAdmin, isMerchantSaler, userAccountNumber, isSystemUser, initialData.paystreamTxns, merchants]);
 
   const accountInfos = React.useMemo(() => {
     if (isSystemUser) return initialData.accountInfos;
@@ -187,12 +187,12 @@ export function DataProvider({ children, initialData }: { children: React.ReactN
          if (isMerchantAdmin) {
             return initialData.accountInfos.filter(ai => ai.ACCOUNTNUMBER && relatedAccounts.has(ai.ACCOUNTNUMBER));
         }
-        if (isMerchantSales) {
+        if (isMerchantSaler) {
             return initialData.accountInfos.filter(ai => ai.PHONENUMBER === currentUser?.email || ai.ACCOUNTNUMBER === userAccountNumber);
         }
     }
     return [];
-  }, [currentUser, isMerchantAdmin, isMerchantSales, userAccountNumber, isSystemUser, merchants, initialData.accountInfos]);
+  }, [currentUser, isMerchantAdmin, isMerchantSaler, userAccountNumber, isSystemUser, merchants, initialData.accountInfos]);
   
 
   const addAllowedCompany = async (company: Omit<allowed_companies, 'ID' | 'Oid' | 'APPROVEUSER' | 'APPROVED' | 'STATUS' | 'INSERTDATE' | 'UPDATEDATE' | 'INSERTUSER' | 'UPDATEUSER' | 'OptimisticLockField' | 'GCRecord' | 'branchName'>) => {
