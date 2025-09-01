@@ -27,40 +27,29 @@ const systemLoginSchema = z.object({
   password: z.string().min(1, 'Password is required.'),
 });
 
-const adminLoginSchema = z.object({
+const merchantLoginSchema = z.object({
   identifier: z.string().min(1, 'Account number is required.'),
   password: z.string().min(1, 'Phone number is required.'),
 });
 
-const salesLoginSchema = z.object({
-  identifier: z.string().min(1, 'Phone number is required.'),
-  password: z.string().optional(),
-});
-
 type SystemLoginFormValues = z.infer<typeof systemLoginSchema>;
-type AdminLoginFormValues = z.infer<typeof adminLoginSchema>;
-type SalesLoginFormValues = z.infer<typeof salesLoginSchema>;
+type MerchantLoginFormValues = z.infer<typeof merchantLoginSchema>;
 
 const LoginForm = ({
     loginType,
 }: {
-    loginType: 'merchantAdmin' | 'merchantSales' | 'system';
+    loginType: 'merchant' | 'system';
 }) => {
     const router = useRouter();
     const { toast } = useToast();
     const { setCurrentUser } = useDataContext();
     const [isLoading, setIsLoading] = React.useState(false);
 
-    const isMerchantAdmin = loginType === 'merchantAdmin';
-    const isMerchantSales = loginType === 'merchantSales';
     const isSystemLogin = loginType === 'system';
     
-    let schema;
-    if (isSystemLogin) schema = systemLoginSchema;
-    else if (isMerchantAdmin) schema = adminLoginSchema;
-    else schema = salesLoginSchema;
+    const schema = isSystemLogin ? systemLoginSchema : merchantLoginSchema;
 
-    const form = useForm<SystemLoginFormValues | AdminLoginFormValues | SalesLoginFormValues>({
+    const form = useForm<SystemLoginFormValues | MerchantLoginFormValues>({
         resolver: zodResolver(schema),
         defaultValues: {
             identifier: '',
@@ -68,13 +57,15 @@ const LoginForm = ({
         },
     });
 
-    async function onSubmit(data: SystemLoginFormValues | AdminLoginFormValues | SalesLoginFormValues) {
+    async function onSubmit(data: SystemLoginFormValues | MerchantLoginFormValues) {
         setIsLoading(true);
+        const apiLoginType = isSystemLogin ? 'system' : 'merchantAdmin'; // merchantAdmin covers both Admin and Sales logic on the backend
+        
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...data, loginType }),
+                body: JSON.stringify({ ...data, loginType: apiLoginType }),
             });
 
             const result = await response.json();
@@ -85,7 +76,7 @@ const LoginForm = ({
                     title: 'Login Successful',
                     description: 'Welcome back!',
                 });
-                router.refresh(); // This is crucial to re-fetch server data
+                router.refresh();
                 router.push('/dashboard');
             } else {
                 toast({
@@ -108,7 +99,7 @@ const LoginForm = ({
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                {isSystemLogin && (
+                {isSystemLogin ? (
                     <>
                         <FormField
                             control={form.control}
@@ -133,33 +124,35 @@ const LoginForm = ({
                             )}
                         />
                     </>
+                ) : (
+                     <>
+                        <FormField
+                            control={form.control}
+                            name="identifier"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Account Number</FormLabel>
+                                <FormControl><Input placeholder="e.g., ACC001" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Phone Number</FormLabel>
+                                <FormControl><Input placeholder="e.g., 111-222-3333" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                    </>
                 )}
-                {isMerchantAdmin && (
-                     <FormField
-                        control={form.control}
-                        name="identifier"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Account Number</FormLabel>
-                            <FormControl><Input placeholder="e.g., ACC001" {...field} /></FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                )}
-                 {(isMerchantAdmin || isMerchantSales) && (
-                     <FormField
-                        control={form.control}
-                        name={isMerchantAdmin ? 'password' : 'identifier'}
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Phone Number</FormLabel>
-                            <FormControl><Input placeholder="e.g., 111-222-3333" {...field} /></FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                 )}
+                <p className="text-xs text-muted-foreground">
+                    For the 'Sales' role, please enter your assigned phone number in both fields.
+                </p>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? 'Signing in...' : 'Sign In'}
                 </Button>
@@ -170,12 +163,10 @@ const LoginForm = ({
 
 
 export default function LoginPage() {
-    const [loginType, setLoginType] = React.useState('merchant');
-
     return (
         <div className="flex min-h-screen w-full items-center justify-center bg-background">
             <Card className="w-full max-w-md">
-                <Tabs value={loginType} onValueChange={setLoginType}>
+                <Tabs defaultValue="merchant" className="w-full">
                     <CardHeader>
                             <TabsList className="grid w-full grid-cols-2">
                                 <TabsTrigger value="merchant">Merchant Login</TabsTrigger>
@@ -183,7 +174,13 @@ export default function LoginPage() {
                             </TabsList>
                     </CardHeader>
                     <TabsContent value="merchant">
-                        <MerchantLogin />
+                        <CardHeader>
+                            <CardTitle className="text-2xl">Merchant Login</CardTitle>
+                            <CardDescription>Enter your credentials to sign in.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                           <LoginForm loginType="merchant" />
+                        </CardContent>
                     </TabsContent>
                     <TabsContent value="system">
                         <CardHeader>
@@ -198,31 +195,4 @@ export default function LoginPage() {
             </Card>
         </div>
     );
-}
-
-const MerchantLogin = () => {
-    const [merchantLoginType, setMerchantLoginType] = React.useState<'merchantAdmin' | 'merchantSales'>('merchantAdmin');
-    
-    return (
-        <>
-            <CardHeader>
-                <CardTitle className="text-2xl">Merchant Login</CardTitle>
-                <CardDescription>Select your role to sign in.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Tabs value={merchantLoginType} onValueChange={(val) => setMerchantLoginType(val as 'merchantAdmin' | 'merchantSales')}>
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="merchantAdmin">Admin</TabsTrigger>
-                        <TabsTrigger value="merchantSales">Sales</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="merchantAdmin" className="pt-4">
-                        <LoginForm loginType="merchantAdmin" />
-                    </TabsContent>
-                    <TabsContent value="merchantSales" className="pt-4">
-                            <LoginForm loginType="merchantSales" />
-                    </TabsContent>
-                </Tabs>
-            </CardContent>
-        </>
-    )
 }

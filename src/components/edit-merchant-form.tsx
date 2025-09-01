@@ -36,7 +36,7 @@ export function EditMerchantForm({
   setOpen: (open: boolean) => void;
 }) {
   const { toast } = useToast();
-  const { roles, merchants, updateMerchant } = useDataContext();
+  const { roles, updateMerchant } = useDataContext();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<MerchantFormValues>({
@@ -66,6 +66,10 @@ export function EditMerchantForm({
         setIsLoading(false);
     }
   }
+
+  const merchantRoles = React.useMemo(() => {
+    return roles.filter(r => r.ROLENAME === 'Admin' || r.ROLENAME === 'Sales');
+  }, [roles]);
 
   return (
     <Form {...form}>
@@ -97,7 +101,7 @@ export function EditMerchantForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {roles.filter(r => r.ROLENAME === 'Admin' || r.ROLENAME === 'Sales').map(role => (
+                  {merchantRoles.map(role => (
                     <SelectItem key={role.ID} value={role.ROLENAME}>{role.ROLENAME}</SelectItem>
                   ))}
                 </SelectContent>
@@ -127,5 +131,3 @@ export function EditMerchantForm({
         </div>
       </form>
     </Form>
-  );
-}

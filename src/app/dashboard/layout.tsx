@@ -21,23 +21,27 @@ export default function DashboardLayout({
 
   useEffect(() => {
     if (currentUser === null) {
-      router.push('/login');
+      // Still loading or no user, handled by DataProvider
       return;
     }
     
-    if (currentUser) {
-      router.push('/login');
-        // const authorized = currentUser.permissions?.includes(pathname) ?? false;
-        // // The root dashboard page is always allowed if the user is logged in
-        // if (pathname === '/dashboard') {
-        //     setIsAuthorized(true);
-        // } else {
-        //     setIsAuthorized(authorized);
-        // }
+    if (!currentUser) {
+       router.push('/login');
+       return;
     }
+    
+    const authorized = currentUser.permissions?.includes(pathname) ?? false;
+    
+    // The root dashboard page is always allowed if the user is logged in
+    if (pathname === '/dashboard') {
+        setIsAuthorized(true);
+    } else {
+        setIsAuthorized(authorized);
+    }
+
   }, [currentUser, pathname, router]);
 
-  if (isAuthorized === null) {
+  if (isAuthorized === null && currentUser) {
     return (
         <Layout>
             <div className="flex min-h-screen items-center justify-center">
@@ -46,6 +50,15 @@ export default function DashboardLayout({
         </Layout>
     );
   }
+  
+  if (currentUser === null) {
+    return (
+       <div className="flex min-h-screen items-center justify-center">
+            <p>Loading user data...</p>
+        </div>
+    )
+  }
+
 
   if (!isAuthorized) {
     return (
@@ -68,4 +81,3 @@ export default function DashboardLayout({
   }
 
   return <Layout>{children}</Layout>;
-}
