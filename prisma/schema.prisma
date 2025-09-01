@@ -1,3 +1,4 @@
+
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
@@ -13,8 +14,8 @@ model AuditLog {
   tableName String
   recordId  String
   action    String
-  oldValue  String?
-  newValue  String?
+  oldValue  Json?
+  newValue  Json?
   changedBy String
   changedAt DateTime @default(now())
 
@@ -54,7 +55,7 @@ model Manage_otps {
   @@map("Manage_otps")
 }
 
-model merchant_users {
+model Merchant_users {
   ID                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ACCOUNTNUMBER     String    @db.VarChar(20)
   FULLNAME          String?   @db.VarChar(100)
@@ -93,7 +94,7 @@ model Roles {
   UPDATEUSERID   String?                 @db.Text
   INSERTDATE     DateTime?               @default(now()) @db.Timestamp()
   UPDATEDATE     DateTime?               @default(now()) @db.Timestamp()
-  merchant_users merchant_users[]        @relation("MerchantUsersToRoles")
+  Merchant_users Merchant_users[]        @relation("MerchantUsersToRoles")
   SystemUsers    SystemUsers[]
   capabilities   role_capablities[]
   permissions    dashboard_permissions[]
