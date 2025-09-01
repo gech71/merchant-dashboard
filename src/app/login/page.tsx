@@ -165,12 +165,12 @@ export default function LoginPage() {
                     <TabsContent value="merchant">
                         <Tabs defaultValue="admin" className="w-full">
                              <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="admin">Admin</TabsTrigger>
-                                <TabsTrigger value="saler">Saler</TabsTrigger>
+                                <TabsTrigger value="admin">ADMIN</TabsTrigger>
+                                <TabsTrigger value="saler">SALER</TabsTrigger>
                             </TabsList>
                             <TabsContent value="admin">
                                 <CardHeader>
-                                    <CardTitle className="text-2xl">Merchant Admin Login</CardTitle>
+                                    <CardTitle className="text-2xl">Merchant ADMIN Login</CardTitle>
                                     <CardDescription>Enter your account and phone number.</CardDescription>
                                 </CardHeader>
                                 <CardContent>
@@ -179,7 +179,7 @@ export default function LoginPage() {
                             </TabsContent>
                              <TabsContent value="saler">
                                 <CardHeader>
-                                    <CardTitle className="text-2xl">Merchant Saler Login</CardTitle>
+                                    <CardTitle className="text-2xl">Merchant SALER Login</CardTitle>
                                     <CardDescription>Enter your phone number to sign in.</CardDescription>
                                 </CardHeader>
                                 <CardContent>
@@ -202,3 +202,5 @@ export default function LoginPage() {
         </div>
     );
 }
+
+      

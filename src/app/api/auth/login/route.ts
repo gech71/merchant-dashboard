@@ -70,12 +70,12 @@ export async function POST(request: Request) {
             return NextResponse.json({ isSuccess: false, message: 'Merchant user not found or credentials invalid.' }, { status: 404 });
         }
 
-        if (loginType === 'merchantAdmin' && merchantUser.ApplicationRole?.ROLENAME !== 'Admin') {
-            return NextResponse.json({ isSuccess: false, message: 'This user is not an Admin. Please use the Saler login.' }, { status: 403 });
+        if (loginType === 'merchantAdmin' && merchantUser.ApplicationRole?.ROLENAME !== 'ADMIN') {
+            return NextResponse.json({ isSuccess: false, message: 'This user is not an ADMIN. Please use the Saler login.' }, { status: 403 });
         }
         
-        if (loginType === 'merchantSaler' && merchantUser.ApplicationRole?.ROLENAME !== 'Saler') {
-            return NextResponse.json({ isSuccess: false, message: 'This user is not a Saler user. Please use the Admin login.' }, { status: 403 });
+        if (loginType === 'merchantSaler' && merchantUser.ApplicationRole?.ROLENAME !== 'SALER') {
+            return NextResponse.json({ isSuccess: false, message: 'This user is not a SALER user. Please use the Admin login.' }, { status: 403 });
         }
 
         user = merchantUser;
@@ -127,3 +127,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ isSuccess: false, message: 'Something went wrong!' }, { status: 500 });
   }
 }
+
+      

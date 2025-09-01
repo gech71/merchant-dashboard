@@ -68,7 +68,7 @@ export function EditMerchantForm({
   }
 
   const merchantRoles = React.useMemo(() => {
-    return roles.filter(r => r.ROLENAME === 'Admin' || r.ROLENAME === 'Saler');
+    return roles.filter(r => r.ROLENAME === 'ADMIN' || r.ROLENAME === 'SALER');
   }, [roles]);
 
   return (
@@ -133,3 +133,5 @@ export function EditMerchantForm({
     </Form>
   );
 }
+
+      
