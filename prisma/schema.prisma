@@ -13,8 +13,8 @@ model AuditLog {
   tableName String
   recordId  String
   action    String
-  oldValue  Json?
-  newValue  Json?
+  oldValue  String?
+  newValue  String?
   changedBy String
   changedAt DateTime @default(now())
 
@@ -93,7 +93,7 @@ model Roles {
   UPDATEUSERID   String?                 @db.Text
   INSERTDATE     DateTime?               @default(now()) @db.Timestamp()
   UPDATEDATE     DateTime?               @default(now()) @db.Timestamp()
-  Merchant_users Merchant_users[]        @relation("MerchantUsersToRoles")
+  merchant_users Merchant_users[]        @relation("MerchantUsersToRoles")
   SystemUsers    SystemUsers[]
   capabilities   role_capablities[]
   permissions    dashboard_permissions[]
@@ -372,8 +372,8 @@ model stream_pay_settings {
   PASSWORD   String?   @db.Text
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER String?   @default("system") @db.Text
-  UPDATEUSER String?   @default("system") @db.Text
+  INSERTUSER String?   @db.Text
+  UPDATEUSER String?   @db.Text
 
   @@map("stream_pay_settings")
 }
@@ -386,8 +386,8 @@ model ussd_push_settings {
   PASSWORD   String?   @db.Text
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER String?   @default("system") @db.Text
-  UPDATEUSER String?   @default("system") @db.Text
+  INSERTUSER String?   @db.Text
+  UPDATEUSER String?   @db.Text
 
   @@map("ussd_push_settings")
 }
