@@ -54,7 +54,7 @@ model Manage_otps {
   @@map("Manage_otps")
 }
 
-model Merchant_users {
+model merchant_users {
   ID                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ACCOUNTNUMBER     String    @db.VarChar(20)
   FULLNAME          String?   @db.VarChar(100)
@@ -93,7 +93,7 @@ model Roles {
   UPDATEUSERID   String?                 @db.Text
   INSERTDATE     DateTime?               @default(now()) @db.Timestamp()
   UPDATEDATE     DateTime?               @default(now()) @db.Timestamp()
-  merchant_users Merchant_users[]        @relation("MerchantUsersToRoles")
+  merchant_users merchant_users[]        @relation("MerchantUsersToRoles")
   SystemUsers    SystemUsers[]
   capabilities   role_capablities[]
   permissions    dashboard_permissions[]
@@ -372,8 +372,8 @@ model stream_pay_settings {
   PASSWORD   String?   @db.Text
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER String?   @db.Text
-  UPDATEUSER String?   @db.Text
+  INSERTUSER String?   @default("system") @db.Text
+  UPDATEUSER String?   @default("system") @db.Text
 
   @@map("stream_pay_settings")
 }
@@ -386,8 +386,8 @@ model ussd_push_settings {
   PASSWORD   String?   @db.Text
   INSERTDATE DateTime? @default(now()) @db.Timestamp()
   UPDATEDATE DateTime? @default(now()) @db.Timestamp()
-  INSERTUSER String?   @db.Text
-  UPDATEUSER String?   @db.Text
+  INSERTUSER String?   @default("system") @db.Text
+  UPDATEUSER String?   @default("system") @db.Text
 
   @@map("ussd_push_settings")
 }
