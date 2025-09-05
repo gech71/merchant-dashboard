@@ -53,13 +53,18 @@ export async function PUT(request: Request, { params }: { params: { id: string }
             data: {
                 ROLENAME,
                 description,
+                UPDATEDATE: new Date(),
+                UPDATEUSERID: user.name,
+                VALUE1: null,
+                VALUE2: null,
+                VALUE3: null,
             },
             include: { permissions: true, capabilities: true }
         });
         
         const newAuditLog = await tx.auditLog.create({
             data: {
-                tableName: 'Roles',
+                tableName: 'roles',
                 recordId: id,
                 action: 'UPDATE',
                 oldValue: oldValue,
@@ -123,7 +128,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
         return await tx.auditLog.create({
             data: {
-                tableName: 'Roles',
+                tableName: 'roles',
                 recordId: id,
                 action: 'DELETE',
                 oldValue: oldValue,
