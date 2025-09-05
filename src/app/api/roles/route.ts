@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    const newRole = await prisma.Roles.create({
+    const newRole = await prisma.roles.create({
       data: {
         ROLENAME,
         description,
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 
 export async function GET() {
     try {
-        const roles = await prisma.Roles.findMany({
+        const roles = await prisma.roles.findMany({
             include: { permissions: true, capabilities: true }
         });
         const rolesSerializable = roles.map(role => ({
